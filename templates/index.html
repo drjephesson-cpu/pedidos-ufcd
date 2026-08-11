@@ -1,162 +1,88 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pedidos UFCD — Farmácia</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css" />
-</head>
-<body>
-  <div class="bg-grid" aria-hidden="true"></div>
+{% set nav_active = 'pedidos' %}
+{% extends "base.html" %}
 
-  <header class="top">
-    <div class="brand">
-      <span class="brand-mark">UFCD</span>
-      <div>
-        <h1>Pedidos UFCD</h1>
-        <p class="subtitle">Farmácia · catálogo fixo · match por Cód. AGHU</p>
-      </div>
-    </div>
-    <div class="top-meta">
-      <div class="user-chip">
-        <span>{{ user.nome if user else '' }}</span>
-        <span class="role-tag">{{ 'Admin' if is_admin else 'Usuário' }}</span>
-      </div>
-      {% if is_admin %}
-        <a class="btn" href="{{ url_for('usuarios') }}">Usuários</a>
-      {% endif %}
-      <a class="btn" href="{{ url_for('historico') }}">Histórico</a>
-      <label class="date-field">
-        Data do pedido
-        <input type="text" id="dataPedido" name="data_pedido_display" value="{{ hoje }}" form="formSalvar" />
-      </label>
-      <a class="btn" id="btnPdf" href="{{ url_for('pedido_pdf_atual') }}">PDF a pedir</a>
-      <a class="btn" href="{{ url_for('exportar', so_pedir=1) }}">Excel</a>
-      <a class="btn" href="{{ url_for('logout') }}">Sair</a>
-    </div>
-  </header>
+{% block title %}Pedidos — UFCD{% endblock %}
+{% block page_title %}Pedido de estoque{% endblock %}
+{% block page_sub %}Catálogo fixo · match por Cód. AGHU{% endblock %}
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-wrap">
-        {% for cat, msg in messages %}
-          <div class="flash flash-{{ cat }}">{{ msg }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+{% block top_actions %}
+  <label class="date-field compact">
+    Data
+    <input type="text" id="dataPedido" value="{{ hoje }}" form="formSalvar" />
+  </label>
+  <a class="btn" id="btnPdf" href="{{ url_for('pedido_pdf_atual') }}">PDF</a>
+  <a class="btn" href="{{ url_for('exportar', so_pedir=1) }}">Excel</a>
+  <button type="submit" class="btn btn-primary" form="formSalvar">Salvar</button>
+{% endblock %}
 
-  <section class="panel imports">
-    <div class="import-box">
-      <h2>Catálogo de pedidos</h2>
-      <p>Fixo no sistema, com as abas da planilha (COMPRIMIDOS, SOLUÇÕES, Geladeira…).</p>
-      {% if tem_catalogo %}
-        <span class="badge ok">{{ total_catalogo }} itens em {{ abas|length }} abas</span>
-      {% else %}
-        <span class="badge warn">Aguardando carga do catálogo fixo</span>
-      {% endif %}
-    </div>
-
-    <form class="import-box" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
-      <h2>Estoque atual (AGHU)</h2>
-      <p>Envie o <strong>EstoqueFarmacia-*.xlsx</strong> do dia. O match é pelo código.</p>
-      <input type="file" name="arquivo" accept=".xlsx,.xls" required />
-      <button type="submit" class="btn">Atualizar estoque</button>
-      {% if tem_estoque %}
-        <span class="badge ok">
-          {{ estoque_meta.get('itens', 0) }} códigos
-          {% if estoque_meta.get('arquivo') %} · {{ estoque_meta.get('arquivo') }}{% endif %}
-        </span>
-      {% else %}
-        <span class="badge warn">Pendente</span>
-      {% endif %}
-    </form>
-
-    <form class="import-box" action="{{ url_for('manual_extra') }}" method="post">
-      <h2>Pedido manual</h2>
-      <p>Inclui no PDF/salvamento mesmo fora do cálculo automático.</p>
-      <label class="field">Código AGHU (opc.)
-        <input type="text" name="codigo" />
-      </label>
-      <label class="field">Medicamento
-        <input type="text" name="descricao" required />
-      </label>
-      <label class="field">Aba / grupo
-        <input type="text" name="aba" value="{{ aba_atual or 'MANUAL' }}" />
-      </label>
-      <label class="field">Quantidade
-        <input type="number" name="quantidade" min="1" step="1" required />
-      </label>
-      <button type="submit" class="btn">Adicionar ao pedido</button>
-    </form>
-
-    <form class="import-box" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
-      <h2>Salvar pedido do dia</h2>
-      <p>Grava todos os “Pedir = Sim” + manuais no histórico{% if usando_neon %} (Neon){% endif %}.</p>
-      <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
-      <label class="field">Observação
-        <input type="text" name="observacao" placeholder="Opcional" />
-      </label>
-      <button type="submit" class="btn btn-primary">Salvar no histórico</button>
-      {% if not usando_neon %}
-        <span class="badge warn">Sem Neon: histórico local (some na Vercel)</span>
-      {% else %}
-        <span class="badge ok">Neon conectado</span>
-      {% endif %}
-    </form>
-  </section>
-
-  {% if extras %}
-  <section class="extras-wrap">
-    <h3>Itens manuais neste pedido</h3>
-    <ul class="extras-list">
-      {% for ex in extras %}
-      <li>
-        <span>{{ ex.descricao }} · qtde {{ ex.quantidade | int }}{% if ex.codigo %} · cód. {{ ex.codigo }}{% endif %}</span>
-        <form method="post" action="{{ url_for('manual_extra_remover', idx=loop.index0) }}">
-          <button type="submit" class="btn btn-danger">Remover</button>
-        </form>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-
-  {% if tem_catalogo %}
-  <nav class="tabs" role="tablist">
-    {% for a in abas %}
+{% block sidebar_extra %}
+  {% if tem_catalogo and abas %}
+  <div class="sidebar-section">
+    <p class="sidebar-label">Categorias</p>
+    <div class="side-cats">
+      {% for a in abas %}
       <a
-        class="tab {% if a.id == aba_atual %}active{% endif %}"
+        class="side-cat {% if a.id == aba_atual %}active{% endif %}"
         href="{{ url_for('index', aba=a.id, filtro=filtro, q=q) }}"
-        title="{{ a.titulo }}"
       >
-        <span class="tab-name">{{ a.titulo }}</span>
+        <span>{{ a.titulo }}</span>
         {% if contagens.get(a.id, 0) %}
-          <span class="tab-count">{{ contagens[a.id] }}</span>
+          <em>{{ contagens[a.id] }}</em>
         {% endif %}
       </a>
-    {% endfor %}
-  </nav>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}
 
-  <section class="toolbar">
+{% block content %}
+  <section class="action-strip">
+    <form class="strip-card" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
+      <div>
+        <h2>Estoque AGHU</h2>
+        <p>Atualize com o Excel do dia.</p>
+        {% if tem_estoque %}
+          <span class="badge ok">{{ estoque_meta.get('itens', 0) }} códigos</span>
+        {% else %}
+          <span class="badge warn">Pendente</span>
+        {% endif %}
+      </div>
+      <div class="strip-controls">
+        <input type="file" name="arquivo" accept=".xlsx,.xls" required />
+        <button type="submit" class="btn">Atualizar</button>
+      </div>
+    </form>
+
+    <form class="strip-card" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
+      <div>
+        <h2>Salvar no histórico</h2>
+        <p>Grava itens com Pedir = Sim (e ajustes manuais da tabela).</p>
+      </div>
+      <div class="strip-controls">
+        <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
+        <input type="text" name="observacao" placeholder="Observação (opc.)" />
+      </div>
+    </form>
+  </section>
+
+  {% if tem_catalogo %}
+  <section class="toolbar compact-toolbar">
     <div class="stats">
       <div class="stat">
-        <span class="stat-label">Itens na aba</span>
+        <span class="stat-label">Itens</span>
         <strong>{{ resumo.total }}</strong>
       </div>
       <div class="stat accent">
-        <span class="stat-label">Precisam pedir</span>
+        <span class="stat-label">Pedir</span>
         <strong>{{ resumo.pedir }}</strong>
       </div>
       <div class="stat">
-        <span class="stat-label">Sem saldo no arquivo</span>
+        <span class="stat-label">Sem saldo</span>
         <strong>{{ resumo.sem_saldo }}</strong>
       </div>
       <div class="stat">
-        <span class="stat-label">Qtde a pedir</span>
+        <span class="stat-label">Qtde</span>
         <strong>{{ resumo.qtd_pedir | int }}</strong>
       </div>
     </div>
@@ -167,7 +93,7 @@
       <select name="filtro">
         <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
         <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
-        <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque no arquivo</option>
+        <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
       </select>
       <button type="submit" class="btn">Filtrar</button>
     </form>
@@ -239,17 +165,11 @@
       </tbody>
     </table>
   </div>
+  <p class="foot-note">Pedir se estoque &lt; ponto de pedido · Quanto = teto até o mínimo (múltiplo da caixa) · Manual sobrescreve a quantidade</p>
   {% else %}
   <section class="empty-state">
     <h2>Catálogo fixo indisponível</h2>
     <p>O arquivo <code>data/catalogo.json</code> não foi encontrado.</p>
   </section>
   {% endif %}
-
-  <footer class="foot">
-    Lógica: Pedir se estoque &lt; ponto de pedido · Quanto = arredonda para cima até o est. mínimo (múltiplo da caixa)
-  </footer>
-
-  <script src="/app.js"></script>
-</body>
-</html>
+{% endblock %}

@@ -40,3 +40,10 @@ if (dataInput) {
   dataInput.addEventListener("input", syncDataPedido);
   syncDataPedido();
 }
+
+const toggle = document.getElementById("sidebarToggle");
+if (toggle) {
+  toggle.addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-open");
+  });
+}

@@ -80,6 +80,15 @@ try:
 except Exception as exc:  # pragma: no cover
     print("aviso init_db:", exc)
 
+
+@app.context_processor
+def inject_globals():
+    return {
+        "user": current_user(),
+        "is_admin": is_admin(),
+        "usando_neon": using_neon(),
+    }
+
 # Abas na mesma ordem da planilha (exceto Estoque)
 ABA_ORDEM_PADRAO = [
     "COMPRIMIDOS",
