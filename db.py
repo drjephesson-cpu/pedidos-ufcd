@@ -17,7 +17,12 @@ _engine: Engine | None = None
 
 def _normalize_db_url(url: str) -> str:
     if url.startswith("postgres://"):
-        return "postgresql://" + url[len("postgres://") :]
+        url = "postgresql://" + url[len("postgres://") :]
+    # SQLAlchemy + psycopg3 (pacote `psycopg`) precisa do dialeto explícito
+    if url.startswith("postgresql://") and "+psycopg" not in url.split("://", 1)[0]:
+        url = "postgresql+psycopg://" + url[len("postgresql://") :]
+    elif url.startswith("postgresql+psycopg2://"):
+        url = "postgresql+psycopg://" + url[len("postgresql+psycopg2://") :]
     return url
 
 

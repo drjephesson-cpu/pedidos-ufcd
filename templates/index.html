@@ -68,8 +68,7 @@
         <p>{{ unidade.hint_estoque }}</p>
       </div>
       <div class="panel-card-body">
-        <input type="file" name="arquivo" accept=".xlsx,.xls" required />
-        <button type="submit" class="btn">Atualizar</button>
+        <input type="file" name="arquivo" accept=".xlsx,.xls" required onchange="this.form.submit()" />
         {% if tem_estoque %}
           <span class="meta-pill">{{ estoque_meta.get('itens', 0) }} códigos</span>
         {% else %}
