@@ -3,14 +3,14 @@
 
 {% block title %}Usuários — Pedidos UFCD{% endblock %}
 {% block page_title %}Usuários{% endblock %}
-{% block page_sub %}Administração de contas{% endblock %}
+{% block page_sub %}Administração de contas · {{ lista|length }} usuário(s){% if usando_neon %} · Neon{% endif %}{% endblock %}
 
 {% block content %}
   <section class="action-strip">
     <form class="strip-card grow" method="post" action="{{ url_for('usuarios') }}">
       <div>
         <h2>Novo usuário</h2>
-        <p>Admin pode criar administrador ou usuário.</p>
+        <p>Contas ficam salvas no Neon e não somem mais entre acessos.</p>
       </div>
       <div class="strip-controls wrap">
         <input type="text" name="nome" placeholder="Nome" />

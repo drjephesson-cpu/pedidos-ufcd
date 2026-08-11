@@ -37,8 +37,15 @@ def get_database_url(sqlite_path: Path | None = None) -> str:
 
 def get_engine(sqlite_path: Path | None = None) -> Engine:
     global _engine
+    want_pg = using_neon()
+    if _engine is not None:
+        is_pg = _engine.dialect.name == "postgresql"
+        if want_pg != is_pg:
+            _engine.dispose()
+            _engine = None
     if _engine is None:
-        url = get_database_url(sqlite_path)
+        # Com Neon, ignora sqlite_path e usa DATABASE_URL
+        url = get_database_url(None if want_pg else sqlite_path)
         connect_args = {}
         if url.startswith("sqlite"):
             connect_args["check_same_thread"] = False

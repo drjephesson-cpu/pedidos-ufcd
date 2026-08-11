@@ -138,6 +138,15 @@ def unidade_cfg(unidade: str | None = None) -> dict:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "pedido-estoque-ufcd-local")
+
+# Garante dialeto certo (Neon vs SQLite) antes de abrir o store
+try:
+    from db import reset_engine
+
+    reset_engine()
+except Exception:
+    pass
+
 # Mesmo banco dos pedidos (Neon na nuvem; SQLite local). /tmp no Vercel é efêmero.
 users = UserStore(None if using_neon() else PEDIDOS_SQLITE)
 
