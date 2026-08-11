@@ -446,40 +446,46 @@ def montar_todos(catalogo: dict, saldos: dict, manuais: dict) -> list:
     return out
 
 
-def coletar_itens_pdf(modo: str = "pedir", aba_id: str | None = None) -> tuple[list[dict], str]:
+def coletar_itens_pdf(
+    modo: str = "pedir",
+    aba_id: str | None = None,
+    escopo: str = "pedir",
+) -> tuple[list[dict], str]:
     """
     modo:
-      - todos: catálogo completo (qtde só quando há pedido)
+      - todos: catálogo completo da unidade
       - pedir: só itens a pedir (todas as categorias)
-      - aba: só a categoria informada (itens a pedir dessa aba)
+      - aba: só a categoria informada
+    escopo (quando modo=aba):
+      - pedir: só Pedir = Sim
+      - todos: todos os itens da categoria
     """
     catalogo = load_catalogo()
     saldos = estoque_saldos()
     manuais = session.get("manuais", {})
     modo = (modo or "pedir").lower()
+    escopo = (escopo or "pedir").lower()
+
+    def _row(it, aba_titulo: str) -> dict:
+        qtd = (
+            float(it["quanto_pedir"])
+            if it.get("quanto_pedir") is not None
+            else 0.0
+        )
+        return {
+            "codigo": it["codigo"],
+            "descricao": it["descricao"],
+            "aba": aba_titulo,
+            "quantidade": qtd,
+            "pedir": it.get("pedir"),
+        }
 
     if modo == "todos":
-        itens_src = montar_todos(catalogo, saldos, manuais)
-        titulo = "Pedido UFCD — todos os itens"
-        itens = []
-        for it in itens_src:
-            itens.append(
-                {
-                    "codigo": it["codigo"],
-                    "descricao": it["descricao"],
-                    "aba": it.get("aba") or "",
-                    "quantidade": float(it["quanto_pedir"] or 0)
-                    if it.get("quanto_pedir") is not None
-                    else 0,
-                    "origem": "manual" if it.get("manual") is not None else "auto",
-                    "pedir": it.get("pedir"),
-                }
-            )
-        return itens, titulo
+        itens = [_row(it, it.get("aba") or "") for it in montar_todos(catalogo, saldos, manuais)]
+        return itens, "Pedido UFCD — todos os itens"
 
     if modo == "aba":
         if not aba_id or aba_id == "todos":
-            # fallback: todos a pedir
             modo = "pedir"
         else:
             titulo_aba = next(
@@ -488,31 +494,24 @@ def coletar_itens_pdf(modo: str = "pedir", aba_id: str | None = None) -> tuple[l
             )
             itens = []
             for it in montar_aba(aba_id, catalogo, saldos, manuais):
-                if not it.get("pedir") or not it.get("quanto_pedir"):
+                if escopo == "pedir" and (not it.get("pedir") or not it.get("quanto_pedir")):
                     continue
-                itens.append(
-                    {
-                        "codigo": it["codigo"],
-                        "descricao": it["descricao"],
-                        "aba": titulo_aba,
-                        "quantidade": float(it["quanto_pedir"]),
-                        "origem": "manual" if it.get("manual") is not None else "auto",
-                    }
-                )
-            for ex in itens_extras_manuais():
-                if (ex.get("aba") or "") == titulo_aba or (ex.get("aba") or "") == aba_id:
-                    itens.append(
-                        {
-                            "codigo": ex.get("codigo"),
-                            "descricao": ex.get("descricao") or "",
-                            "aba": ex.get("aba") or titulo_aba,
-                            "quantidade": float(ex.get("quantidade") or 0),
-                            "origem": "manual",
-                        }
-                    )
-            return itens, f"Pedido UFCD — {titulo_aba}"
+                itens.append(_row(it, titulo_aba))
+            if escopo == "pedir":
+                for ex in itens_extras_manuais():
+                    if (ex.get("aba") or "") in (titulo_aba, aba_id):
+                        itens.append(
+                            {
+                                "codigo": ex.get("codigo"),
+                                "descricao": ex.get("descricao") or "",
+                                "aba": ex.get("aba") or titulo_aba,
+                                "quantidade": float(ex.get("quantidade") or 0),
+                            }
+                        )
+            sufixo = "a pedir" if escopo == "pedir" else "todos"
+            return itens, f"Pedido UFCD — {titulo_aba} ({sufixo})"
 
-    # pedir (default)
+    # pedir (default / geral)
     return (
         coletar_itens_pedido(incluir_extras=True),
         "Pedido UFCD — itens a pedir",
@@ -890,14 +889,19 @@ def pedido_pdf_atual():
     data_ped = parse_data_pedido(request.args.get("data"))
     modo = (request.args.get("modo") or "pedir").lower()
     aba = request.args.get("aba")
-    itens, titulo = coletar_itens_pdf(modo=modo, aba_id=aba)
+    escopo = (request.args.get("escopo") or "pedir").lower()
+    itens, titulo = coletar_itens_pdf(modo=modo, aba_id=aba, escopo=escopo)
 
-    # Em "todos", PDF lista o catálogo; nos demais, só quem tem quantidade > 0
-    if modo != "todos":
+    # Só exige quantidade > 0 quando o escopo é "a pedir"
+    so_pedir = modo == "pedir" or (modo == "aba" and escopo == "pedir")
+    if so_pedir:
         itens = [i for i in itens if float(i.get("quantidade") or 0) > 0]
         if not itens:
             flash("Nenhum item a pedir para gerar PDF.", "erro")
             return redirect(url_for("index", aba=aba or "todos"))
+    elif not itens:
+        flash("Nenhum item para gerar PDF.", "erro")
+        return redirect(url_for("index", aba=aba or "todos"))
 
     user = current_user() or {}
     pdf = gerar_pdf_pedido(
@@ -906,7 +910,10 @@ def pedido_pdf_atual():
         usuario=user.get("nome") or user.get("username"),
         itens=itens,
     )
-    sufixo = modo if modo != "aba" else (aba or "categoria")
+    if modo == "aba":
+        sufixo = f"{aba or 'categoria'}_{escopo}"
+    else:
+        sufixo = modo
     return send_file(
         io.BytesIO(pdf),
         as_attachment=True,

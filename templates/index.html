@@ -195,18 +195,24 @@
         <button type="button" class="btn btn-quiet" data-close-pdf>Fechar</button>
       </header>
       <div class="modal-body">
+        <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='pedir') }}">
+          <strong>Todos a pedir</strong>
+          <span>Somente Pedir = Sim (todas as categorias)</span>
+        </a>
         <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='todos') }}">
           <strong>Todos os itens</strong>
           <span>Catálogo completo da unidade</span>
         </a>
-        <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='pedir') }}">
-          <strong>Todos a pedir</strong>
-          <span>Somente Pedir = Sim</span>
-        </a>
         <p class="modal-section">Por categoria</p>
-        <div class="pdf-grid">
+        <div class="pdf-cat-list">
           {% for a in abas %}
-          <a class="pdf-choice compact pdf-link" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id) }}">{{ a.titulo }}</a>
+          <div class="pdf-cat-row">
+            <span class="pdf-cat-name">{{ a.titulo }}</span>
+            <div class="pdf-cat-actions">
+              <a class="btn btn-quiet pdf-link" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id, escopo='pedir') }}">A pedir</a>
+              <a class="btn pdf-link" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id, escopo='todos') }}">Todos</a>
+            </div>
+          </div>
           {% endfor %}
         </div>
       </div>

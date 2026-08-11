@@ -82,7 +82,7 @@ def gerar_pdf_pedido(
         story.append(Paragraph(f"Obs.: {observacao}", sub_style))
     story.append(Spacer(1, 0.4 * cm))
 
-    header = ["Aba", "Cód.", "Medicamento", "Qtde", "Origem"]
+    header = ["Aba", "Cód.", "Medicamento", "Qtde"]
     data = [header]
     for it in itens:
         data.append(
@@ -91,14 +91,13 @@ def gerar_pdf_pedido(
                 str(it.get("codigo") or "—"),
                 Paragraph(str(it.get("descricao") or ""), cell_style),
                 f"{_fmt_qtd(it.get('quantidade'))}",
-                "Manual" if it.get("origem") == "manual" else "Auto",
             ]
         )
 
     if len(data) == 1:
-        story.append(Paragraph("Nenhum item a pedir.", styles["Normal"]))
+        story.append(Paragraph("Nenhum item no PDF.", styles["Normal"]))
     else:
-        table = Table(data, colWidths=[3.2 * cm, 2.0 * cm, 9.0 * cm, 1.6 * cm, 1.8 * cm])
+        table = Table(data, colWidths=[3.4 * cm, 2.2 * cm, 10.2 * cm, 1.8 * cm])
         table.setStyle(
             TableStyle(
                 [
@@ -108,7 +107,7 @@ def gerar_pdf_pedido(
                     ("FONTSIZE", (0, 0), (-1, 0), 9),
                     ("FONTSIZE", (0, 1), (-1, -1), 8),
                     ("ALIGN", (1, 0), (1, -1), "CENTER"),
-                    ("ALIGN", (3, 0), (4, -1), "CENTER"),
+                    ("ALIGN", (3, 0), (3, -1), "CENTER"),
                     ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                     ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#b7c9bf")),
                     (

@@ -500,6 +500,30 @@ td {
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 0.4rem;
 }
+.pdf-cat-list {
+  display: grid;
+  gap: 0.4rem;
+}
+.pdf-cat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.55rem 0.7rem;
+  background: #fbfcfb;
+}
+.pdf-cat-name {
+  font-weight: 750;
+  font-size: 0.9rem;
+}
+.pdf-cat-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
 
 /* Compat páginas secundárias */
 .action-strip {
