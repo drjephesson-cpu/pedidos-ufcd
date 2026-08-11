@@ -446,76 +446,87 @@ def montar_todos(catalogo: dict, saldos: dict, manuais: dict) -> list:
     return out
 
 
-def coletar_itens_pdf(
-    modo: str = "pedir",
-    aba_id: str | None = None,
-    escopo: str = "pedir",
-) -> tuple[list[dict], str]:
-    """
-    modo:
-      - todos: catálogo completo da unidade
-      - pedir: só itens a pedir (todas as categorias)
-      - aba: só a categoria informada
-    escopo (quando modo=aba):
-      - pedir: só Pedir = Sim
-      - todos: todos os itens da categoria
-    """
+def listar_itens_filtrados(
+    aba: str | None = None,
+    filtro: str = "todos",
+    q: str = "",
+) -> tuple[list[dict], dict]:
+    """Lista itens como na tela (aba + filtro + busca)."""
     catalogo = load_catalogo()
     saldos = estoque_saldos()
     manuais = session.get("manuais", {})
-    modo = (modo or "pedir").lower()
-    escopo = (escopo or "pedir").lower()
+    abas = catalogo.get("abas") or []
+    ordem = {n: i for i, n in enumerate(ABA_ORDEM_PADRAO)}
+    abas_sorted = sorted(abas, key=lambda a: ordem.get(a["id"], 100 + abas.index(a)))
 
-    def _row(it, aba_titulo: str) -> dict:
-        qtd = (
-            float(it["quanto_pedir"])
-            if it.get("quanto_pedir") is not None
-            else 0.0
+    aba_atual = aba or "todos"
+    filtro = filtro or "todos"
+    q = (q or "").strip().lower()
+
+    if aba_atual == "todos":
+        itens = montar_todos(catalogo, saldos, manuais)
+    else:
+        itens = montar_aba(aba_atual, catalogo, saldos, manuais)
+        titulo = next(
+            (a["titulo"] for a in abas_sorted if a["id"] == aba_atual), aba_atual
         )
-        return {
-            "codigo": it["codigo"],
-            "descricao": it["descricao"],
-            "aba": aba_titulo,
-            "quantidade": qtd,
-            "pedir": it.get("pedir"),
-        }
+        for it in itens:
+            it["aba"] = titulo
 
-    if modo == "todos":
-        itens = [_row(it, it.get("aba") or "") for it in montar_todos(catalogo, saldos, manuais)]
-        return itens, "Pedido UFCD — todos os itens"
+    resumo = {"total": len(itens), "pedir": 0, "sem_saldo": 0, "qtd_pedir": 0}
+    for it in itens:
+        if it["sem_estoque"]:
+            resumo["sem_saldo"] += 1
+        if it["pedir"]:
+            resumo["pedir"] += 1
+            if it["quanto_pedir"]:
+                resumo["qtd_pedir"] += it["quanto_pedir"]
 
-    if modo == "aba":
-        if not aba_id or aba_id == "todos":
-            modo = "pedir"
-        else:
-            titulo_aba = next(
-                (a["titulo"] for a in catalogo.get("abas", []) if a["id"] == aba_id),
-                aba_id,
-            )
-            itens = []
-            for it in montar_aba(aba_id, catalogo, saldos, manuais):
-                if escopo == "pedir" and (not it.get("pedir") or not it.get("quanto_pedir")):
-                    continue
-                itens.append(_row(it, titulo_aba))
-            if escopo == "pedir":
-                for ex in itens_extras_manuais():
-                    if (ex.get("aba") or "") in (titulo_aba, aba_id):
-                        itens.append(
-                            {
-                                "codigo": ex.get("codigo"),
-                                "descricao": ex.get("descricao") or "",
-                                "aba": ex.get("aba") or titulo_aba,
-                                "quantidade": float(ex.get("quantidade") or 0),
-                            }
-                        )
-            sufixo = "a pedir" if escopo == "pedir" else "todos"
-            return itens, f"Pedido UFCD — {titulo_aba} ({sufixo})"
+    if filtro == "pedir":
+        itens = [i for i in itens if i["pedir"]]
+    elif filtro == "sem":
+        itens = [i for i in itens if i["sem_estoque"]]
 
-    # pedir (default / geral)
-    return (
-        coletar_itens_pedido(incluir_extras=True),
-        "Pedido UFCD — itens a pedir",
-    )
+    if q:
+        itens = [
+            i
+            for i in itens
+            if q in str(i["codigo"])
+            or q in (i["descricao"] or "").lower()
+            or q in (i.get("aba") or "").lower()
+        ]
+
+    meta = {
+        "aba": aba_atual,
+        "filtro": filtro,
+        "q": q,
+        "ver_todos": aba_atual == "todos",
+        "abas": abas_sorted,
+        "resumo": resumo,
+    }
+    return itens, meta
+
+
+def itens_para_pdf(itens: list[dict]) -> list[dict]:
+    out = []
+    for it in itens:
+        out.append(
+            {
+                "codigo": it.get("codigo"),
+                "descricao": it.get("descricao") or "",
+                "aba": it.get("aba") or "",
+                "estoque_minimo": it.get("estoque_minimo"),
+                "ponto_pedido": it.get("ponto_pedido"),
+                "caixa_com": it.get("caixa_com"),
+                "estoque_aghu": it.get("estoque_aghu"),
+                "quantidade": float(it["quanto_pedir"])
+                if it.get("quanto_pedir") is not None
+                else 0,
+                "pedir": bool(it.get("pedir")),
+            }
+        )
+    return out
+
 
 def _db_path():
     return None if using_neon() else PEDIDOS_SQLITE
@@ -549,6 +560,8 @@ def coletar_itens_pedido(incluir_extras: bool = True) -> list[dict]:
                     "estoque_aghu": it.get("estoque_aghu"),
                     "estoque_minimo": it.get("estoque_minimo"),
                     "ponto_pedido": it.get("ponto_pedido"),
+                    "caixa_com": it.get("caixa_com"),
+                    "pedir": True,
                 }
             )
 
@@ -673,54 +686,20 @@ def index():
     saldos = estoque_saldos()
     meta = estoque_meta()
     abas = catalogo.get("abas") or []
-    # ordenar como na planilha quando possível
     ordem = {n: i for i, n in enumerate(ABA_ORDEM_PADRAO)}
     abas_sorted = sorted(
         abas, key=lambda a: ordem.get(a["id"], 100 + abas.index(a))
     )
 
     aba_atual = request.args.get("aba") or "todos"
-    filtro = request.args.get("filtro", "todos")  # todos | pedir | sem
+    filtro = request.args.get("filtro", "todos")
     q = (request.args.get("q") or "").strip().lower()
 
     manuais = session.get("manuais", {})
-    itens = []
-    resumo = {"total": 0, "pedir": 0, "sem_saldo": 0, "qtd_pedir": 0}
-    ver_todos = aba_atual == "todos"
+    itens, view_meta = listar_itens_filtrados(aba_atual, filtro, q)
+    resumo = view_meta["resumo"]
+    ver_todos = view_meta["ver_todos"]
 
-    if ver_todos:
-        itens = montar_todos(catalogo, saldos, manuais)
-    elif aba_atual:
-        itens = montar_aba(aba_atual, catalogo, saldos, manuais)
-        for it in itens:
-            it["aba"] = next(
-                (a["titulo"] for a in abas_sorted if a["id"] == aba_atual), aba_atual
-            )
-
-    resumo["total"] = len(itens)
-    for it in itens:
-        if it["sem_estoque"]:
-            resumo["sem_saldo"] += 1
-        if it["pedir"]:
-            resumo["pedir"] += 1
-            if it["quanto_pedir"]:
-                resumo["qtd_pedir"] += it["quanto_pedir"]
-
-    if filtro == "pedir":
-        itens = [i for i in itens if i["pedir"]]
-    elif filtro == "sem":
-        itens = [i for i in itens if i["sem_estoque"]]
-
-    if q:
-        itens = [
-            i
-            for i in itens
-            if q in str(i["codigo"])
-            or q in (i["descricao"] or "").lower()
-            or q in (i.get("aba") or "").lower()
-        ]
-
-    # resumo global por aba
     contagens = {}
     total_pedir = 0
     for a in abas_sorted:
@@ -887,21 +866,26 @@ def pedido_salvar():
 @login_required
 def pedido_pdf_atual():
     data_ped = parse_data_pedido(request.args.get("data"))
-    modo = (request.args.get("modo") or "pedir").lower()
-    aba = request.args.get("aba")
-    escopo = (request.args.get("escopo") or "pedir").lower()
-    itens, titulo = coletar_itens_pdf(modo=modo, aba_id=aba, escopo=escopo)
+    aba = request.args.get("aba") or "todos"
+    filtro = request.args.get("filtro") or "todos"
+    q = request.args.get("q") or ""
 
-    # Só exige quantidade > 0 quando o escopo é "a pedir"
-    so_pedir = modo == "pedir" or (modo == "aba" and escopo == "pedir")
-    if so_pedir:
-        itens = [i for i in itens if float(i.get("quantidade") or 0) > 0]
-        if not itens:
-            flash("Nenhum item a pedir para gerar PDF.", "erro")
-            return redirect(url_for("index", aba=aba or "todos"))
-    elif not itens:
-        flash("Nenhum item para gerar PDF.", "erro")
-        return redirect(url_for("index", aba=aba or "todos"))
+    itens_view, meta = listar_itens_filtrados(aba, filtro, q)
+    itens = itens_para_pdf(itens_view)
+    if not itens:
+        flash("Nenhum item no filtro atual para gerar PDF.", "erro")
+        return redirect(url_for("index", aba=aba, filtro=filtro, q=q))
+
+    if meta["ver_todos"]:
+        titulo = "Pedido UFCD — visão atual (todas as categorias)"
+    else:
+        titulo = f"Pedido UFCD — {itens[0].get('aba') or aba}"
+    if filtro == "pedir":
+        titulo += " · só a pedir"
+    elif filtro == "sem":
+        titulo += " · sem estoque"
+    if q:
+        titulo += f" · busca: {q}"
 
     user = current_user() or {}
     pdf = gerar_pdf_pedido(
@@ -910,14 +894,10 @@ def pedido_pdf_atual():
         usuario=user.get("nome") or user.get("username"),
         itens=itens,
     )
-    if modo == "aba":
-        sufixo = f"{aba or 'categoria'}_{escopo}"
-    else:
-        sufixo = modo
     return send_file(
         io.BytesIO(pdf),
         as_attachment=True,
-        download_name=f"pedido_{sufixo}_{data_ped.isoformat()}.pdf",
+        download_name=f"pedido_filtro_{data_ped.isoformat()}.pdf",
         mimetype="application/pdf",
     )
 
@@ -996,18 +976,20 @@ def historico_excluir(pedido_id: int):
 @app.route("/exportar")
 @login_required
 def exportar():
-    catalogo = load_catalogo()
-    saldos = estoque_saldos()
-    manuais = session.get("manuais", {})
-    so_pedir = request.args.get("so_pedir", "1") == "1"
-    aba_filtro = request.args.get("aba")
+    data_ped = parse_data_pedido(request.args.get("data"))
+    aba = request.args.get("aba") or "todos"
+    filtro = request.args.get("filtro") or "todos"
+    q = request.args.get("q") or ""
+    itens, meta = listar_itens_filtrados(aba, filtro, q)
 
     wb = Workbook()
-    wb.remove(wb.active)
+    ws = wb.active
+    ws.title = "Pedido"
 
-    header_fill = PatternFill("solid", fgColor="1B4F72")
+    header_fill = PatternFill("solid", fgColor="16352B")
     header_font = Font(color="FFFFFF", bold=True)
     sim_fill = PatternFill("solid", fgColor="FDEBD0")
+    estoque_fill = PatternFill("solid", fgColor="EAF5FB")
     thin = Border(
         left=Side(style="thin", color="CCCCCC"),
         right=Side(style="thin", color="CCCCCC"),
@@ -1015,64 +997,61 @@ def exportar():
         bottom=Side(style="thin", color="CCCCCC"),
     )
 
-    abas = catalogo.get("abas", [])
-    for a in abas:
-        if aba_filtro and a["id"] != aba_filtro:
-            continue
-        itens = montar_aba(a["id"], catalogo, saldos, manuais)
-        if so_pedir:
-            itens = [i for i in itens if i["pedir"] and i["quanto_pedir"]]
-        # nome de aba Excel max 31 chars
-        safe = re.sub(r"[\\/*?:\[\]]", "-", a["titulo"])[:31] or "Aba"
-        ws = wb.create_sheet(safe)
-        ws["A1"] = f"PEDIDO MEDICAMENTOS - DATA: {date.today().strftime('%d/%m/%Y')}"
-        ws["A2"] = a["titulo"]
-        headers = [
-            "Cód. AGHU",
-            "Medicamento",
-            "Est. Mínimo",
-            "Ponto de Pedido",
-            "Caixa com",
-            "Estoque AGHU",
-            "Pedir?",
-            "Quanto Pedir?",
+    ws["A1"] = f"PEDIDO UFCD — DATA: {data_ped.strftime('%d/%m/%Y')}"
+    ws["A2"] = (
+        f"Filtro: aba={meta['aba']} · {meta['filtro']}"
+        + (f" · busca={meta['q']}" if meta["q"] else "")
+    )
+    headers = [
+        "Categoria",
+        "Cód. AGHU",
+        "Medicamento",
+        "Est. Mínimo",
+        "Ponto de Pedido",
+        "Caixa com",
+        "Estoque AGHU",
+        "Pedir?",
+        "Quanto Pedir?",
+    ]
+    for c, h in enumerate(headers, 1):
+        cell = ws.cell(4, c, h)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.border = thin
+
+    for r, it in enumerate(itens, 5):
+        vals = [
+            it.get("aba") or "",
+            it["codigo"],
+            it["descricao"],
+            it["estoque_minimo"],
+            it["ponto_pedido"],
+            it["caixa_com"],
+            "" if it["estoque_aghu"] is None else it["estoque_aghu"],
+            "Sim" if it["pedir"] else "Não",
+            "" if it["quanto_pedir"] is None else it["quanto_pedir"],
         ]
-        for c, h in enumerate(headers, 1):
-            cell = ws.cell(4, c, h)
-            cell.fill = header_fill
-            cell.font = header_font
+        for c, v in enumerate(vals, 1):
+            cell = ws.cell(r, c, v)
             cell.border = thin
+            if it["pedir"]:
+                cell.fill = sim_fill
+            elif c == 7:
+                cell.fill = estoque_fill
 
-        for r, it in enumerate(itens, 5):
-            vals = [
-                it["codigo"],
-                it["descricao"],
-                it["estoque_minimo"],
-                it["ponto_pedido"],
-                it["caixa_com"],
-                "" if it["estoque_aghu"] is None else it["estoque_aghu"],
-                "Sim" if it["pedir"] else "Não",
-                "" if it["quanto_pedir"] is None else it["quanto_pedir"],
-            ]
-            for c, v in enumerate(vals, 1):
-                cell = ws.cell(r, c, v)
-                cell.border = thin
-                if it["pedir"]:
-                    cell.fill = sim_fill
+    ws.column_dimensions["A"].width = 18
+    ws.column_dimensions["B"].width = 12
+    ws.column_dimensions["C"].width = 42
+    for col in "DEFGHI":
+        ws.column_dimensions[col].width = 14
 
-        ws.column_dimensions["A"].width = 12
-        ws.column_dimensions["B"].width = 42
-        for col in "CDEFGH":
-            ws.column_dimensions[col].width = 14
-
-    if not wb.sheetnames:
-        ws = wb.create_sheet("Pedido")
-        ws["A1"] = "Nenhum item para pedir."
+    if not itens:
+        ws["A5"] = "Nenhum item no filtro atual."
 
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
-    fname = f"pedido_medicamentos_{date.today().isoformat()}.xlsx"
+    fname = f"pedido_filtro_{data_ped.isoformat()}.xlsx"
     return send_file(
         buf,
         as_attachment=True,

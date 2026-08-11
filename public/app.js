@@ -25,7 +25,7 @@ function syncDataPedido() {
   if (!input) return;
   const val = input.value.trim();
   if (hidden) hidden.value = val;
-  document.querySelectorAll(".pdf-link").forEach((link) => {
+  document.querySelectorAll(".export-link").forEach((link) => {
     const u = new URL(link.getAttribute("href"), window.location.origin);
     u.searchParams.set("data", val);
     link.href = u.pathname + u.search;
@@ -54,32 +54,4 @@ document.querySelectorAll(".unit-toggle").forEach((btn) => {
     btn.setAttribute("aria-expanded", open ? "true" : "false");
     if (panel) panel.classList.toggle("is-open", open);
   });
-});
-
-const pdfModal = document.getElementById("pdfModal");
-const pdfOpenBtn = document.getElementById("pdfOpenBtn");
-
-function closePdfModal() {
-  if (pdfModal) pdfModal.hidden = true;
-}
-
-function openPdfModal() {
-  if (!pdfModal) return;
-  syncDataPedido();
-  pdfModal.hidden = false;
-}
-
-if (pdfOpenBtn) {
-  pdfOpenBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openPdfModal();
-  });
-}
-
-document.querySelectorAll("[data-close-pdf]").forEach((el) => {
-  el.addEventListener("click", closePdfModal);
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closePdfModal();
 });

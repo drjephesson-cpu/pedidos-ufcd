@@ -10,8 +10,6 @@
     Data
     <input type="text" id="dataPedido" value="{{ hoje }}" form="formSalvar" />
   </label>
-  <button type="button" class="btn" id="pdfOpenBtn">PDF</button>
-  <a class="btn" href="{{ url_for('exportar', so_pedir=1) }}">Excel</a>
   <button type="submit" class="btn btn-primary" form="formSalvar">Salvar</button>
 {% endblock %}
 
@@ -114,6 +112,16 @@
         <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
       </select>
       <button type="submit" class="btn">Filtrar</button>
+      <a
+        class="btn export-link"
+        id="pdfExportBtn"
+        href="{{ url_for('pedido_pdf_atual', aba=aba_atual, filtro=filtro, q=q) }}"
+      >PDF</a>
+      <a
+        class="btn export-link"
+        id="excelExportBtn"
+        href="{{ url_for('exportar', aba=aba_atual, filtro=filtro, q=q) }}"
+      >Excel</a>
     </form>
   </section>
 
@@ -184,38 +192,4 @@
   </section>
   {% endif %}
 
-  <div class="modal" id="pdfModal" hidden>
-    <div class="modal-backdrop" data-close-pdf></div>
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
-      <header class="modal-head">
-        <div>
-          <h2 id="pdfModalTitle">Gerar PDF</h2>
-          <p>Escolha o escopo do pedido UFCD</p>
-        </div>
-        <button type="button" class="btn btn-quiet" data-close-pdf>Fechar</button>
-      </header>
-      <div class="modal-body">
-        <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='pedir') }}">
-          <strong>Todos a pedir</strong>
-          <span>Somente Pedir = Sim (todas as categorias)</span>
-        </a>
-        <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='todos') }}">
-          <strong>Todos os itens</strong>
-          <span>Catálogo completo da unidade</span>
-        </a>
-        <p class="modal-section">Por categoria</p>
-        <div class="pdf-cat-list">
-          {% for a in abas %}
-          <div class="pdf-cat-row">
-            <span class="pdf-cat-name">{{ a.titulo }}</span>
-            <div class="pdf-cat-actions">
-              <a class="btn btn-quiet pdf-link" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id, escopo='pedir') }}">A pedir</a>
-              <a class="btn pdf-link" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id, escopo='todos') }}">Todos</a>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
 {% endblock %}
