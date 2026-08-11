@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 from functools import wraps
 from pathlib import Path
 
@@ -11,7 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from db import connect, get_engine, using_neon
+from db import connect, using_neon
 
 # Admin inicial — senha apenas em hash (não versionar senha em texto puro)
 ADMIN_SEED = {
@@ -24,6 +25,16 @@ ADMIN_SEED = {
     "role": "admin",
     "nome": "Jephesson",
 }
+
+# Contas conhecidas perdidas no /tmp do Vercel — recriadas no Neon se faltarem.
+# Senha temporária: env DEFAULT_USER_PASSWORD ou Alterar@2026
+RESTORE_USERS = [
+    {
+        "username": "lecasser",
+        "nome": "LEANDRO CASSER",
+        "role": "usuario",
+    },
+]
 
 ROLES = ("admin", "usuario")
 
@@ -39,22 +50,21 @@ class UserStore:
             return None
         return self.db_path
 
+    def _user_exists(self, conn, username: str) -> bool:
+        row = conn.execute(
+            text(
+                "SELECT id FROM users WHERE LOWER(username) = LOWER(:username)"
+            ),
+            {"username": username},
+        ).first()
+        return bool(row)
+
     def _init_db(self) -> None:
-        # tabela users é criada em db.init_db; aqui só garante seed
         from db import init_db
 
         init_db(self._sqlite_path())
         with connect(self._sqlite_path()) as conn:
-            row = conn.execute(
-                text(
-                    """
-                    SELECT id FROM users
-                    WHERE LOWER(username) = LOWER(:username)
-                    """
-                ),
-                {"username": ADMIN_SEED["username"]},
-            ).first()
-            if not row:
+            if not self._user_exists(conn, ADMIN_SEED["username"]):
                 conn.execute(
                     text(
                         """
@@ -67,6 +77,25 @@ class UserStore:
                         "password_hash": ADMIN_SEED["password_hash"],
                         "role": ADMIN_SEED["role"],
                         "nome": ADMIN_SEED["nome"],
+                    },
+                )
+
+            temp_pw = (os.environ.get("DEFAULT_USER_PASSWORD") or "Alterar@2026").strip()
+            for u in RESTORE_USERS:
+                if self._user_exists(conn, u["username"]):
+                    continue
+                conn.execute(
+                    text(
+                        """
+                        INSERT INTO users (username, password_hash, role, nome, ativo)
+                        VALUES (:username, :password_hash, :role, :nome, 1)
+                        """
+                    ),
+                    {
+                        "username": u["username"],
+                        "password_hash": generate_password_hash(temp_pw),
+                        "role": u["role"],
+                        "nome": u["nome"],
                     },
                 )
 
@@ -102,7 +131,12 @@ class UserStore:
                     """
                 )
             ).mappings().all()
-        return [dict(r) for r in rows]
+        out = []
+        for r in rows:
+            d = dict(r)
+            d["ativo"] = bool(d.get("ativo"))
+            out.append(d)
+        return out
 
     def get_user(self, user_id: int) -> dict | None:
         with connect(self._sqlite_path()) as conn:
@@ -112,7 +146,11 @@ class UserStore:
                 ),
                 {"id": user_id},
             ).mappings().first()
-        return dict(row) if row else None
+        if not row:
+            return None
+        d = dict(row)
+        d["ativo"] = bool(d.get("ativo"))
+        return d
 
     def create_user(
         self, username: str, password: str, role: str, nome: str = ""
@@ -127,6 +165,8 @@ class UserStore:
             return False, "Senha deve ter pelo menos 4 caracteres."
         try:
             with connect(self._sqlite_path()) as conn:
+                if self._user_exists(conn, username):
+                    return False, "Este usuário já existe."
                 conn.execute(
                     text(
                         """
@@ -143,7 +183,9 @@ class UserStore:
                 )
         except IntegrityError:
             return False, "Este usuário já existe."
-        return True, "Usuário criado."
+        except Exception as e:
+            return False, f"Erro ao salvar usuário: {e}"
+        return True, f"Usuário {username} criado e salvo no banco."
 
     def set_role(self, user_id: int, role: str) -> tuple[bool, str]:
         if role not in ROLES:
@@ -188,9 +230,7 @@ class UserStore:
             return False, "Senha deve ter pelo menos 4 caracteres."
         with connect(self._sqlite_path()) as conn:
             res = conn.execute(
-                text(
-                    "UPDATE users SET password_hash = :h WHERE id = :id"
-                ),
+                text("UPDATE users SET password_hash = :h WHERE id = :id"),
                 {"h": generate_password_hash(new_password), "id": user_id},
             )
             if (res.rowcount or 0) == 0:
