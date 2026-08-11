@@ -1,14 +1,51 @@
-/* —— Barra de carregamento Neon —— */
+/* —— Pop-up de carregamento Neon com percentual —— */
 const NeonLoad = (() => {
   let depth = 0;
   let hideTimer = null;
+  let tickTimer = null;
+  let pct = 0;
 
   function el() {
     return document.getElementById("neonLoader");
   }
-
   function labelEl() {
     return document.getElementById("neonLoaderLabel");
+  }
+  function barEl() {
+    return document.getElementById("neonLoaderBar");
+  }
+  function pctEl() {
+    return document.getElementById("neonLoaderPct");
+  }
+
+  function paint(n) {
+    pct = Math.max(0, Math.min(100, n));
+    const bar = barEl();
+    const label = pctEl();
+    const node = el();
+    if (bar) bar.style.width = `${pct.toFixed(0)}%`;
+    if (label) label.textContent = `${Math.round(pct)}%`;
+    if (node) {
+      node.setAttribute("aria-valuenow", String(Math.round(pct)));
+      node.setAttribute("aria-valuemin", "0");
+      node.setAttribute("aria-valuemax", "100");
+    }
+  }
+
+  function stopTick() {
+    if (tickTimer) {
+      clearTimeout(tickTimer);
+      tickTimer = null;
+    }
+  }
+
+  function tick() {
+    // Sobe rápido no começo e desacelera perto de 90% (espera a resposta real)
+    const gap = 90 - pct;
+    pct += Math.max(0.4, gap * 0.08);
+    if (pct > 90) pct = 90;
+    paint(pct);
+    tickTimer = setTimeout(tick, 150);
   }
 
   function show(message) {
@@ -27,12 +64,20 @@ const NeonLoad = (() => {
     try {
       sessionStorage.setItem("neon_loading", "1");
     } catch (e) {}
+    if (depth === 1) {
+      pct = 0;
+      paint(0);
+      stopTick();
+      tickTimer = setTimeout(tick, 60);
+    }
   }
 
   function hide(force) {
     depth = force ? 0 : Math.max(0, depth - 1);
     if (depth > 0) return;
     const node = el();
+    stopTick();
+    paint(100);
     if (!node) {
       document.documentElement.classList.remove("neon-loading");
       try {
@@ -48,8 +93,9 @@ const NeonLoad = (() => {
       try {
         sessionStorage.removeItem("neon_loading");
       } catch (e) {}
+      paint(0);
       hideTimer = null;
-    }, 220);
+    }, 280);
   }
 
   function wrap(promise, message) {
@@ -57,7 +103,6 @@ const NeonLoad = (() => {
     return Promise.resolve(promise).finally(() => hide());
   }
 
-  // Página terminou de carregar → some a barra da navegação anterior
   function ready() {
     depth = 0;
     hide(true);

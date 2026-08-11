@@ -20,11 +20,22 @@
   </script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
-  <div id="neonLoader" class="neon-loader" role="progressbar" aria-busy="true" aria-label="Carregando" hidden>
-    <div class="neon-loader-track">
-      <div class="neon-loader-bar"></div>
+  <div id="neonLoader" class="neon-loader" hidden>
+    <div class="neon-loader-backdrop" aria-hidden="true"></div>
+    <div
+      class="neon-loader-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="neonLoaderLabel"
+      aria-describedby="neonLoaderPct"
+    >
+      <div class="neon-loader-spin" aria-hidden="true"></div>
+      <p class="neon-loader-label" id="neonLoaderLabel">Carregando Neon…</p>
+      <div class="neon-loader-track">
+        <div class="neon-loader-bar" id="neonLoaderBar" style="width: 0%"></div>
+      </div>
+      <strong class="neon-loader-pct" id="neonLoaderPct">0%</strong>
     </div>
-    <span class="neon-loader-label" id="neonLoaderLabel">Carregando Neon…</span>
   </div>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">

@@ -19,11 +19,16 @@
   </script>
 </head>
 <body class="login-page">
-  <div id="neonLoader" class="neon-loader" role="progressbar" aria-busy="true" aria-label="Carregando" hidden>
-    <div class="neon-loader-track">
-      <div class="neon-loader-bar"></div>
+  <div id="neonLoader" class="neon-loader" hidden>
+    <div class="neon-loader-backdrop" aria-hidden="true"></div>
+    <div class="neon-loader-dialog" role="dialog" aria-modal="true" aria-labelledby="neonLoaderLabel">
+      <div class="neon-loader-spin" aria-hidden="true"></div>
+      <p class="neon-loader-label" id="neonLoaderLabel">Entrando…</p>
+      <div class="neon-loader-track">
+        <div class="neon-loader-bar" id="neonLoaderBar" style="width: 0%"></div>
+      </div>
+      <strong class="neon-loader-pct" id="neonLoaderPct">0%</strong>
     </div>
-    <span class="neon-loader-label" id="neonLoaderLabel">Entrando…</span>
   </div>
   <main class="login-card">
     <div class="login-brand">
@@ -48,6 +53,26 @@
     (function () {
       var loader = document.getElementById("neonLoader");
       var label = document.getElementById("neonLoaderLabel");
+      var bar = document.getElementById("neonLoaderBar");
+      var pctEl = document.getElementById("neonLoaderPct");
+      var pct = 0;
+      var timer = null;
+
+      function paint(n) {
+        pct = Math.max(0, Math.min(100, n));
+        if (bar) bar.style.width = pct.toFixed(0) + "%";
+        if (pctEl) pctEl.textContent = Math.round(pct) + "%";
+        if (loader) loader.setAttribute("aria-valuenow", String(Math.round(pct)));
+      }
+
+      function tick() {
+        var gap = 90 - pct;
+        pct += Math.max(0.35, gap * 0.07);
+        if (pct > 90) pct = 90;
+        paint(pct);
+        timer = setTimeout(tick, 160);
+      }
+
       function show(msg) {
         if (label && msg) label.textContent = msg;
         if (loader) {
@@ -56,15 +81,31 @@
         }
         document.documentElement.classList.add("neon-loading");
         try { sessionStorage.setItem("neon_loading", "1"); } catch (e) {}
+        pct = 0;
+        paint(0);
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(tick, 80);
       }
+
       function hide() {
+        if (timer) { clearTimeout(timer); timer = null; }
+        paint(100);
         document.documentElement.classList.remove("neon-loading");
         try { sessionStorage.removeItem("neon_loading"); } catch (e) {}
-        if (!loader) return;
-        loader.classList.remove("is-on");
-        loader.hidden = true;
+        setTimeout(function () {
+          if (!loader) return;
+          loader.classList.remove("is-on");
+          loader.hidden = true;
+          paint(0);
+        }, 220);
       }
-      hide();
+
+      // Se veio de outra tela com loading, mantém o pop-up até montar
+      if (document.documentElement.classList.contains("neon-loading")) {
+        show(label ? label.textContent : "Carregando…");
+        setTimeout(hide, 350);
+      }
+
       var form = document.querySelector(".login-form");
       if (form) {
         form.addEventListener("submit", function () {
