@@ -3,25 +3,14 @@
 
 {% block title %}Pedidos — UFCD{% endblock %}
 {% block page_title %}Pedido de estoque{% endblock %}
-{% block page_sub %}Catálogo fixo · match por Cód. AGHU{% endblock %}
+{% block page_sub %}Unidade UFCD · match por Cód. AGHU{% endblock %}
 
 {% block top_actions %}
   <label class="date-field compact">
     Data
     <input type="text" id="dataPedido" value="{{ hoje }}" form="formSalvar" />
   </label>
-  <div class="pdf-menu" id="pdfMenu">
-    <button type="button" class="btn" id="pdfToggle">PDF ▾</button>
-    <div class="pdf-menu-panel" hidden>
-      <a class="pdf-link" data-modo="todos" href="{{ url_for('pedido_pdf_atual', modo='todos') }}">Todos os itens</a>
-      <a class="pdf-link" data-modo="pedir" href="{{ url_for('pedido_pdf_atual', modo='pedir') }}">Todos a pedir</a>
-      <div class="pdf-divider"></div>
-      <p class="pdf-hint">Por categoria</p>
-      {% for a in abas %}
-      <a class="pdf-link" data-modo="aba" data-aba="{{ a.id }}" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id) }}">{{ a.titulo }}</a>
-      {% endfor %}
-    </div>
-  </div>
+  <button type="button" class="btn" id="pdfOpenBtn">PDF</button>
   <a class="btn" href="{{ url_for('exportar', so_pedir=1) }}">Excel</a>
   <button type="submit" class="btn btn-primary" form="formSalvar">Salvar</button>
 {% endblock %}
@@ -29,93 +18,71 @@
 {% block sidebar_extra %}
   {% if tem_catalogo and abas %}
   <div class="sidebar-section">
-    <p class="sidebar-label">UFCD · Categorias</p>
-    <div class="side-cats">
-      <a
-        class="side-cat {% if aba_atual == 'todos' %}active{% endif %}"
-        href="{{ url_for('index', aba='todos', filtro=filtro, q=q) }}"
-      >
-        <span>Todos</span>
+    <p class="sidebar-label">Unidades</p>
+    <div class="unit-tree">
+      <button type="button" class="unit-toggle {% if nav_active == 'pedidos' %}is-open{% endif %}" data-unit="ufcd" aria-expanded="true">
+        <span class="unit-chevron">▸</span>
+        <span class="unit-name">UFCD</span>
         {% if contagens.get('todos', 0) %}
           <em>{{ contagens['todos'] }}</em>
         {% endif %}
-      </a>
-      {% for a in abas %}
-      <a
-        class="side-cat {% if a.id == aba_atual %}active{% endif %}"
-        href="{{ url_for('index', aba=a.id, filtro=filtro, q=q) }}"
-      >
-        <span>{{ a.titulo }}</span>
-        {% if contagens.get(a.id, 0) %}
-          <em>{{ contagens[a.id] }}</em>
-        {% endif %}
-      </a>
-      {% endfor %}
+      </button>
+      <div class="unit-children {% if nav_active == 'pedidos' %}is-open{% endif %}" data-unit-panel="ufcd">
+        <a
+          class="side-cat {% if aba_atual == 'todos' %}active{% endif %}"
+          href="{{ url_for('index', aba='todos', filtro=filtro, q=q) }}"
+        >
+          <span>Todos</span>
+          {% if contagens.get('todos', 0) %}<em>{{ contagens['todos'] }}</em>{% endif %}
+        </a>
+        {% for a in abas %}
+        <a
+          class="side-cat {% if a.id == aba_atual %}active{% endif %}"
+          href="{{ url_for('index', aba=a.id, filtro=filtro, q=q) }}"
+        >
+          <span>{{ a.titulo }}</span>
+          {% if contagens.get(a.id, 0) %}<em>{{ contagens[a.id] }}</em>{% endif %}
+        </a>
+        {% endfor %}
+      </div>
     </div>
   </div>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  <section class="action-strip">
-    <form class="strip-card" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
-      <div>
-        <h2>Estoque AGHU</h2>
-        <p>Atualize com o Excel do dia.</p>
-        {% if tem_estoque %}
-          <span class="badge ok">{{ estoque_meta.get('itens', 0) }} códigos</span>
-        {% else %}
-          <span class="badge warn">Pendente</span>
-        {% endif %}
-      </div>
-      <div class="strip-controls">
-        <input type="file" name="arquivo" accept=".xlsx,.xls" required />
-        <button type="submit" class="btn">Atualizar</button>
-      </div>
+  <section class="command-bar">
+    <form class="command-group" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
+      <span class="command-label">Estoque AGHU</span>
+      <input type="file" name="arquivo" accept=".xlsx,.xls" required />
+      <button type="submit" class="btn btn-quiet">Atualizar</button>
+      {% if tem_estoque %}
+        <span class="meta-pill">{{ estoque_meta.get('itens', 0) }} códigos</span>
+      {% endif %}
     </form>
 
-    <form class="strip-card" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
-      <div>
-        <h2>Salvar no histórico</h2>
-        <p>Grava itens com Pedir = Sim (e ajustes manuais da tabela).</p>
-      </div>
-      <div class="strip-controls">
-        <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
-        <input type="text" name="observacao" placeholder="Observação (opc.)" />
-      </div>
+    <form class="command-group grow" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
+      <span class="command-label">Histórico</span>
+      <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
+      <input type="text" name="observacao" placeholder="Observação (opcional)" />
     </form>
   </section>
 
   {% if tem_catalogo %}
-  <section class="toolbar compact-toolbar">
-    <div class="stats">
-      <div class="stat">
-        <span class="stat-label">Itens</span>
-        <strong>{{ resumo.total }}</strong>
-      </div>
-      <div class="stat accent">
-        <span class="stat-label">Pedir</span>
-        <strong>{{ resumo.pedir }}</strong>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Sem saldo</span>
-        <strong>{{ resumo.sem_saldo }}</strong>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Qtde</span>
-        <strong>{{ resumo.qtd_pedir | int }}</strong>
-      </div>
-    </div>
-
+  <section class="metrics-row">
+    <div class="metric"><span>Itens</span><strong>{{ resumo.total }}</strong></div>
+    <div class="metric accent"><span>A pedir</span><strong>{{ resumo.pedir }}</strong></div>
+    <div class="metric"><span>Sem saldo</span><strong>{{ resumo.sem_saldo }}</strong></div>
+    <div class="metric"><span>Quantidade</span><strong>{{ resumo.qtd_pedir | int }}</strong></div>
     <form class="filters" method="get">
       <input type="hidden" name="aba" value="{{ aba_atual }}" />
-      <input type="search" name="q" value="{{ q }}" placeholder="Buscar código ou nome…" />
+      <input type="search" name="q" value="{{ q }}" placeholder="Buscar…" />
       <select name="filtro">
         <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
         <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
         <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
       </select>
-      <button type="submit" class="btn">Filtrar</button>
+      <button type="submit" class="btn btn-quiet">Filtrar</button>
     </form>
   </section>
 
@@ -126,12 +93,12 @@
           {% if ver_todos %}<th>Categoria</th>{% endif %}
           <th>Cód. AGHU</th>
           <th>Medicamento</th>
-          <th>Est. Mínimo</th>
-          <th>Ponto de Pedido</th>
-          <th>Caixa com</th>
-          <th class="col-estoque">Estoque AGHU</th>
+          <th>Est. Mín.</th>
+          <th>Ponto</th>
+          <th>Caixa</th>
+          <th class="col-estoque">Estoque</th>
           <th>Pedir?</th>
-          <th>Quanto Pedir?</th>
+          <th>Qtde</th>
           <th>Manual</th>
         </tr>
       </thead>
@@ -145,11 +112,7 @@
           <td class="num">{{ it.ponto_pedido | int }}</td>
           <td class="num">{{ it.caixa_com | int }}</td>
           <td class="num col-estoque">
-            {% if it.estoque_aghu is none %}
-              <span class="muted">—</span>
-            {% else %}
-              {{ it.estoque_aghu | int }}
-            {% endif %}
+            {% if it.estoque_aghu is none %}<span class="muted">—</span>{% else %}{{ it.estoque_aghu | int }}{% endif %}
           </td>
           <td>
             {% if it.estoque_aghu is none %}
@@ -161,11 +124,7 @@
             {% endif %}
           </td>
           <td class="num quanto">
-            {% if it.quanto_pedir is not none %}
-              {{ it.quanto_pedir | int }}
-            {% else %}
-              <span class="muted">—</span>
-            {% endif %}
+            {% if it.quanto_pedir is not none %}{{ it.quanto_pedir | int }}{% else %}<span class="muted">—</span>{% endif %}
           </td>
           <td>
             <input
@@ -175,7 +134,7 @@
               step="1"
               data-codigo="{{ it.codigo }}"
               value="{{ it.manual if it.manual is not none else '' }}"
-              placeholder="opc."
+              placeholder="—"
             />
           </td>
         </tr>
@@ -187,11 +146,39 @@
       </tbody>
     </table>
   </div>
-  <p class="foot-note">Pedir se estoque &lt; ponto de pedido · Quanto = teto até o mínimo (múltiplo da caixa) · Manual sobrescreve a quantidade</p>
   {% else %}
   <section class="empty-state">
-    <h2>Catálogo fixo indisponível</h2>
-    <p>O arquivo <code>data/catalogo.json</code> não foi encontrado.</p>
+    <h2>Catálogo indisponível</h2>
+    <p>Arquivo <code>data/catalogo.json</code> não encontrado.</p>
   </section>
   {% endif %}
+
+  <div class="modal" id="pdfModal" hidden>
+    <div class="modal-backdrop" data-close-pdf></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
+      <header class="modal-head">
+        <div>
+          <h2 id="pdfModalTitle">Gerar PDF</h2>
+          <p>Escolha o escopo do pedido UFCD</p>
+        </div>
+        <button type="button" class="btn btn-quiet" data-close-pdf>Fechar</button>
+      </header>
+      <div class="modal-body">
+        <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='todos') }}">
+          <strong>Todos os itens</strong>
+          <span>Catálogo completo da unidade</span>
+        </a>
+        <a class="pdf-choice pdf-link" href="{{ url_for('pedido_pdf_atual', modo='pedir') }}">
+          <strong>Todos a pedir</strong>
+          <span>Somente Pedir = Sim</span>
+        </a>
+        <p class="modal-section">Por categoria</p>
+        <div class="pdf-grid">
+          {% for a in abas %}
+          <a class="pdf-choice compact pdf-link" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id) }}">{{ a.titulo }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

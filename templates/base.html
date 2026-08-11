@@ -6,31 +6,25 @@
   <title>{% block title %}Pedidos UFCD{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <span class="brand-mark">UFCD</span>
+        <span class="brand-mark">P</span>
         <div>
-          <strong>Pedidos UFCD</strong>
-          <small>Farmácia</small>
+          <strong>Pedidos</strong>
+          <small>Farmácia hospitalar</small>
         </div>
       </div>
 
       <nav class="sidebar-nav">
-        <a class="nav-link {% if nav_active == 'pedidos' %}active{% endif %}" href="{{ url_for('index') }}">
-          <span class="nav-ico">☰</span> Pedidos
-        </a>
-        <a class="nav-link {% if nav_active == 'historico' %}active{% endif %}" href="{{ url_for('historico') }}">
-          <span class="nav-ico">◷</span> Histórico
-        </a>
+        <a class="nav-link {% if nav_active == 'pedidos' %}active{% endif %}" href="{{ url_for('index') }}">Pedidos</a>
+        <a class="nav-link {% if nav_active == 'historico' %}active{% endif %}" href="{{ url_for('historico') }}">Histórico</a>
         {% if is_admin %}
-        <a class="nav-link {% if nav_active == 'usuarios' %}active{% endif %}" href="{{ url_for('usuarios') }}">
-          <span class="nav-ico">☺</span> Usuários
-        </a>
+        <a class="nav-link {% if nav_active == 'usuarios' %}active{% endif %}" href="{{ url_for('usuarios') }}">Usuários</a>
         {% endif %}
       </nav>
 
@@ -40,11 +34,8 @@
         {% if user %}
         <div class="sidebar-user">
           <strong>{{ user.nome }}</strong>
-          <span>{{ 'Administrador' if is_admin else 'Usuário' }}</span>
+          <span>{{ 'Admin' if is_admin else 'Usuário' }}{% if usando_neon %} · Neon{% endif %}</span>
         </div>
-        {% endif %}
-        {% if usando_neon is defined and usando_neon %}
-          <span class="badge ok">Neon</span>
         {% endif %}
         <a class="nav-link logout" href="{{ url_for('logout') }}">Sair</a>
       </div>
@@ -52,7 +43,7 @@
 
     <div class="main-area">
       <header class="main-bar">
-        <button type="button" class="btn sidebar-toggle" id="sidebarToggle" aria-label="Menu">☰</button>
+        <button type="button" class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="Menu">☰</button>
         <div class="main-bar-title">
           <h1>{% block page_title %}Pedidos{% endblock %}</h1>
           <p>{% block page_sub %}{% endblock %}</p>

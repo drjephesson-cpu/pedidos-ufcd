@@ -4,8 +4,7 @@ async function salvarManual(codigo, valor) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ codigo, valor: valor === "" ? null : Number(valor) }),
   });
-  const url = new URL(window.location.href);
-  window.location.href = url.toString();
+  window.location.href = new URL(window.location.href).toString();
 }
 
 document.querySelectorAll(".manual-input").forEach((input) => {
@@ -47,15 +46,40 @@ if (toggle) {
   });
 }
 
-const pdfToggle = document.getElementById("pdfToggle");
-const pdfPanel = document.querySelector("#pdfMenu .pdf-menu-panel");
-if (pdfToggle && pdfPanel) {
-  pdfToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    pdfPanel.hidden = !pdfPanel.hidden;
+document.querySelectorAll(".unit-toggle").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const unit = btn.dataset.unit;
+    const panel = document.querySelector(`[data-unit-panel="${unit}"]`);
+    const open = btn.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (panel) panel.classList.toggle("is-open", open);
   });
-  document.addEventListener("click", () => {
-    pdfPanel.hidden = true;
-  });
-  pdfPanel.addEventListener("click", (e) => e.stopPropagation());
+});
+
+const pdfModal = document.getElementById("pdfModal");
+const pdfOpenBtn = document.getElementById("pdfOpenBtn");
+
+function closePdfModal() {
+  if (pdfModal) pdfModal.hidden = true;
 }
+
+function openPdfModal() {
+  if (!pdfModal) return;
+  syncDataPedido();
+  pdfModal.hidden = false;
+}
+
+if (pdfOpenBtn) {
+  pdfOpenBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    openPdfModal();
+  });
+}
+
+document.querySelectorAll("[data-close-pdf]").forEach((el) => {
+  el.addEventListener("click", closePdfModal);
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closePdfModal();
+});
