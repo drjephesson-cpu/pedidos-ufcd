@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Entrar — Pedidos UFCD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="login-page">
+  <div class="bg-grid" aria-hidden="true"></div>
+  <main class="login-card">
+    <div class="login-brand">
+      <span class="brand-mark">UFCD</span>
+      <h1>Pedidos UFCD</h1>
+      <p>Acesso à farmácia · pedido de estoque</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" class="login-form" autocomplete="on">
+      <label>
+        Usuário
+        <input type="text" name="username" required autofocus autocomplete="username" />
+      </label>
+      <label>
+        Senha
+        <input type="password" name="password" required autocomplete="current-password" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Usuários — Pedidos UFCD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark">UFCD</span>
+      <div>
+        <h1>Usuários</h1>
+        <p class="subtitle">Administração · admin pode criar e gerenciar contas</p>
+      </div>
+    </div>
+    <div class="top-meta">
+      <a class="btn" href="{{ url_for('index') }}">Voltar aos pedidos</a>
+      <a class="btn" href="{{ url_for('logout') }}">Sair</a>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <section class="panel imports">
+    <form class="import-box" method="post" action="{{ url_for('usuarios') }}">
+      <h2>Novo usuário</h2>
+      <p>Defina se a conta será <strong>administrador</strong> ou <strong>usuário</strong>.</p>
+      <label class="field">
+        Nome
+        <input type="text" name="nome" placeholder="Nome de exibição" />
+      </label>
+      <label class="field">
+        Usuário (login)
+        <input type="text" name="username" required autocomplete="off" />
+      </label>
+      <label class="field">
+        Senha
+        <input type="password" name="password" required autocomplete="new-password" />
+      </label>
+      <label class="field">
+        Papel
+        <select name="role">
+          <option value="usuario">Usuário</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-primary">Adicionar</button>
+    </form>
+  </section>
+
+  <div class="table-wrap users-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Nome</th>
+          <th>Papel</th>
+          <th>Status</th>
+          <th>Criado em</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in lista %}
+        <tr class="{% if not u.ativo %}row-sem{% endif %}">
+          <td class="mono">{{ u.username }}</td>
+          <td>{{ u.nome }}</td>
+          <td>
+            <form method="post" action="{{ url_for('usuarios_papel', user_id=u.id) }}" class="inline-form">
+              <select name="role" onchange="this.form.submit()">
+                <option value="usuario" {% if u.role == 'usuario' %}selected{% endif %}>Usuário</option>
+                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Administrador</option>
+              </select>
+            </form>
+          </td>
+          <td>
+            {% if u.ativo %}
+              <span class="pill sim">Ativo</span>
+            {% else %}
+              <span class="pill neutro">Inativo</span>
+            {% endif %}
+          </td>
+          <td class="muted">{{ u.criado_em }}</td>
+          <td class="actions">
+            <form method="post" action="{{ url_for('usuarios_senha', user_id=u.id) }}" class="inline-form">
+              <input type="password" name="password" placeholder="Nova senha" required />
+              <button type="submit" class="btn">Senha</button>
+            </form>
+            <form method="post" action="{{ url_for('usuarios_ativo', user_id=u.id) }}" class="inline-form">
+              <input type="hidden" name="ativo" value="{{ 0 if u.ativo else 1 }}" />
+              <button type="submit" class="btn">{{ 'Desativar' if u.ativo else 'Ativar' }}</button>
+            </form>
+            <form method="post" action="{{ url_for('usuarios_excluir', user_id=u.id) }}" class="inline-form" onsubmit="return confirm('Excluir {{ u.username }}?');">
+              <button type="submit" class="btn btn-danger">Excluir</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">Nenhum usuário.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

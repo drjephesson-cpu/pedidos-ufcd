@@ -140,6 +140,127 @@ body > * { position: relative; z-index: 1; }
   color: #f3fff9;
 }
 
+.btn-danger {
+  border-color: #e0b0b0;
+  color: var(--danger);
+  background: #fff5f5;
+}
+
+.btn-block { width: 100%; justify-content: center; }
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.role-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #143d2f;
+  color: #eef8f3;
+  border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+}
+
+/* Login */
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: min(420px, 100%);
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(183, 201, 191, 0.7);
+  border-radius: 18px;
+  padding: 1.6rem 1.5rem 1.4rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.9rem;
+  animation: rise 0.5s ease both;
+}
+
+.login-brand {
+  text-align: center;
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.7rem;
+}
+
+.login-brand p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.login-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.login-form label,
+.field {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.login-form input,
+.field input,
+.field select,
+.inline-form input,
+.inline-form select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink);
+  background: #fff;
+}
+
+.users-table { margin-top: 0.5rem; max-height: none; }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.inline-form {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+  margin: 0;
+}
+
+.inline-form input[type="password"] {
+  width: 7rem;
+  padding: 0.35rem 0.45rem;
+}
+
+
 .flash-wrap {
   padding: 0 1.75rem;
   display: grid;

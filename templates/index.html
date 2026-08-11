@@ -21,11 +21,19 @@
       </div>
     </div>
     <div class="top-meta">
+      <div class="user-chip">
+        <span>{{ user.nome if user else '' }}</span>
+        <span class="role-tag">{{ 'Admin' if is_admin else 'Usuário' }}</span>
+      </div>
+      {% if is_admin %}
+        <a class="btn" href="{{ url_for('usuarios') }}">Usuários</a>
+      {% endif %}
       <label class="date-field">
         Data do pedido
         <input type="text" id="dataPedido" value="{{ hoje }}" />
       </label>
       <a class="btn btn-primary" href="{{ url_for('exportar', so_pedir=1) }}">Exportar pedido (.xlsx)</a>
+      <a class="btn" href="{{ url_for('logout') }}">Sair</a>
     </div>
   </header>
 

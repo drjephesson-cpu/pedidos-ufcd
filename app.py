@@ -34,6 +34,14 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from werkzeug.utils import secure_filename
 
+from auth import (
+    UserStore,
+    admin_required,
+    current_user,
+    is_admin,
+    login_required,
+)
+
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
 # No Vercel o filesystem do deploy é só leitura; gravações vão para /tmp
@@ -44,9 +52,11 @@ DATA.mkdir(exist_ok=True)
 
 CATALOGO_PATH = DATA / "catalogo.json"  # fixo no repositório
 ESTOQUE_PATH = WRITABLE / "estoque_atual.json"
+USERS_DB = WRITABLE / "users.db"
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "pedido-estoque-ufcd-local")
+users = UserStore(USERS_DB)
 
 # Abas na mesma ordem da planilha (exceto Estoque)
 ABA_ORDEM_PADRAO = [
@@ -394,7 +404,88 @@ def montar_aba(aba_id: str, catalogo: dict, saldos: dict, manuais: dict) -> list
     return result
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if session.get("user"):
+        return redirect(url_for("index"))
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+        user = users.authenticate(username, password)
+        if user:
+            session["user"] = user
+            session.pop("manuais", None)
+            nxt = request.args.get("next") or url_for("index")
+            if not nxt.startswith("/"):
+                nxt = url_for("index")
+            flash(f"Olá, {user['nome']}!", "ok")
+            return redirect(nxt)
+        flash("Usuário ou senha inválidos.", "erro")
+    return render_template("login.html")
+
+
+@app.route("/logout", methods=["POST", "GET"])
+def logout():
+    session.clear()
+    flash("Sessão encerrada.", "ok")
+    return redirect(url_for("login"))
+
+
+@app.route("/usuarios", methods=["GET", "POST"])
+@admin_required
+def usuarios():
+    if request.method == "POST":
+        ok, msg = users.create_user(
+            username=request.form.get("username", ""),
+            password=request.form.get("password", ""),
+            role=request.form.get("role", "usuario"),
+            nome=request.form.get("nome", ""),
+        )
+        flash(msg, "ok" if ok else "erro")
+        return redirect(url_for("usuarios"))
+    return render_template(
+        "usuarios.html",
+        lista=users.list_users(),
+        user=current_user(),
+        is_admin=True,
+    )
+
+
+@app.route("/usuarios/<int:user_id>/papel", methods=["POST"])
+@admin_required
+def usuarios_papel(user_id: int):
+    ok, msg = users.set_role(user_id, request.form.get("role", "usuario"))
+    flash(msg, "ok" if ok else "erro")
+    return redirect(url_for("usuarios"))
+
+
+@app.route("/usuarios/<int:user_id>/ativo", methods=["POST"])
+@admin_required
+def usuarios_ativo(user_id: int):
+    ativo = request.form.get("ativo") == "1"
+    ok, msg = users.set_ativo(user_id, ativo)
+    flash(msg, "ok" if ok else "erro")
+    return redirect(url_for("usuarios"))
+
+
+@app.route("/usuarios/<int:user_id>/excluir", methods=["POST"])
+@admin_required
+def usuarios_excluir(user_id: int):
+    ok, msg = users.delete_user(user_id)
+    flash(msg, "ok" if ok else "erro")
+    return redirect(url_for("usuarios"))
+
+
+@app.route("/usuarios/<int:user_id>/senha", methods=["POST"])
+@admin_required
+def usuarios_senha(user_id: int):
+    ok, msg = users.change_password(user_id, request.form.get("password", ""))
+    flash(msg, "ok" if ok else "erro")
+    return redirect(url_for("usuarios"))
+
+
 @app.route("/")
+@login_required
 def index():
     catalogo = load_catalogo()
     saldos = estoque_saldos()
@@ -457,10 +548,13 @@ def index():
         contagens=contagens,
         hoje=date.today().strftime("%d/%m/%Y"),
         total_catalogo=sum(a.get("count", 0) for a in abas_sorted),
+        user=current_user(),
+        is_admin=is_admin(),
     )
 
 
 @app.route("/importar/catalogo", methods=["POST"])
+@login_required
 def importar_catalogo():
     f = request.files.get("arquivo")
     password = (request.form.get("senha") or "").strip() or None
@@ -484,6 +578,7 @@ def importar_catalogo():
 
 
 @app.route("/importar/estoque", methods=["POST"])
+@login_required
 def importar_estoque():
     f = request.files.get("arquivo")
     if not f or not f.filename:
@@ -502,6 +597,7 @@ def importar_estoque():
 
 
 @app.route("/api/manual", methods=["POST"])
+@login_required
 def api_manual():
     data = request.get_json(force=True)
     cod = str(data.get("codigo", ""))
@@ -517,6 +613,7 @@ def api_manual():
 
 
 @app.route("/exportar")
+@login_required
 def exportar():
     catalogo = load_catalogo()
     saldos = estoque_saldos()
@@ -604,6 +701,7 @@ def exportar():
 
 
 @app.route("/api/status")
+@login_required
 def api_status():
     cat = load_catalogo()
     return jsonify(
