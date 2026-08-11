@@ -68,7 +68,7 @@
         <p>{{ unidade.hint_estoque }} · salvo no Neon</p>
       </div>
       <div class="panel-card-body">
-        <input type="file" name="arquivo" accept=".xlsx,.xls" required onchange="this.form.submit()" />
+        <input type="file" name="arquivo" accept=".xlsx,.xls" required onchange="this.form.classList.add('is-uploading'); this.form.submit()" />
         {% if tem_estoque %}
           <span class="meta-pill">{{ estoque_meta.get('itens', 0) }} códigos</span>
         {% else %}
@@ -81,11 +81,11 @@
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
         <h2>Pedido do dia</h2>
-        <p>
+        <p id="pedidoDiaStatus">
           {% if autosave_info %}
             Salvo automaticamente #{{ autosave_info[0] }} · {{ autosave_info[1] }} itens
           {% else %}
-            Ao atualizar o estoque, o pedido do dia é gravado sozinho no histórico
+            Após o Excel, o pedido do dia grava sozinho no histórico (em segundo plano)
           {% endif %}
         </p>
       </div>

@@ -381,51 +381,57 @@ def normaliza_codigo(val) -> str | None:
 def parse_estoque_xlsx(file_storage) -> tuple[dict, dict]:
     """Lê EstoqueFarmacia: colunas codigo + saldo_farmacia_central (ou 8ª col)."""
     wb = load_workbook(file_storage, data_only=True, read_only=True)
-    ws = wb[wb.sheetnames[0]]
-    rows = ws.iter_rows(values_only=True)
     try:
-        header = next(rows)
-    except StopIteration:
-        return {}, {}
+        ws = wb[wb.sheetnames[0]]
+        rows = ws.iter_rows(values_only=True)
+        try:
+            header = next(rows)
+        except StopIteration:
+            return {}, {}
 
-    header_l = [str(h).strip().lower() if h is not None else "" for h in header]
-    cod_idx = None
-    saldo_idx = None
-    for i, h in enumerate(header_l):
-        if h in ("codigo", "código", "cod_aghu", "cód. aghu", "cod. aghu"):
-            cod_idx = i
-        if h in (
-            "saldo_farmacia_central",
-            "saldo_farmacia_bloco",
-            "saldo",
-            "estoque",
-            "estoque_aghu",
-            "qtde",
-            "quantidade",
-        ):
-            saldo_idx = i
+        header_l = [str(h).strip().lower() if h is not None else "" for h in header]
+        cod_idx = None
+        saldo_idx = None
+        for i, h in enumerate(header_l):
+            if h in ("codigo", "código", "cod_aghu", "cód. aghu", "cod. aghu"):
+                cod_idx = i
+            if h in (
+                "saldo_farmacia_central",
+                "saldo_farmacia_bloco",
+                "saldo",
+                "estoque",
+                "estoque_aghu",
+                "qtde",
+                "quantidade",
+            ):
+                saldo_idx = i
 
-    # fallback: 1ª coluna = código, 8ª = saldo (como na planilha)
-    if cod_idx is None:
-        cod_idx = 0
-    if saldo_idx is None:
-        saldo_idx = 7 if len(header) >= 8 else len(header) - 1
+        # fallback: 1ª coluna = código, 8ª = saldo (como na planilha)
+        if cod_idx is None:
+            cod_idx = 0
+        if saldo_idx is None:
+            saldo_idx = 7 if len(header) >= 8 else len(header) - 1
 
-    mapa: dict[str, float | None] = {}
-    for row in rows:
-        if not row:
-            continue
-        cod = normaliza_codigo(row[cod_idx] if cod_idx < len(row) else None)
-        if not cod:
-            continue
-        saldo_raw = row[saldo_idx] if saldo_idx < len(row) else None
-        if saldo_raw is None or saldo_raw == "":
-            mapa[cod] = None  # sem saldo informado
-        else:
-            try:
-                mapa[cod] = float(saldo_raw)
-            except Exception:
-                mapa[cod] = None
+        mapa: dict[str, float | None] = {}
+        for row in rows:
+            if not row:
+                continue
+            cod = normaliza_codigo(row[cod_idx] if cod_idx < len(row) else None)
+            if not cod:
+                continue
+            saldo_raw = row[saldo_idx] if saldo_idx < len(row) else None
+            if saldo_raw is None or saldo_raw == "":
+                mapa[cod] = None  # sem saldo informado
+            else:
+                try:
+                    mapa[cod] = float(saldo_raw)
+                except Exception:
+                    mapa[cod] = None
+    finally:
+        try:
+            wb.close()
+        except Exception:
+            pass
 
     arquivo = getattr(file_storage, "filename", None) or getattr(
         file_storage, "name", None
@@ -1102,19 +1108,35 @@ def importar_estoque():
         if not mapa:
             flash("Nenhum item de estoque encontrado.", "erro")
             return redirect(url_for("index", unidade=uid))
+        # Só grava estoque aqui — pedido do dia em background na página
+        # (antes o autosave sincronizado dobrava o tempo do upload).
         save_estoque(mapa, meta, uid)
         dest = "Neon" if using_neon() else "disco"
         flash(
             f"Estoque salvo ({dest}): {len(mapa)} códigos ({meta.get('arquivo')}).",
             "ok",
         )
-        try:
-            autosave_pedido_dia(uid, date.today(), quiet=False)
-        except Exception as e:
-            flash(f"Estoque ok, mas falhou o auto-salvamento do pedido: {e}", "erro")
+        return redirect(url_for("index", unidade=uid, gravar_pedido=1, filtro="pedir"))
     except Exception as e:
         flash(f"Erro ao ler estoque: {e}", "erro")
     return redirect(url_for("index", unidade=uid))
+
+
+@app.route("/api/autosave-pedido", methods=["POST"])
+@login_required
+def api_autosave_pedido():
+    """Grava o pedido do dia sem bloquear o upload do Excel."""
+    data = request.get_json(silent=True) or {}
+    uid = resolve_unidade(data.get("unidade"))
+    data_ped = parse_data_pedido(data.get("data_pedido"))
+    try:
+        info = autosave_pedido_dia(uid, data_ped, quiet=True)
+    except Exception as e:
+        return jsonify({"ok": False, "erro": str(e)}), 500
+    if not info:
+        return jsonify({"ok": True, "salvo": False, "motivo": "sem_itens"})
+    pid, n = info
+    return jsonify({"ok": True, "salvo": True, "pedido_id": pid, "itens": n})
 
 
 @app.route("/api/manual", methods=["POST"])
@@ -1125,10 +1147,7 @@ def api_manual():
     cod = str(data.get("codigo", ""))
     valor = data.get("valor")
     set_manual_unidade(uid, cod, valor)
-    try:
-        autosave_pedido_dia(uid, date.today(), quiet=True)
-    except Exception:
-        pass
+    # Sem autosave: edição fica rápida; histórico via Salvar / pós-Excel
     return jsonify({"ok": True})
 
 
@@ -1161,10 +1180,6 @@ def api_parametros():
         )
     except Exception as e:
         return jsonify({"ok": False, "erro": str(e)}), 500
-    try:
-        autosave_pedido_dia(uid, date.today(), quiet=True)
-    except Exception:
-        pass
     return jsonify({"ok": True})
 
 
