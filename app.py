@@ -13,6 +13,7 @@ from __future__ import annotations
 import io
 import json
 import math
+import os
 import re
 import tempfile
 from datetime import date
@@ -35,12 +36,17 @@ from werkzeug.utils import secure_filename
 
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
+# No Vercel o filesystem do deploy é só leitura; gravações vão para /tmp
+ON_VERCEL = bool(os.environ.get("VERCEL"))
+WRITABLE = Path("/tmp/pedido-estoque") if ON_VERCEL else DATA
+WRITABLE.mkdir(parents=True, exist_ok=True)
 DATA.mkdir(exist_ok=True)
-CATALOGO_PATH = DATA / "catalogo.json"
-ESTOQUE_PATH = DATA / "estoque_atual.json"
+
+CATALOGO_PATH = DATA / "catalogo.json"  # fixo no repositório
+ESTOQUE_PATH = WRITABLE / "estoque_atual.json"
 
 app = Flask(__name__)
-app.secret_key = "pedido-estoque-ufcd-local"
+app.secret_key = os.environ.get("SECRET_KEY", "pedido-estoque-ufcd-local")
 
 # Abas na mesma ordem da planilha (exceto Estoque)
 ABA_ORDEM_PADRAO = [
@@ -614,17 +620,17 @@ def bootstrap_estoque_exemplo():
     """Se existir exemplo e ainda não houver estoque, importa."""
     exemplo = DATA / "EstoqueFarmacia-exemplo.xlsx"
     if exemplo.exists() and not ESTOQUE_PATH.exists():
-        with exemplo.open("rb") as f:
-            class _F:
-                filename = exemplo.name
-                def read(self_inner):  # noqa
-                    return None
-            # use path directly
-            mapa, meta = parse_estoque_xlsx(exemplo)
-            save_estoque(mapa, meta)
+        mapa, meta = parse_estoque_xlsx(exemplo)
+        save_estoque(mapa, meta)
+
+
+# Carrega estoque de exemplo na subida (local e Vercel)
+try:
+    bootstrap_estoque_exemplo()
+except Exception:
+    pass
 
 
 if __name__ == "__main__":
-    bootstrap_estoque_exemplo()
-    print("Pedido de Estoque — http://127.0.0.1:5000")
-    app.run(debug=True, port=5000)
+    print("Pedidos UFCD — http://127.0.0.1:5000")
+    app.run(debug=not ON_VERCEL, port=int(os.environ.get("PORT", 5000)))
