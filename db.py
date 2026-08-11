@@ -11,6 +11,7 @@ from typing import Any
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
+from sqlalchemy.pool import NullPool
 
 _engine: Engine | None = None
 
@@ -46,10 +47,16 @@ def get_engine(sqlite_path: Path | None = None) -> Engine:
     if _engine is None:
         # Com Neon, ignora sqlite_path e usa DATABASE_URL
         url = get_database_url(None if want_pg else sqlite_path)
-        connect_args = {}
+        connect_args: dict = {}
+        engine_kwargs: dict = {"connect_args": connect_args}
         if url.startswith("sqlite"):
             connect_args["check_same_thread"] = False
-        _engine = create_engine(url, pool_pre_ping=True, connect_args=connect_args)
+            engine_kwargs["pool_pre_ping"] = True
+        else:
+            # Serverless (Vercel): sem pool persistente; timeout evita hang longo
+            connect_args["connect_timeout"] = 10
+            engine_kwargs["poolclass"] = NullPool
+        _engine = create_engine(url, **engine_kwargs)
     return _engine
 
 
@@ -407,7 +414,21 @@ def salvar_pedido_dia(
                 pedido_id = int(res.lastrowid)
             criado = True
 
-        for it in itens:
+        rows = [
+            {
+                "pedido_id": pedido_id,
+                "codigo": it.get("codigo"),
+                "descricao": it.get("descricao") or "",
+                "aba": it.get("aba") or "",
+                "quantidade": float(it.get("quantidade") or 0),
+                "origem": it.get("origem") or "auto",
+                "estoque_aghu": it.get("estoque_aghu"),
+                "estoque_minimo": it.get("estoque_minimo"),
+                "ponto_pedido": it.get("ponto_pedido"),
+            }
+            for it in itens
+        ]
+        if rows:
             conn.execute(
                 text(
                     """
@@ -420,17 +441,7 @@ def salvar_pedido_dia(
                     )
                     """
                 ),
-                {
-                    "pedido_id": pedido_id,
-                    "codigo": it.get("codigo"),
-                    "descricao": it.get("descricao") or "",
-                    "aba": it.get("aba") or "",
-                    "quantidade": float(it.get("quantidade") or 0),
-                    "origem": it.get("origem") or "auto",
-                    "estoque_aghu": it.get("estoque_aghu"),
-                    "estoque_minimo": it.get("estoque_minimo"),
-                    "ponto_pedido": it.get("ponto_pedido"),
-                },
+                rows,
             )
     return int(pedido_id), criado
 

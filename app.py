@@ -197,6 +197,10 @@ def ceiling_math(value: float, significance: float) -> float:
     return math.ceil(value / significance) * significance
 
 
+# Cache em memória do catálogo (evita reler JSON gigante a cada request)
+_catalogo_cache: dict[str, tuple[float, dict]] = {}
+
+
 def load_catalogo(unidade: str | None = None) -> dict:
     cfg = unidade_cfg(unidade)
     path = cfg["catalogo"]
@@ -206,8 +210,17 @@ def load_catalogo(unidade: str | None = None) -> dict:
             path = CATALOGO_PATH
         else:
             return {"abas": [], "itens": {}, "modelo": cfg["modelo"]}
+    key = str(path.resolve())
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    hit = _catalogo_cache.get(key)
+    if hit and hit[0] == mtime:
+        return hit[1]
     data = json.loads(path.read_text(encoding="utf-8"))
     data.setdefault("modelo", cfg["modelo"])
+    _catalogo_cache[key] = (mtime, data)
     return data
 
 
@@ -217,6 +230,7 @@ def save_catalogo(catalogo: dict, unidade: str | None = None) -> None:
     path.write_text(
         json.dumps(catalogo, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    _catalogo_cache.pop(str(path.resolve()), None)
 
 
 def estoque_path_for(unidade: str | None = None) -> Path:
@@ -250,12 +264,26 @@ def _uid_storage(unidade: str | None = None) -> str:
 def load_estoque(unidade: str | None = None) -> dict:
     """Payload {saldos, meta} ou legado."""
     uid = _uid_storage(unidade)
+    try:
+        from flask import g, has_request_context
+
+        if has_request_context():
+            cache = g.__dict__.setdefault("_estoque_cache", {})
+            if uid in cache:
+                return cache[uid]
+        else:
+            cache = None
+    except Exception:
+        cache = None
+
     if using_neon():
-        return load_estoque_db(uid, None) or {}
-    path = estoque_path_for(uid)
-    if not path.exists():
-        return {}
-    return json.loads(path.read_text(encoding="utf-8"))
+        data = load_estoque_db(uid, None) or {}
+    else:
+        path = estoque_path_for(uid)
+        data = {} if not path.exists() else json.loads(path.read_text(encoding="utf-8"))
+    if cache is not None:
+        cache[uid] = data
+    return data
 
 
 def save_estoque(mapa: dict, meta: dict | None = None, unidade: str | None = None) -> None:
@@ -263,14 +291,21 @@ def save_estoque(mapa: dict, meta: dict | None = None, unidade: str | None = Non
     payload_meta = meta or {}
     if using_neon():
         save_estoque_db(uid, mapa, payload_meta, None)
-        return
-    cfg = UNIDADES[uid]
-    path = WRITABLE / cfg["estoque_file"]
-    path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"saldos": mapa, "meta": payload_meta}
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    else:
+        cfg = UNIDADES[uid]
+        path = WRITABLE / cfg["estoque_file"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {"saldos": mapa, "meta": payload_meta}
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    try:
+        from flask import g, has_request_context
+
+        if has_request_context() and hasattr(g, "_estoque_cache"):
+            g._estoque_cache.pop(uid, None)
+    except Exception:
+        pass
 
 
 def estoque_saldos(unidade: str | None = None) -> dict:
@@ -646,43 +681,39 @@ def montar_todos(
         ):
             row = dict(it)
             row["aba"] = aba["titulo"]
+            row["aba_id"] = aba["id"]
             out.append(row)
     return out
 
 
-def listar_itens_filtrados(
-    aba: str | None = None,
+def contagens_pedir(todos: list[dict], abas_sorted: list[dict]) -> dict[str, int]:
+    """Contagens de itens a pedir a partir de uma única passagem."""
+    contagens = {a["id"]: 0 for a in abas_sorted}
+    contagens["todos"] = 0
+    for it in todos:
+        if not it.get("pedir"):
+            continue
+        contagens["todos"] += 1
+        aid = it.get("aba_id")
+        if aid in contagens:
+            contagens[aid] += 1
+    return contagens
+
+
+def filtrar_itens_view(
+    itens: list[dict],
+    *,
+    aba: str = "todos",
     filtro: str = "todos",
     q: str = "",
-    unidade: str | None = None,
 ) -> tuple[list[dict], dict]:
-    """Lista itens como na tela (unidade + aba + filtro + busca)."""
-    uid = resolve_unidade(unidade)
-    catalogo = load_catalogo(uid)
-    saldos = estoque_saldos(uid)
-    manuais = manuais_da_unidade(uid)
-    parametros = load_catalogo_parametros(uid, _db_path())
-    abas = catalogo.get("abas") or []
-    abas_sorted = ordenar_abas(abas, uid)
-    modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
-
+    """Aplica aba/filtro/busca e monta o resumo da view atual."""
     aba_atual = aba or "todos"
     filtro = filtro or "todos"
     q = (q or "").strip().lower()
 
-    if aba_atual == "todos":
-        itens = montar_todos(
-            catalogo, saldos, manuais, modelo=modelo, parametros=parametros
-        )
-    else:
-        itens = montar_aba(
-            aba_atual, catalogo, saldos, manuais, modelo=modelo, parametros=parametros
-        )
-        titulo = next(
-            (a["titulo"] for a in abas_sorted if a["id"] == aba_atual), aba_atual
-        )
-        for it in itens:
-            it["aba"] = titulo
+    if aba_atual != "todos":
+        itens = [i for i in itens if i.get("aba_id") == aba_atual]
 
     resumo = {"total": len(itens), "pedir": 0, "sem_saldo": 0, "qtd_pedir": 0}
     for it in itens:
@@ -708,13 +739,40 @@ def listar_itens_filtrados(
             or q in (i.get("grupo") or "").lower()
         ]
 
-    meta = {
+    return itens, {
         "aba": aba_atual,
         "filtro": filtro,
         "q": q,
         "ver_todos": aba_atual == "todos",
-        "abas": abas_sorted,
         "resumo": resumo,
+    }
+
+
+def listar_itens_filtrados(
+    aba: str | None = None,
+    filtro: str = "todos",
+    q: str = "",
+    unidade: str | None = None,
+) -> tuple[list[dict], dict]:
+    """Lista itens como na tela (unidade + aba + filtro + busca)."""
+    uid = resolve_unidade(unidade)
+    catalogo = load_catalogo(uid)
+    saldos = estoque_saldos(uid)
+    manuais = manuais_da_unidade(uid)
+    parametros = load_catalogo_parametros(uid, _db_path())
+    abas = catalogo.get("abas") or []
+    abas_sorted = ordenar_abas(abas, uid)
+    modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
+
+    todos = montar_todos(
+        catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+    )
+    itens, view = filtrar_itens_view(
+        todos, aba=aba or "todos", filtro=filtro or "todos", q=q or ""
+    )
+    meta = {
+        **view,
+        "abas": abas_sorted,
         "unidade": uid,
         "modelo": modelo,
     }
@@ -958,56 +1016,28 @@ def index():
     manuais = manuais_da_unidade(uid)
     modelo = catalogo.get("modelo") or cfg["modelo"]
     parametros = load_catalogo_parametros(uid, _db_path())
-    itens, view_meta = listar_itens_filtrados(aba_atual, filtro, q, unidade=uid)
+
+    # Uma passagem só: contagens + lista filtrada (antes recalculava 2–3× + outra unidade)
+    todos = montar_todos(
+        catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+    )
+    contagens = contagens_pedir(todos, abas_sorted)
+    itens, view_meta = filtrar_itens_view(
+        todos, aba=aba_atual, filtro=filtro, q=q
+    )
     resumo = view_meta["resumo"]
     ver_todos = view_meta["ver_todos"]
 
-    contagens = {}
-    total_pedir = 0
-    for a in abas_sorted:
-        lista = montar_aba(
-            a["id"], catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+    # Badge da unidade atual; outras unidades usam cache da sessão (sem 2º catálogo/Neon)
+    session[f"cnt_pedir_{uid}"] = contagens["todos"]
+    contagens_unidade = {
+        oid: (
+            contagens["todos"]
+            if oid == uid
+            else int(session.get(f"cnt_pedir_{oid}") or 0)
         )
-        contagens[a["id"]] = sum(1 for i in lista if i["pedir"])
-        total_pedir += contagens[a["id"]]
-    contagens["todos"] = total_pedir
-
-    # contagens de pedir por unidade (sidebar)
-    contagens_unidade = {uid: total_pedir}
-    for other_id in UNIDADES:
-        if other_id == uid:
-            continue
-        try:
-            other_cat = load_catalogo(other_id)
-            other_saldos = estoque_saldos(other_id)
-            other_manuais = manuais_da_unidade(other_id)
-            other_params = load_catalogo_parametros(other_id, _db_path())
-            other_modelo = other_cat.get("modelo") or UNIDADES[other_id]["modelo"]
-            n = 0
-            for a in other_cat.get("abas") or []:
-                n += sum(
-                    1
-                    for i in montar_aba(
-                        a["id"],
-                        other_cat,
-                        other_saldos,
-                        other_manuais,
-                        modelo=other_modelo,
-                        parametros=other_params,
-                    )
-                    if i["pedir"]
-                )
-            contagens_unidade[other_id] = n
-        except Exception:
-            contagens_unidade[other_id] = 0
-
-    # Auto-salva o pedido do dia quando há estoque e itens a pedir
-    autosave_info = None
-    if saldos and resumo.get("pedir", 0) > 0:
-        try:
-            autosave_info = autosave_pedido_dia(uid, date.today(), quiet=True)
-        except Exception as e:
-            print("aviso autosave:", e)
+        for oid in UNIDADES
+    }
 
     return render_template(
         "index.html",
@@ -1029,7 +1059,7 @@ def index():
         unidade_id=uid,
         unidade=cfg,
         mostra_ponto_caixa=True,
-        autosave_info=autosave_info,
+        autosave_info=None,
     )
 
 
@@ -1276,8 +1306,6 @@ def historico():
     if f_unidade in ("centro", "centro_cirurgico", "bloco"):
         f_unidade = "cc"
     try:
-        # garante coluna unidade
-        init_db(_db_path())
         pedidos = listar_pedidos(
             _db_path(), unidade=f_unidade, aba=f_aba, usuario=f_usuario
         )
