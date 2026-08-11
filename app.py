@@ -1537,14 +1537,52 @@ def api_status():
 
 
 def bootstrap_estoque_exemplo():
-    """Se existir exemplo e ainda não houver estoque, importa."""
+    """Se existir exemplo e ainda não houver estoque UFCD em arquivo, importa."""
     exemplo = DATA / "EstoqueFarmacia-exemplo.xlsx"
-    if exemplo.exists() and not ESTOQUE_PATH.exists():
+    if exemplo.exists() and not ESTOQUE_PATH.exists() and not using_neon():
         mapa, meta = parse_estoque_xlsx(exemplo)
-        save_estoque(mapa, meta)
+        save_estoque(mapa, meta, "ufcd")
 
 
-# Carrega estoque de exemplo na subida (local e Vercel)
+def bootstrap_estoque_seeds():
+    """
+    Restaura estoque a partir de seeds do repositório quando a unidade estiver vazia.
+    Serve para recuperar o que se perdeu no /tmp do Vercel e popular o Neon.
+    """
+    seeds = {
+        "cc": DATA / "seed_estoque_cc.json",
+        "ufcd": DATA / "seed_estoque_ufcd.json",
+    }
+    for uid, path in seeds.items():
+        if not path.exists():
+            continue
+        raw = load_estoque(uid)
+        if isinstance(raw, dict) and "saldos" in raw:
+            atuais = raw.get("saldos") or {}
+        else:
+            atuais = raw or {}
+        if atuais:
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as e:
+            print("aviso seed estoque", uid, e)
+            continue
+        mapa = data.get("saldos") or {}
+        meta = data.get("meta") or {}
+        if not mapa:
+            continue
+        meta = dict(meta)
+        meta["restaurado_em"] = date.today().isoformat()
+        save_estoque(mapa, meta, uid)
+        print(f"estoque restaurado ({uid}): {len(mapa)} códigos")
+
+
+# Restaura seeds / exemplo na subida (local e Vercel/Neon)
+try:
+    bootstrap_estoque_seeds()
+except Exception as exc:
+    print("aviso bootstrap_estoque_seeds:", exc)
 try:
     bootstrap_estoque_exemplo()
 except Exception:
