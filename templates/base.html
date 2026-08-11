@@ -8,8 +8,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
+  <script>
+    // Mostra a barra já no HTML se a navegação anterior pediu carregamento Neon
+    (function () {
+      try {
+        if (sessionStorage.getItem("neon_loading") === "1") {
+          document.documentElement.classList.add("neon-loading");
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
+  <div id="neonLoader" class="neon-loader" role="progressbar" aria-busy="true" aria-label="Carregando" hidden>
+    <div class="neon-loader-track">
+      <div class="neon-loader-bar"></div>
+    </div>
+    <span class="neon-loader-label" id="neonLoaderLabel">Carregando Neon…</span>
+  </div>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">

@@ -682,3 +682,61 @@ td.col-qtde-pedir {
   font-weight: 650;
   color: var(--muted);
 }
+
+/* Barra de carregamento Neon (topo) */
+.neon-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.neon-loader.is-on,
+html.neon-loading .neon-loader {
+  opacity: 1;
+}
+.neon-loader[hidden] {
+  display: block !important;
+  opacity: 0;
+}
+.neon-loader.is-on[hidden],
+html.neon-loading .neon-loader[hidden] {
+  opacity: 1;
+}
+.neon-loader-track {
+  height: 3px;
+  background: rgba(13, 107, 76, 0.12);
+  overflow: hidden;
+}
+.neon-loader-bar {
+  height: 100%;
+  width: 35%;
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(90deg, #0a8f62, #0d6b4c, #14b884);
+  animation: neon-indeterminate 1.05s ease-in-out infinite;
+  transform-origin: left center;
+}
+.neon-loader.is-done .neon-loader-bar {
+  width: 100%;
+  animation: none;
+  transition: width 0.2s ease;
+}
+.neon-loader-label {
+  display: inline-block;
+  margin: 0.35rem 0 0 0.85rem;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(16, 26, 22, 0.88);
+  color: #edf5f0;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow);
+}
+@keyframes neon-indeterminate {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(380%); }
+}

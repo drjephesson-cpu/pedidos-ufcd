@@ -1,24 +1,153 @@
-async function salvarManual(codigo, valor, unidade) {
-  await fetch("/api/manual", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      codigo,
-      valor: valor === "" ? null : Number(valor),
-      unidade: unidade || undefined,
-    }),
+/* —— Barra de carregamento Neon —— */
+const NeonLoad = (() => {
+  let depth = 0;
+  let hideTimer = null;
+
+  function el() {
+    return document.getElementById("neonLoader");
+  }
+
+  function labelEl() {
+    return document.getElementById("neonLoaderLabel");
+  }
+
+  function show(message) {
+    const node = el();
+    if (!node) return;
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+    depth += 1;
+    if (message && labelEl()) labelEl().textContent = message;
+    node.hidden = false;
+    node.classList.remove("is-done");
+    node.classList.add("is-on");
+    document.documentElement.classList.add("neon-loading");
+    try {
+      sessionStorage.setItem("neon_loading", "1");
+    } catch (e) {}
+  }
+
+  function hide(force) {
+    depth = force ? 0 : Math.max(0, depth - 1);
+    if (depth > 0) return;
+    const node = el();
+    if (!node) {
+      document.documentElement.classList.remove("neon-loading");
+      try {
+        sessionStorage.removeItem("neon_loading");
+      } catch (e) {}
+      return;
+    }
+    node.classList.add("is-done");
+    hideTimer = setTimeout(() => {
+      node.classList.remove("is-on", "is-done");
+      node.hidden = true;
+      document.documentElement.classList.remove("neon-loading");
+      try {
+        sessionStorage.removeItem("neon_loading");
+      } catch (e) {}
+      hideTimer = null;
+    }, 220);
+  }
+
+  function wrap(promise, message) {
+    show(message || "Carregando Neon…");
+    return Promise.resolve(promise).finally(() => hide());
+  }
+
+  // Página terminou de carregar → some a barra da navegação anterior
+  function ready() {
+    depth = 0;
+    hide(true);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ready);
+  } else {
+    ready();
+  }
+  window.addEventListener("pageshow", (ev) => {
+    if (ev.persisted) ready();
   });
-  // Sem reload completo — só atualiza a linha na tela
-  const row = document.querySelector(`.item-row[data-codigo="${CSS.escape(String(codigo))}"]`);
+
+  return { show, hide, wrap };
+})();
+
+async function neonFetch(url, options, message) {
+  return NeonLoad.wrap(fetch(url, options), message || "Salvando no Neon…");
+}
+
+function isInternalNav(href) {
+  if (!href || href.startsWith("#") || href.startsWith("javascript:")) return false;
+  try {
+    const u = new URL(href, window.location.origin);
+    return u.origin === window.location.origin;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Links e formulários que batem no servidor/Neon
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]");
+  if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+    return;
+  }
+  if (a.hasAttribute("download") || a.target === "_blank") return;
+  if (!isInternalNav(a.getAttribute("href"))) return;
+  const path = a.pathname || "";
+  // Export PDF/Excel também passa pelo servidor
+  NeonLoad.show(
+    path.includes("historico")
+      ? "Carregando histórico…"
+      : path.includes("pdf") || path.includes("export")
+        ? "Gerando arquivo…"
+        : "Carregando Neon…"
+  );
+});
+
+document.addEventListener("submit", (e) => {
+  const form = e.target;
+  if (!(form instanceof HTMLFormElement)) return;
+  if (form.dataset.noLoader === "1") return;
+  const action = (form.getAttribute("action") || "").toLowerCase();
+  let msg = "Carregando Neon…";
+  if (action.includes("estoque") || form.querySelector('input[type="file"]')) {
+    msg = "Enviando estoque ao Neon…";
+  } else if (action.includes("pedido") || form.id === "formSalvar") {
+    msg = "Salvando pedido no Neon…";
+  } else if (action.includes("login") || form.classList.contains("login-form")) {
+    msg = "Entrando…";
+  }
+  NeonLoad.show(msg);
+});
+
+async function salvarManual(codigo, valor, unidade) {
+  await neonFetch(
+    "/api/manual",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        codigo,
+        valor: valor === "" ? null : Number(valor),
+        unidade: unidade || undefined,
+      }),
+    },
+    "Salvando ajuste no Neon…"
+  );
+  const row = document.querySelector(
+    `.item-row[data-codigo="${CSS.escape(String(codigo))}"]`
+  );
   if (!row) {
+    NeonLoad.show("Atualizando tela…");
     window.location.reload();
     return;
   }
   const qtdeCell = row.querySelector(".quanto");
-  if (valor === "") {
-    // volta ao cálculo do servidor no próximo refresh; marca visualmente
-    return;
-  }
+  if (valor === "") return;
   const n = Number(valor);
   if (qtdeCell && Number.isFinite(n)) {
     qtdeCell.textContent = String(Math.trunc(n));
@@ -79,6 +208,7 @@ document.querySelectorAll(".unit-toggle").forEach((btn) => {
       params.set("unidade", unit);
       params.set("aba", "todos");
       params.delete("q");
+      NeonLoad.show("Carregando unidade…");
       window.location.href = `${window.location.pathname}?${params.toString()}`;
       return;
     }
@@ -134,18 +264,21 @@ document.querySelectorAll(".item-row").forEach((row) => {
     });
     saveBtn.disabled = true;
     try {
-      const res = await fetch("/api/parametros", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await neonFetch(
+        "/api/parametros",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+        "Salvando parâmetros no Neon…"
+      );
       const data = await res.json();
       if (!res.ok || !data.ok) {
         alert(data.erro || "Não foi possível salvar.");
         saveBtn.disabled = false;
         return;
       }
-      // Atualiza a linha sem recarregar a página inteira
       row.querySelectorAll(".param-cell").forEach((cell) => {
         const view = cell.querySelector(".param-view");
         const input = cell.querySelector(".param-input");
@@ -177,11 +310,15 @@ async function gravarPedidoDiaEmBackground() {
     "";
 
   try {
-    const res = await fetch("/api/autosave-pedido", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ unidade, data_pedido: dataPedido }),
-    });
+    const res = await neonFetch(
+      "/api/autosave-pedido",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unidade, data_pedido: dataPedido }),
+      },
+      "Gravando pedido do dia no Neon…"
+    );
     const data = await res.json();
     if (status) {
       if (data.salvo) {

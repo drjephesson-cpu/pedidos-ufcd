@@ -8,8 +8,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
+  <script>
+    (function () {
+      try {
+        if (sessionStorage.getItem("neon_loading") === "1") {
+          document.documentElement.classList.add("neon-loading");
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body class="login-page">
+  <div id="neonLoader" class="neon-loader" role="progressbar" aria-busy="true" aria-label="Carregando" hidden>
+    <div class="neon-loader-track">
+      <div class="neon-loader-bar"></div>
+    </div>
+    <span class="neon-loader-label" id="neonLoaderLabel">Entrando…</span>
+  </div>
   <main class="login-card">
     <div class="login-brand">
       <span class="brand-mark">P</span>
@@ -29,5 +44,34 @@
       <button type="submit" class="btn btn-primary btn-block">Entrar</button>
     </form>
   </main>
+  <script>
+    (function () {
+      var loader = document.getElementById("neonLoader");
+      var label = document.getElementById("neonLoaderLabel");
+      function show(msg) {
+        if (label && msg) label.textContent = msg;
+        if (loader) {
+          loader.hidden = false;
+          loader.classList.add("is-on");
+        }
+        document.documentElement.classList.add("neon-loading");
+        try { sessionStorage.setItem("neon_loading", "1"); } catch (e) {}
+      }
+      function hide() {
+        document.documentElement.classList.remove("neon-loading");
+        try { sessionStorage.removeItem("neon_loading"); } catch (e) {}
+        if (!loader) return;
+        loader.classList.remove("is-on");
+        loader.hidden = true;
+      }
+      hide();
+      var form = document.querySelector(".login-form");
+      if (form) {
+        form.addEventListener("submit", function () {
+          show("Entrando…");
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
