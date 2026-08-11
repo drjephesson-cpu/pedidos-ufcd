@@ -8,6 +8,7 @@ venv/
 Thumbs.db
 data/estoque_atual.json
 data/users.db
+data/pedidos.db
 *.xlsx
 !data/EstoqueFarmacia-exemplo.xlsx
 .idea/

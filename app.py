@@ -16,8 +16,15 @@ import math
 import os
 import re
 import tempfile
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
 
 from flask import (
     Flask,
@@ -41,6 +48,15 @@ from auth import (
     is_admin,
     login_required,
 )
+from db import (
+    criar_pedido,
+    excluir_pedido,
+    init_db,
+    listar_pedidos,
+    obter_pedido,
+    using_neon,
+)
+from pdf_util import gerar_pdf_pedido
 
 BASE = Path(__file__).resolve().parent
 DATA = BASE / "data"
@@ -53,10 +69,16 @@ DATA.mkdir(exist_ok=True)
 CATALOGO_PATH = DATA / "catalogo.json"  # fixo no repositório
 ESTOQUE_PATH = WRITABLE / "estoque_atual.json"
 USERS_DB = WRITABLE / "users.db"
+PEDIDOS_SQLITE = WRITABLE / "pedidos.db"
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "pedido-estoque-ufcd-local")
 users = UserStore(USERS_DB)
+
+try:
+    init_db(None if using_neon() else PEDIDOS_SQLITE)
+except Exception as exc:  # pragma: no cover
+    print("aviso init_db:", exc)
 
 # Abas na mesma ordem da planilha (exceto Estoque)
 ABA_ORDEM_PADRAO = [
@@ -404,6 +426,74 @@ def montar_aba(aba_id: str, catalogo: dict, saldos: dict, manuais: dict) -> list
     return result
 
 
+def _db_path():
+    return None if using_neon() else PEDIDOS_SQLITE
+
+
+def itens_extras_manuais() -> list[dict]:
+    return session.get("extras_manuais", [])
+
+
+def coletar_itens_pedido(incluir_extras: bool = True) -> list[dict]:
+    """Itens com Pedir=Sim (todas as abas) + extras manuais da sessão."""
+    catalogo = load_catalogo()
+    saldos = estoque_saldos()
+    manuais = session.get("manuais", {})
+    out: list[dict] = []
+    vistos: set[str] = set()
+
+    for aba in catalogo.get("abas", []):
+        for it in montar_aba(aba["id"], catalogo, saldos, manuais):
+            if not it.get("pedir") or not it.get("quanto_pedir"):
+                continue
+            key = str(it["codigo"])
+            vistos.add(key)
+            out.append(
+                {
+                    "codigo": it["codigo"],
+                    "descricao": it["descricao"],
+                    "aba": aba["titulo"],
+                    "quantidade": float(it["quanto_pedir"]),
+                    "origem": "manual" if it.get("manual") is not None else "auto",
+                    "estoque_aghu": it.get("estoque_aghu"),
+                    "estoque_minimo": it.get("estoque_minimo"),
+                    "ponto_pedido": it.get("ponto_pedido"),
+                }
+            )
+
+    if incluir_extras:
+        for ex in itens_extras_manuais():
+            cod = ex.get("codigo")
+            key = str(cod) if cod not in (None, "") else f"manual:{ex.get('descricao')}"
+            if key in vistos:
+                continue
+            out.append(
+                {
+                    "codigo": int(cod) if cod not in (None, "") else None,
+                    "descricao": ex.get("descricao") or "",
+                    "aba": ex.get("aba") or "MANUAL",
+                    "quantidade": float(ex.get("quantidade") or 0),
+                    "origem": "manual",
+                    "estoque_aghu": None,
+                    "estoque_minimo": None,
+                    "ponto_pedido": None,
+                }
+            )
+    return out
+
+
+def parse_data_pedido(raw: str | None) -> date:
+    raw = (raw or "").strip()
+    if not raw:
+        return date.today()
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(raw, fmt).date()
+        except ValueError:
+            continue
+    return date.today()
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("user"):
@@ -415,6 +505,7 @@ def login():
         if user:
             session["user"] = user
             session.pop("manuais", None)
+            session.pop("extras_manuais", None)
             nxt = request.args.get("next") or url_for("index")
             if not nxt.startswith("/"):
                 nxt = url_for("index")
@@ -550,6 +641,8 @@ def index():
         total_catalogo=sum(a.get("count", 0) for a in abas_sorted),
         user=current_user(),
         is_admin=is_admin(),
+        extras=itens_extras_manuais(),
+        usando_neon=using_neon(),
     )
 
 
@@ -610,6 +703,176 @@ def api_manual():
     session["manuais"] = manuais
     session.modified = True
     return jsonify({"ok": True})
+
+
+@app.route("/manual/extra", methods=["POST"])
+@login_required
+def manual_extra():
+    descricao = (request.form.get("descricao") or "").strip()
+    aba = (request.form.get("aba") or "MANUAL").strip() or "MANUAL"
+    qtd_raw = request.form.get("quantidade") or ""
+    cod_raw = (request.form.get("codigo") or "").strip()
+    try:
+        quantidade = float(qtd_raw)
+    except ValueError:
+        flash("Quantidade inválida.", "erro")
+        return redirect(url_for("index"))
+    if not descricao or quantidade <= 0:
+        flash("Informe descrição e quantidade do item manual.", "erro")
+        return redirect(url_for("index"))
+    codigo = None
+    if cod_raw:
+        try:
+            codigo = int(float(cod_raw))
+        except ValueError:
+            flash("Código inválido.", "erro")
+            return redirect(url_for("index"))
+    extras = itens_extras_manuais()
+    extras.append(
+        {
+            "codigo": codigo,
+            "descricao": descricao,
+            "aba": aba,
+            "quantidade": quantidade,
+        }
+    )
+    session["extras_manuais"] = extras
+    session.modified = True
+    flash("Item manual adicionado ao pedido.", "ok")
+    return redirect(url_for("index", filtro="pedir"))
+
+
+@app.route("/manual/extra/<int:idx>/remover", methods=["POST"])
+@login_required
+def manual_extra_remover(idx: int):
+    extras = itens_extras_manuais()
+    if 0 <= idx < len(extras):
+        extras.pop(idx)
+        session["extras_manuais"] = extras
+        session.modified = True
+        flash("Item manual removido.", "ok")
+    return redirect(url_for("index"))
+
+
+@app.route("/pedido/salvar", methods=["POST"])
+@login_required
+def pedido_salvar():
+    data_ped = parse_data_pedido(request.form.get("data_pedido"))
+    observacao = (request.form.get("observacao") or "").strip()
+    itens = coletar_itens_pedido(incluir_extras=True)
+    if not itens:
+        flash("Não há itens para salvar (Pedir = Sim ou manuais).", "erro")
+        return redirect(url_for("index"))
+    try:
+        user = current_user() or {}
+        pid = criar_pedido(
+            data_pedido=data_ped,
+            usuario=user.get("nome") or user.get("username"),
+            observacao=observacao,
+            itens=itens,
+            sqlite_path=_db_path(),
+        )
+        session["extras_manuais"] = []
+        session.modified = True
+        flash(f"Pedido #{pid} salvo ({data_ped.strftime('%d/%m/%Y')}) — {len(itens)} itens.", "ok")
+        return redirect(url_for("historico_detalhe", pedido_id=pid))
+    except Exception as e:
+        flash(f"Erro ao salvar pedido: {e}", "erro")
+        return redirect(url_for("index"))
+
+
+@app.route("/pedido/pdf")
+@login_required
+def pedido_pdf_atual():
+    data_ped = parse_data_pedido(request.args.get("data"))
+    itens = coletar_itens_pedido(incluir_extras=True)
+    if not itens:
+        flash("Nenhum item a pedir para gerar PDF.", "erro")
+        return redirect(url_for("index"))
+    user = current_user() or {}
+    pdf = gerar_pdf_pedido(
+        titulo="Pedido de medicamentos (itens a pedir)",
+        data_pedido=data_ped.strftime("%d/%m/%Y"),
+        usuario=user.get("nome") or user.get("username"),
+        itens=itens,
+    )
+    return send_file(
+        io.BytesIO(pdf),
+        as_attachment=True,
+        download_name=f"pedido_{data_ped.isoformat()}.pdf",
+        mimetype="application/pdf",
+    )
+
+
+@app.route("/historico")
+@login_required
+def historico():
+    try:
+        pedidos = listar_pedidos(_db_path())
+    except Exception as e:
+        pedidos = []
+        flash(f"Erro ao carregar histórico: {e}", "erro")
+    return render_template(
+        "historico.html",
+        pedidos=pedidos,
+        user=current_user(),
+        is_admin=is_admin(),
+        usando_neon=using_neon(),
+    )
+
+
+@app.route("/historico/<int:pedido_id>")
+@login_required
+def historico_detalhe(pedido_id: int):
+    ped = obter_pedido(pedido_id, _db_path())
+    if not ped:
+        flash("Pedido não encontrado.", "erro")
+        return redirect(url_for("historico"))
+    return render_template(
+        "historico_detalhe.html",
+        pedido=ped,
+        user=current_user(),
+        is_admin=is_admin(),
+    )
+
+
+@app.route("/historico/<int:pedido_id>/pdf")
+@login_required
+def historico_pdf(pedido_id: int):
+    ped = obter_pedido(pedido_id, _db_path())
+    if not ped:
+        flash("Pedido não encontrado.", "erro")
+        return redirect(url_for("historico"))
+    data_ped = ped["data_pedido"]
+    if hasattr(data_ped, "strftime"):
+        data_str = data_ped.strftime("%d/%m/%Y")
+        data_iso = data_ped.isoformat()
+    else:
+        data_str = str(data_ped)
+        data_iso = str(data_ped)
+    pdf = gerar_pdf_pedido(
+        titulo=f"Pedido #{pedido_id}",
+        data_pedido=data_str,
+        usuario=ped.get("usuario"),
+        itens=ped.get("itens") or [],
+        observacao=ped.get("observacao"),
+    )
+    return send_file(
+        io.BytesIO(pdf),
+        as_attachment=True,
+        download_name=f"pedido_{pedido_id}_{data_iso}.pdf",
+        mimetype="application/pdf",
+    )
+
+
+@app.route("/historico/<int:pedido_id>/excluir", methods=["POST"])
+@admin_required
+def historico_excluir(pedido_id: int):
+    if excluir_pedido(pedido_id, _db_path()):
+        flash("Pedido excluído.", "ok")
+    else:
+        flash("Pedido não encontrado.", "erro")
+    return redirect(url_for("historico"))
 
 
 @app.route("/exportar")

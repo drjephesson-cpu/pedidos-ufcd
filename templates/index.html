@@ -28,11 +28,13 @@
       {% if is_admin %}
         <a class="btn" href="{{ url_for('usuarios') }}">Usuários</a>
       {% endif %}
+      <a class="btn" href="{{ url_for('historico') }}">Histórico</a>
       <label class="date-field">
         Data do pedido
-        <input type="text" id="dataPedido" value="{{ hoje }}" />
+        <input type="text" id="dataPedido" name="data_pedido_display" value="{{ hoje }}" form="formSalvar" />
       </label>
-      <a class="btn btn-primary" href="{{ url_for('exportar', so_pedir=1) }}">Exportar pedido (.xlsx)</a>
+      <a class="btn" id="btnPdf" href="{{ url_for('pedido_pdf_atual') }}">PDF a pedir</a>
+      <a class="btn" href="{{ url_for('exportar', so_pedir=1) }}">Excel</a>
       <a class="btn" href="{{ url_for('logout') }}">Sair</a>
     </div>
   </header>
@@ -72,7 +74,56 @@
         <span class="badge warn">Pendente</span>
       {% endif %}
     </form>
+
+    <form class="import-box" action="{{ url_for('manual_extra') }}" method="post">
+      <h2>Pedido manual</h2>
+      <p>Inclui no PDF/salvamento mesmo fora do cálculo automático.</p>
+      <label class="field">Código AGHU (opc.)
+        <input type="text" name="codigo" />
+      </label>
+      <label class="field">Medicamento
+        <input type="text" name="descricao" required />
+      </label>
+      <label class="field">Aba / grupo
+        <input type="text" name="aba" value="{{ aba_atual or 'MANUAL' }}" />
+      </label>
+      <label class="field">Quantidade
+        <input type="number" name="quantidade" min="1" step="1" required />
+      </label>
+      <button type="submit" class="btn">Adicionar ao pedido</button>
+    </form>
+
+    <form class="import-box" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
+      <h2>Salvar pedido do dia</h2>
+      <p>Grava todos os “Pedir = Sim” + manuais no histórico{% if usando_neon %} (Neon){% endif %}.</p>
+      <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
+      <label class="field">Observação
+        <input type="text" name="observacao" placeholder="Opcional" />
+      </label>
+      <button type="submit" class="btn btn-primary">Salvar no histórico</button>
+      {% if not usando_neon %}
+        <span class="badge warn">Sem Neon: histórico local (some na Vercel)</span>
+      {% else %}
+        <span class="badge ok">Neon conectado</span>
+      {% endif %}
+    </form>
   </section>
+
+  {% if extras %}
+  <section class="extras-wrap">
+    <h3>Itens manuais neste pedido</h3>
+    <ul class="extras-list">
+      {% for ex in extras %}
+      <li>
+        <span>{{ ex.descricao }} · qtde {{ ex.quantidade | int }}{% if ex.codigo %} · cód. {{ ex.codigo }}{% endif %}</span>
+        <form method="post" action="{{ url_for('manual_extra_remover', idx=loop.index0) }}">
+          <button type="submit" class="btn btn-danger">Remover</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
 
   {% if tem_catalogo %}
   <nav class="tabs" role="tablist">

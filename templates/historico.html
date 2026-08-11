@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Histórico — Pedidos UFCD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark">UFCD</span>
+      <div>
+        <h1>Histórico de pedidos</h1>
+        <p class="subtitle">
+          Pedidos salvos por data
+          {% if usando_neon %}<span class="badge ok">Neon</span>{% else %}<span class="badge warn">SQLite local</span>{% endif %}
+        </p>
+      </div>
+    </div>
+    <div class="top-meta">
+      <a class="btn" href="{{ url_for('index') }}">Voltar aos pedidos</a>
+      <a class="btn" href="{{ url_for('logout') }}">Sair</a>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="table-wrap users-table">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Data do pedido</th>
+          <th>Usuário</th>
+          <th>Itens</th>
+          <th>Qtde total</th>
+          <th>Criado em</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr>
+          <td class="mono">{{ p.id }}</td>
+          <td><strong>{{ p.data_pedido.strftime('%d/%m/%Y') if p.data_pedido.strftime is defined else p.data_pedido }}</strong></td>
+          <td>{{ p.usuario or '—' }}</td>
+          <td class="num">{{ p.qtd_itens }}</td>
+          <td class="num">{{ p.qtd_total | int }}</td>
+          <td class="muted">{{ p.criado_em }}</td>
+          <td class="actions">
+            <a class="btn" href="{{ url_for('historico_detalhe', pedido_id=p.id) }}">Abrir</a>
+            <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=p.id) }}">PDF</a>
+            {% if is_admin %}
+            <form method="post" action="{{ url_for('historico_excluir', pedido_id=p.id) }}" class="inline-form" onsubmit="return confirm('Excluir pedido #{{ p.id }}?');">
+              <button type="submit" class="btn btn-danger">Excluir</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="empty">Nenhum pedido salvo ainda.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pedido #{{ pedido.id }} — Pedidos UFCD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark">UFCD</span>
+      <div>
+        <h1>Pedido #{{ pedido.id }}</h1>
+        <p class="subtitle">
+          Data {{ pedido.data_pedido.strftime('%d/%m/%Y') if pedido.data_pedido.strftime is defined else pedido.data_pedido }}
+          · {{ pedido.usuario or '—' }}
+        </p>
+      </div>
+    </div>
+    <div class="top-meta">
+      <a class="btn" href="{{ url_for('historico') }}">Histórico</a>
+      <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=pedido.id) }}">Baixar PDF</a>
+      <a class="btn" href="{{ url_for('index') }}">Pedidos</a>
+    </div>
+  </header>
+
+  {% if pedido.observacao %}
+  <div class="flash-wrap"><div class="flash flash-ok">Obs.: {{ pedido.observacao }}</div></div>
+  {% endif %}
+
+  <div class="table-wrap users-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Aba</th>
+          <th>Cód. AGHU</th>
+          <th>Medicamento</th>
+          <th>Quanto pedir</th>
+          <th>Origem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in pedido.itens %}
+        <tr class="{% if it.origem == 'manual' %}row-pedir{% endif %}">
+          <td>{{ it.aba or '—' }}</td>
+          <td class="mono">{{ it.codigo if it.codigo is not none else '—' }}</td>
+          <td class="desc">{{ it.descricao }}</td>
+          <td class="num"><strong>{{ it.quantidade | int }}</strong></td>
+          <td>{% if it.origem == 'manual' %}<span class="pill sim">Manual</span>{% else %}<span class="pill nao">Auto</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">Sem itens.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
