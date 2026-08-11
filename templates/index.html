@@ -51,38 +51,69 @@
 {% endblock %}
 
 {% block content %}
-  <section class="command-bar">
-    <form class="command-group" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
-      <span class="command-label">Estoque AGHU</span>
-      <input type="file" name="arquivo" accept=".xlsx,.xls" required />
-      <button type="submit" class="btn btn-quiet">Atualizar</button>
-      {% if tem_estoque %}
-        <span class="meta-pill">{{ estoque_meta.get('itens', 0) }} códigos</span>
-      {% endif %}
+  <section class="top-cards">
+    <form class="panel-card" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
+      <div class="panel-card-head">
+        <h2>Estoque AGHU</h2>
+        <p>Envie o Excel do dia para atualizar os saldos.</p>
+      </div>
+      <div class="panel-card-body">
+        <input type="file" name="arquivo" accept=".xlsx,.xls" required />
+        <button type="submit" class="btn">Atualizar</button>
+        {% if tem_estoque %}
+          <span class="meta-pill">{{ estoque_meta.get('itens', 0) }} códigos</span>
+        {% else %}
+          <span class="meta-pill warn">Pendente</span>
+        {% endif %}
+      </div>
     </form>
 
-    <form class="command-group grow" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
-      <span class="command-label">Histórico</span>
-      <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
-      <input type="text" name="observacao" placeholder="Observação (opcional)" />
+    <form class="panel-card" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
+      <div class="panel-card-head">
+        <h2>Salvar no histórico</h2>
+        <p>Grava itens com Pedir = Sim e ajustes manuais.</p>
+      </div>
+      <div class="panel-card-body">
+        <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
+        <input type="text" name="observacao" placeholder="Observação (opcional)" class="grow-input" />
+      </div>
     </form>
   </section>
 
   {% if tem_catalogo %}
-  <section class="metrics-row">
-    <div class="metric"><span>Itens</span><strong>{{ resumo.total }}</strong></div>
-    <div class="metric accent"><span>A pedir</span><strong>{{ resumo.pedir }}</strong></div>
-    <div class="metric"><span>Sem saldo</span><strong>{{ resumo.sem_saldo }}</strong></div>
-    <div class="metric"><span>Quantidade</span><strong>{{ resumo.qtd_pedir | int }}</strong></div>
-    <form class="filters" method="get">
+  <section class="top-cards metrics-cards">
+    <div class="panel-card metric-card">
+      <span>Itens</span>
+      <strong>{{ resumo.total }}</strong>
+    </div>
+    <div class="panel-card metric-card accent">
+      <span>A pedir</span>
+      <strong>{{ resumo.pedir }}</strong>
+    </div>
+    <div class="panel-card metric-card">
+      <span>Sem saldo</span>
+      <strong>{{ resumo.sem_saldo }}</strong>
+    </div>
+    <div class="panel-card metric-card">
+      <span>Quantidade</span>
+      <strong>{{ resumo.qtd_pedir | int }}</strong>
+    </div>
+  </section>
+
+  <section class="panel-card filter-card">
+    <div class="panel-card-head">
+      <h2>Buscar na lista</h2>
+      <p>{{ 'Todas as categorias' if ver_todos else ('Categoria: ' ~ aba_atual) }}</p>
+    </div>
+    <form class="panel-card-body filters" method="get">
       <input type="hidden" name="aba" value="{{ aba_atual }}" />
-      <input type="search" name="q" value="{{ q }}" placeholder="Buscar…" />
+      <input type="search" name="q" value="{{ q }}" placeholder="Código ou medicamento…" />
       <select name="filtro">
         <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
         <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
         <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
       </select>
-      <button type="submit" class="btn btn-quiet">Filtrar</button>
+      <button type="submit" class="btn">Filtrar</button>
     </form>
   </section>
 
