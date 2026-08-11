@@ -34,6 +34,11 @@ RESTORE_USERS = [
         "nome": "LEANDRO CASSER",
         "role": "usuario",
     },
+    {
+        "username": "camila",
+        "nome": "Camila",
+        "role": "admin",
+    },
 ]
 
 ROLES = ("admin", "usuario")
