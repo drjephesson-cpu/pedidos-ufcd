@@ -1,9 +1,9 @@
 {% set nav_active = 'pedidos' %}
 {% extends "base.html" %}
 
-{% block title %}Pedidos — UFCD{% endblock %}
+{% block title %}Pedidos — {{ unidade.titulo }}{% endblock %}
 {% block page_title %}Pedido de estoque{% endblock %}
-{% block page_sub %}Unidade UFCD · match por Cód. AGHU{% endblock %}
+{% block page_sub %}Unidade {{ unidade.titulo }} · match por Cód. AGHU{% endblock %}
 
 {% block top_actions %}
   <label class="date-field compact">
@@ -14,21 +14,27 @@
 {% endblock %}
 
 {% block sidebar_extra %}
-  {% if tem_catalogo and abas %}
   <div class="sidebar-section">
     <p class="sidebar-label">Unidades</p>
     <div class="unit-tree">
-      <button type="button" class="unit-toggle {% if nav_active == 'pedidos' %}is-open{% endif %}" data-unit="ufcd" aria-expanded="true">
+      {% for uid, ucfg in unidades.items() %}
+      <button
+        type="button"
+        class="unit-toggle {% if unidade_id == uid %}is-open{% endif %}"
+        data-unit="{{ uid }}"
+        aria-expanded="{{ 'true' if unidade_id == uid else 'false' }}"
+      >
         <span class="unit-chevron">▸</span>
-        <span class="unit-name">UFCD</span>
-        {% if contagens.get('todos', 0) %}
-          <em>{{ contagens['todos'] }}</em>
+        <span class="unit-name">{{ ucfg.titulo }}</span>
+        {% if contagens_unidade.get(uid, 0) %}
+          <em>{{ contagens_unidade[uid] }}</em>
         {% endif %}
       </button>
-      <div class="unit-children {% if nav_active == 'pedidos' %}is-open{% endif %}" data-unit-panel="ufcd">
+      <div class="unit-children {% if unidade_id == uid %}is-open{% endif %}" data-unit-panel="{{ uid }}">
+        {% if unidade_id == uid and tem_catalogo and abas %}
         <a
           class="side-cat {% if aba_atual == 'todos' %}active{% endif %}"
-          href="{{ url_for('index', aba='todos', filtro=filtro, q=q) }}"
+          href="{{ url_for('index', unidade=unidade_id, aba='todos', filtro=filtro, q=q) }}"
         >
           <span>Todos</span>
           {% if contagens.get('todos', 0) %}<em>{{ contagens['todos'] }}</em>{% endif %}
@@ -36,24 +42,30 @@
         {% for a in abas %}
         <a
           class="side-cat {% if a.id == aba_atual %}active{% endif %}"
-          href="{{ url_for('index', aba=a.id, filtro=filtro, q=q) }}"
+          href="{{ url_for('index', unidade=unidade_id, aba=a.id, filtro=filtro, q=q) }}"
         >
           <span>{{ a.titulo }}</span>
           {% if contagens.get(a.id, 0) %}<em>{{ contagens[a.id] }}</em>{% endif %}
         </a>
         {% endfor %}
+        {% else %}
+        <a class="side-cat" href="{{ url_for('index', unidade=uid) }}">
+          <span>Abrir unidade</span>
+        </a>
+        {% endif %}
       </div>
+      {% endfor %}
     </div>
   </div>
-  {% endif %}
 {% endblock %}
 
 {% block content %}
   <section class="top-cards">
     <form class="panel-card" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
-        <h2>Estoque AGHU</h2>
-        <p>Envie o Excel do dia para atualizar os saldos.</p>
+        <h2>Estoque {{ 'Bloco' if unidade_id == 'cc' else 'AGHU' }}</h2>
+        <p>{{ unidade.hint_estoque }}</p>
       </div>
       <div class="panel-card-body">
         <input type="file" name="arquivo" accept=".xlsx,.xls" required />
@@ -67,6 +79,7 @@
     </form>
 
     <form class="panel-card" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
+      <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
         <h2>Salvar no histórico</h2>
         <p>Grava itens com Pedir = Sim e ajustes manuais.</p>
@@ -104,6 +117,7 @@
       <p>{{ 'Todas as categorias' if ver_todos else ('Categoria: ' ~ aba_atual) }}</p>
     </div>
     <form class="panel-card-body filters" method="get">
+      <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <input type="hidden" name="aba" value="{{ aba_atual }}" />
       <input type="search" name="q" value="{{ q }}" placeholder="Código ou medicamento…" />
       <select name="filtro">
@@ -115,12 +129,12 @@
       <a
         class="btn export-link"
         id="pdfExportBtn"
-        href="{{ url_for('pedido_pdf_atual', aba=aba_atual, filtro=filtro, q=q) }}"
+        href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
       >PDF</a>
       <a
         class="btn export-link"
         id="excelExportBtn"
-        href="{{ url_for('exportar', aba=aba_atual, filtro=filtro, q=q) }}"
+        href="{{ url_for('exportar', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
       >Excel</a>
     </form>
   </section>
@@ -131,10 +145,12 @@
         <tr>
           {% if ver_todos %}<th>Categoria</th>{% endif %}
           <th>Cód. AGHU</th>
-          <th>Medicamento</th>
+          <th>{% if unidade_id == 'cc' %}Item{% else %}Medicamento{% endif %}</th>
           <th>Est. Mín.</th>
+          {% if mostra_ponto_caixa %}
           <th>Ponto</th>
           <th>Caixa</th>
+          {% endif %}
           <th class="col-estoque">Estoque</th>
           <th>Pedir?</th>
           <th>Qtde</th>
@@ -142,14 +158,17 @@
         </tr>
       </thead>
       <tbody>
+        {% set cols = (9 if mostra_ponto_caixa else 7) + (1 if ver_todos else 0) %}
         {% for it in itens %}
         <tr class="{% if it.pedir %}row-pedir{% endif %} {% if it.sem_estoque %}row-sem{% endif %}">
           {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
           <td class="mono">{{ it.codigo }}</td>
           <td class="desc">{{ it.descricao }}</td>
           <td class="num">{{ it.estoque_minimo | int }}</td>
+          {% if mostra_ponto_caixa %}
           <td class="num">{{ it.ponto_pedido | int }}</td>
           <td class="num">{{ it.caixa_com | int }}</td>
+          {% endif %}
           <td class="num col-estoque">
             {% if it.estoque_aghu is none %}<span class="muted">—</span>{% else %}{{ it.estoque_aghu | int }}{% endif %}
           </td>
@@ -172,6 +191,7 @@
               min="0"
               step="1"
               data-codigo="{{ it.codigo }}"
+              data-unidade="{{ unidade_id }}"
               value="{{ it.manual if it.manual is not none else '' }}"
               placeholder="—"
             />
@@ -179,7 +199,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="{{ 10 if ver_todos else 9 }}" class="empty">Nenhum item neste filtro.</td>
+          <td colspan="{{ cols }}" class="empty">Nenhum item neste filtro.</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -188,7 +208,7 @@
   {% else %}
   <section class="empty-state">
     <h2>Catálogo indisponível</h2>
-    <p>Arquivo <code>data/catalogo.json</code> não encontrado.</p>
+    <p>Arquivo de catálogo da unidade {{ unidade.titulo }} não encontrado.</p>
   </section>
   {% endif %}
 

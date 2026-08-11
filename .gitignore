@@ -13,3 +13,6 @@ data/pedidos.db
 !data/EstoqueFarmacia-exemplo.xlsx
 .idea/
 .vscode/
+
+data/estoque_cc.json
+data/estoque_ufcd.json

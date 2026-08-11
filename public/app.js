@@ -1,15 +1,19 @@
-async function salvarManual(codigo, valor) {
+async function salvarManual(codigo, valor, unidade) {
   await fetch("/api/manual", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ codigo, valor: valor === "" ? null : Number(valor) }),
+    body: JSON.stringify({
+      codigo,
+      valor: valor === "" ? null : Number(valor),
+      unidade: unidade || undefined,
+    }),
   });
   window.location.href = new URL(window.location.href).toString();
 }
 
 document.querySelectorAll(".manual-input").forEach((input) => {
   input.addEventListener("change", () => {
-    salvarManual(input.dataset.codigo, input.value.trim());
+    salvarManual(input.dataset.codigo, input.value.trim(), input.dataset.unidade);
   });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -49,6 +53,15 @@ if (toggle) {
 document.querySelectorAll(".unit-toggle").forEach((btn) => {
   btn.addEventListener("click", () => {
     const unit = btn.dataset.unit;
+    const params = new URLSearchParams(window.location.search);
+    const current = params.get("unidade") || "ufcd";
+    if (unit && unit !== current) {
+      params.set("unidade", unit);
+      params.set("aba", "todos");
+      params.delete("q");
+      window.location.href = `${window.location.pathname}?${params.toString()}`;
+      return;
+    }
     const panel = document.querySelector(`[data-unit-panel="${unit}"]`);
     const open = btn.classList.toggle("is-open");
     btn.setAttribute("aria-expanded", open ? "true" : "false");

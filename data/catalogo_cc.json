@@ -1,0 +1,3137 @@
+{
+  "unidade": "cc",
+  "titulo": "Centro Cirúrgico",
+  "modelo": "minimo",
+  "abas": [
+    {
+      "id": "med_caf",
+      "titulo": "Medicamentos CAF",
+      "count": 35
+    },
+    {
+      "id": "med_farm",
+      "titulo": "Medicamentos Farmácia Central",
+      "count": 49
+    },
+    {
+      "id": "materiais",
+      "titulo": "Materiais",
+      "count": 229
+    },
+    {
+      "id": "fios",
+      "titulo": "Fios de sutura",
+      "count": 64
+    }
+  ],
+  "itens": {
+    "med_caf": [
+      {
+        "codigo": 900086,
+        "descricao": "Atropina 0,25 mg/1ml (pedir cx 100)",
+        "estoque_minimo": 75.0,
+        "ponto_pedido": 75.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 284962,
+        "descricao": "Azul de metileno 1% amp 5 mL",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 294812,
+        "descricao": "Azul patente 25 mg/mL (CX: 5)",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 402442,
+        "descricao": "Contraste Iobitridol 350mg/ml 50 ml",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 218421,
+        "descricao": "Bupi. 0,5% pesada 4mL",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900108,
+        "descricao": "Bupi. 0,5% c/v Fr/amp 20mL",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 218405,
+        "descricao": "Bupi. 0,5% s/v Fr/amp 20 mL",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 248681,
+        "descricao": "Cefazolina 1 g (Pedir cx.: 50 un.)",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900149,
+        "descricao": "Cetoprofeno (cx:50un)",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900123,
+        "descricao": "Dexametasona AMP (pedir cx 50)",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900081,
+        "descricao": "Dipirona 500 mg/mL  (pedir cx 100)",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900135,
+        "descricao": "Efedrina 50mg/mL (pedir cx: 25)",
+        "estoque_minimo": 35.0,
+        "ponto_pedido": 35.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 279445,
+        "descricao": "Esmolol 10mg/ml amp 10 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900137,
+        "descricao": "FENTANIL (CX 25 UNI.)",
+        "estoque_minimo": 75.0,
+        "ponto_pedido": 75.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 294838,
+        "descricao": "Fluoresceína sódica 20% amp 5 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 12858,
+        "descricao": "Glicina 1,5% Bolsa 3000 ml",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900039,
+        "descricao": "Lidocaína 1% c/vaso",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 16543,
+        "descricao": "Lidocaína 1% s/vaso",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900178,
+        "descricao": "Lidocaína 2% c/vaso",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 16489,
+        "descricao": "Lidocaína 2% s/vaso (cx 25)",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 15865,
+        "descricao": "Lidocaina gel - SERINGA",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900046,
+        "descricao": "Metaraminol   (Pedir cx.: 25 un.)",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900068,
+        "descricao": "Ondansetrona  (Pedir cx.: 50 un.)",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 248584,
+        "descricao": "Ropivacaína 7,5 mg/mL Fr/amp 20mL",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 289072,
+        "descricao": "Suxametônio 100mg",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900148,
+        "descricao": "Atracúrio 50mg/5 ml (Pedir cx.: 25 un.)",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "MEDICAMENTOS TERMOLÁBEIS (GELADEIRA)"
+      },
+      {
+        "codigo": 294220,
+        "descricao": "CISatracúrio 10 ml (Pedir cx.: 5 un.)",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "MEDICAMENTOS TERMOLÁBEIS (GELADEIRA)"
+      },
+      {
+        "codigo": 900058,
+        "descricao": "Ocitocina 5 UI  (Pedir cx.: 50 un.)",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "MEDICAMENTOS TERMOLÁBEIS (GELADEIRA)"
+      },
+      {
+        "codigo": 900066,
+        "descricao": "Pancurônio 4mg/2 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "MEDICAMENTOS TERMOLÁBEIS (GELADEIRA)"
+      },
+      {
+        "codigo": 900100,
+        "descricao": "Rocurônio 5mL(Pedir cx.: 25 un.)",
+        "estoque_minimo": 125.0,
+        "ponto_pedido": 125.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "MEDICAMENTOS TERMOLÁBEIS (GELADEIRA)"
+      },
+      {
+        "codigo": 900044,
+        "descricao": "Lidocaína spray 10% 50mL",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "SOLUÇÕES"
+      },
+      {
+        "codigo": 401196,
+        "descricao": "Lugol 3%",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "SOLUÇÕES"
+      },
+      {
+        "codigo": 900121,
+        "descricao": "Dexametasona acetato 0,1% creme",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "POMADAS"
+      },
+      {
+        "codigo": 290223,
+        "descricao": "Lidocaína gel 2% tb 30 g (pedir cx 10)",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "POMADAS"
+      },
+      {
+        "codigo": 17337,
+        "descricao": "Neomic 5 mg+bacitrac. pom 15 g",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "POMADAS"
+      }
+    ],
+    "med_farm": [
+      {
+        "codigo": 145050,
+        "descricao": "Ácido Tranexâmico",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900103,
+        "descricao": "Adenosina 6 mg/2 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900085,
+        "descricao": "Albumina hum 200mg/ml fr 50 ml",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900169,
+        "descricao": "Aminofilina 240mg/10 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900101,
+        "descricao": "Amiodarona 150 mg/3 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 13811,
+        "descricao": "Ampicilna 1g",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900107,
+        "descricao": "Bicarbon. Na 8,4% 10 ml",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 14079,
+        "descricao": "Cefalotina 1 g",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 16640,
+        "descricao": "Cefoxitina 1g",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 16969,
+        "descricao": "Ceftriaxona 1 g",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 174653,
+        "descricao": "Ciprofloxacino 200mg/100 mL",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 14168,
+        "descricao": "Clindamicina 150mg/ml amp 4 ml",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900112,
+        "descricao": "Clonidina 150 mcg amp 1mL",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900161,
+        "descricao": "Cloreto Potássio 19,1% 10 mL",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900079,
+        "descricao": "Cloreto Sódio 20% 10 mL",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 12769,
+        "descricao": "Deslanosídeo 0,4 mg/2 mL",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 269618,
+        "descricao": "Dimenidrinato E.V. amp 10 ml",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900128,
+        "descricao": "Dobutamina 250 mg/20 mL",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900019,
+        "descricao": "Dopamina 50 mg/10 mL",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 14885,
+        "descricao": "Epinefrina 1mg/mL amp 1mL",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900020,
+        "descricao": "Furosemida 20 mg/2 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 15202,
+        "descricao": "Gentamicina 40mg/ml amp 2 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900024,
+        "descricao": "Glicose 50 %",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 207772,
+        "descricao": "Gluconato de Cálcio 10% amp 10 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900030,
+        "descricao": "Heparina 5.000/ml amp 5 ml",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900025,
+        "descricao": "Hidralazina 20 mg/1 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 15474,
+        "descricao": "Hidrocortisona 100mg",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 15482,
+        "descricao": "Hidrocortisona 500mg",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 273795,
+        "descricao": "Hioscina 20 mg/ 1 ml amp",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900047,
+        "descricao": "Metilergometrina, maleato 0,2 mg/1 ml",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900055,
+        "descricao": "Metoclopramida 10 mg amp 2 ml",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 400242,
+        "descricao": "Metronidazol 500 mg/100 ml E.V.",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900061,
+        "descricao": "Nitroglicerina 50mg/10 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900167,
+        "descricao": "Nitroprussiato 50mg",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900062,
+        "descricao": "Norepinefrina 1 mg/ml amp 4 ml",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 201790,
+        "descricao": "Omeprazol 40mg",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 248665,
+        "descricao": "Piperacilina 4 g + tazobactam 500 mg",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900090,
+        "descricao": "Prometazina 50 mg/2 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 17825,
+        "descricao": "Protamina 1000 UI/ml amp 5 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900075,
+        "descricao": "Sulf. magnésio 50% amp 10 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900074,
+        "descricao": "Terbutalina 0,5 mg/ ml amp 1 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900010,
+        "descricao": "Vitamina K IM/SC",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900117,
+        "descricao": "Difenidramina 50mg/ml - amp 01 mL",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 900134,
+        "descricao": "Enoxaparina 40mg",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "AMPOLAS"
+      },
+      {
+        "codigo": 12831,
+        "descricao": "Manitol 20% 250 ml",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "LOÇÕES/SOLUÇÕES"
+      },
+      {
+        "codigo": 900094,
+        "descricao": "Salbutamol Spray 100 mcg",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "LOÇÕES/SOLUÇÕES"
+      },
+      {
+        "codigo": 288963,
+        "descricao": "Nafazolina 0,5mg/mL sol. Nasal",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "RESERVA TERAPÊUTICA"
+      },
+      {
+        "codigo": 279457,
+        "descricao": "Retin+aa+metion+cloranf pom oft 3,5 g",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "RESERVA TERAPÊUTICA"
+      },
+      {
+        "codigo": 272124,
+        "descricao": "Subgalato de bismuto 10 gr",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo",
+        "grupo": "RESERVA TERAPÊUTICA"
+      }
+    ],
+    "materiais": [
+      {
+        "codigo": 400994,
+        "descricao": "Agulha 13x4,5 (Pedir cx : 100 un)",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 2615,
+        "descricao": "Agulha 25x7 (Pedir cx: 100 )",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 2593,
+        "descricao": "Agulha 25x8",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 2879,
+        "descricao": "Agulha 40x12 (Pedir cx: 100 )",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405686,
+        "descricao": "Ag. anestesia para bloqueio de plexo 21G",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 223263,
+        "descricao": "Agulha Peridural 16 G",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400281,
+        "descricao": "Agulha Raqui nº 22",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400282,
+        "descricao": "Agulha Raqui nº 25",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 271994,
+        "descricao": "Agulha Raqui nº 27",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294146,
+        "descricao": "Agulha Raqui nº 22 P/ OBESO",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293708,
+        "descricao": "Agulha tipo Huber",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401200,
+        "descricao": "Atad. Algodão 15cm",
+        "estoque_minimo": 0.0,
+        "ponto_pedido": 0.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401202,
+        "descricao": "Atad. Algodão 20cm",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1856,
+        "descricao": "Atad Crepom 10cm (Pedir 12)",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1864,
+        "descricao": "Atad Crepom 15cm (Pedir 12)",
+        "estoque_minimo": 24.0,
+        "ponto_pedido": 24.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400099,
+        "descricao": "Atad Crepom 20cm (Pedir 12)",
+        "estoque_minimo": 24.0,
+        "ponto_pedido": 24.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400097,
+        "descricao": "Atad Crepom 30cm (Pedir 12)",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293936,
+        "descricao": "Bisturi  lâmina nº 11,",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293947,
+        "descricao": "Bisturi lâmina nº 15, (CX: 10)",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293951,
+        "descricao": "Bisturi lâmina nº 23, (CX: 10)",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 402260,
+        "descricao": "Bisturi , lâmina nº 24 (CX: 10)",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401460,
+        "descricao": "Bolsa Colostomia  (cx: 10 un)",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294687,
+        "descricao": "Cânula Traque Nº 3,0 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293823,
+        "descricao": "Cânula Traque Nº 3,5 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293824,
+        "descricao": "Cânula Traque Nº 4,0 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293825,
+        "descricao": "Cânula Traque Nº 4,5 c/balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293826,
+        "descricao": "Cânula Traque Nº 5,0 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293828,
+        "descricao": "Cânula Traque Nº 5,5 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293831,
+        "descricao": "Cânula Traque Nº 6,0 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293814,
+        "descricao": "Cânula Traque Nº 6,5 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293833,
+        "descricao": "Cânula Traque Nº 7,0 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293836,
+        "descricao": "Cânula Traque Nº 7,5 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293837,
+        "descricao": "Cânula Traque Nº 8,0 c/balão",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293839,
+        "descricao": "Cânula Traque Nº 8,5 c/balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293840,
+        "descricao": "Cânula Traque Nº 9,0 c/balão",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293842,
+        "descricao": "Cânula Traque Nº 9,5 c/balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400105,
+        "descricao": "Capa p/ vídeo ( pct : 10)",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294007,
+        "descricao": "Cateter  periférico nº 14",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294008,
+        "descricao": "Cateter periférico nº 16",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293738,
+        "descricao": "Cateter periférico  nº 18",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293747,
+        "descricao": "Cateter  periférico nº 20",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293732,
+        "descricao": "Cateter periférico nº 22",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293862,
+        "descricao": "Cateter periférico nº 24",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400109,
+        "descricao": "Cateter tipo óculos infantil",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 256668,
+        "descricao": "Cateter tipo óculos adulto",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 3476,
+        "descricao": "Cateter oxigênio Sonda nº 6",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 3450,
+        "descricao": "Cateter oxigênio Sonda nº 8",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400114,
+        "descricao": "Cateter umbilical 2,5 CH",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 402646,
+        "descricao": "Cateter umbilical 3,0 CH",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293905,
+        "descricao": "Clamp Umbilical",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401954,
+        "descricao": "Coletor secreção (bronquinho)",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 7072,
+        "descricao": "Coletor urina aberto",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 6742,
+        "descricao": "Coletor urina fech (cx: 5un)",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 2356,
+        "descricao": "Seringa 3 ml luer lock",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 273181,
+        "descricao": "Seringa 5 ml  luer slip",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400181,
+        "descricao": "Seringa 5 ml  luer lock",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294196,
+        "descricao": "Seringa 10 ml luer slip",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 2330,
+        "descricao": "Seringa 10 ml luer lock",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 2283,
+        "descricao": "Seringa 20 ml luer slip",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 192937,
+        "descricao": "Seringa 20 ml luer lock (cx:50)",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401120,
+        "descricao": "Seringa 60 ml urológica c/ bico",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401348,
+        "descricao": "Seringa 60 ml luer slip",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294192,
+        "descricao": "Seringa 60 ml luer lock",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293965,
+        "descricao": "Sonda de Aspiração nº 4",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293966,
+        "descricao": "Sonda de Aspiração nº 6",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400340,
+        "descricao": "Sonda de Aspiração nº 8  (pedir 10 unid)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400341,
+        "descricao": "Sonda de Aspiração nº 10",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400343,
+        "descricao": "Sonda de Aspiração nº 12 (pedir 10 unid)",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400344,
+        "descricao": "Sonda de Aspiração nº 14  (pedir 10 unid)",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400251,
+        "descricao": "Sonda Folley 2V nº 8",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400252,
+        "descricao": "Sonda Folley 2V nº 10",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 12173,
+        "descricao": "Sonda Folley 2V nº 12",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 11894,
+        "descricao": "Sonda Folley 2V nº 14",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 12297,
+        "descricao": "Sonda Folley 2V nº 16",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 11908,
+        "descricao": "Sonda Folley 2V nº 18",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294040,
+        "descricao": "Sonda Folley 3V nº 20",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 144550,
+        "descricao": "Sonda Folley 3V nº 22",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294044,
+        "descricao": "Sonda Folley 3V n° 24",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293718,
+        "descricao": "Sonda Nasoentérica Infantil nº 06",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293716,
+        "descricao": "Sonda Nasoentérica Adulto nº 12",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400253,
+        "descricao": "Sonda Nasogástrica nº 6 curta",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400254,
+        "descricao": "Sonda Nasogástrica nº 8 curta",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400255,
+        "descricao": "Sonda Nasogástrica nº 10 curta",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400260,
+        "descricao": "Sonda Nasogástrica nº 8 longa",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293930,
+        "descricao": "Sonda Nasogástrica nº 10 longa",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293932,
+        "descricao": "Sonda Nasogástrica nº 14 longa",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400258,
+        "descricao": "Sonda Nasogástrica nº 18  longa",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400259,
+        "descricao": "Sonda Nasogástrica nº 20 longa",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400257,
+        "descricao": "Sonda Nasogástrica nº 16  longa",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293741,
+        "descricao": "Sonda Uretral nº 6",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400261,
+        "descricao": "Sonda Uretral nº 8",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293744,
+        "descricao": "Sonda Uretral nº 10",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293745,
+        "descricao": "Sonda Uretral nº 12",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293748,
+        "descricao": "Sonda Uretral nº 14",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293749,
+        "descricao": "Sonda Uretral nº 16",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293752,
+        "descricao": "Sonda Uretral nº 18",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400263,
+        "descricao": "Sugador Odontológico",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 174181,
+        "descricao": "Torneirinha 3V luer lock",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 9237,
+        "descricao": "Tubo endotraqueal Nº 2,0 sem balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1112,
+        "descricao": "Tubo endotraqueal Nº 2,5 sem balão",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1120,
+        "descricao": "Tubo endotraqueal Nº 3,0 sem balão",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1139,
+        "descricao": "Tubo endotraqueal Nº 3,5 sem balão",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 9229,
+        "descricao": "Tubo endotraqueal Nº 4,0 sem balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1163,
+        "descricao": "Tubo endotraqueal Nº 4,5 sem balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 9245,
+        "descricao": "Tubo endotraqueal Nº 5,0 sem balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 9253,
+        "descricao": "Tubo endotraqueal  Nº 5,5 sem balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1104,
+        "descricao": "Tubo endotraqueal Nº 6,0 sem balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1147,
+        "descricao": "Tubo endotraqueal Nº 6,5 sem balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1082,
+        "descricao": "Tubo endotraqueal Nº 3,0 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401778,
+        "descricao": "Sonda de Gastrostomia 16 FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400247,
+        "descricao": "Sonda de Gastrostomia 20 FR",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 402960,
+        "descricao": "Sonda de Gastrostomia 24 FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401220,
+        "descricao": "Tela Marlex 7 x 15 cm",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401426,
+        "descricao": "Tela Marlex 15 x 15 cm",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401296,
+        "descricao": "Tela Marlex 30 x 30 cm",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 230669,
+        "descricao": "Tubo carlens nº 32 esquerdo",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 6769,
+        "descricao": "Coletor de urina infantil masculino",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404440,
+        "descricao": "Conj drenagem tóraxnº 20",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404443,
+        "descricao": "Conj drenagem tórax nº 24 fr 2 litros",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404438,
+        "descricao": "Conj drenagem tórax-nº 26",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294133,
+        "descricao": "Conj drenagem tórax- nº 28",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404437,
+        "descricao": "Conj drenagem tórax nº 30",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294135,
+        "descricao": "Conj drenagem tórax nº 32",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294136,
+        "descricao": "Conj drenagem tórax nº 34",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294137,
+        "descricao": "Conj drenagem tórax nº 36",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400122,
+        "descricao": "Curativo central infantil",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400916,
+        "descricao": "Curativo central 9x10 adulto",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400169,
+        "descricao": "Curativo (Melolin)",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293764,
+        "descricao": "Dreno Kehr Nº 12",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293766,
+        "descricao": "Dreno Kehr Nº 14",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293767,
+        "descricao": "Dreno Kehr Nº 16",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293769,
+        "descricao": "Dreno Kehr Nº 18",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293820,
+        "descricao": "Dreno Kehr Nº 20",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400141,
+        "descricao": "Dreno Kehr Nº 22",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293827,
+        "descricao": "Dreno Penrose nº 1",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293830,
+        "descricao": "Dreno Penrose nº 2",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293834,
+        "descricao": "Dreno Penrose nº 3",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293838,
+        "descricao": "Dreno Penrose nº 4",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400143,
+        "descricao": "Dreno Sucção Nº 3,2",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400145,
+        "descricao": "Dreno Sucção Nº 4,8",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400146,
+        "descricao": "Dreno Sucção Nº 6,4",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 89249,
+        "descricao": "Eletrodo adulto (pct:  50un)",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401004,
+        "descricao": "Eletrodo infantil (cx 50un)",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 113492,
+        "descricao": "Eletrodo neonatal (cx 50un)",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 186864,
+        "descricao": "Equipo de irrigação",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294102,
+        "descricao": "Equipo Bureta",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294121,
+        "descricao": "Equipo Macrogts ( pct: 25)",
+        "estoque_minimo": 75.0,
+        "ponto_pedido": 75.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401286,
+        "descricao": "Equipo Microgotas",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1007,
+        "descricao": "Equipo p/ Bomba Infusão",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 277185,
+        "descricao": "Equipo Bomba Inf FOTO",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401442,
+        "descricao": "Extensor intermediário 2 v",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293925,
+        "descricao": "Extensor 40 / 60 cm prime red",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403998,
+        "descricao": "Extensor 60 cm",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403018,
+        "descricao": "Extensor 120 cm prime red",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403019,
+        "descricao": "Ext. 120cm pr red FOTO",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400910,
+        "descricao": "Extensor 120 cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400152,
+        "descricao": "Fixador cateter perif IV-FIX",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400315,
+        "descricao": "Frasco E.Q.U. estéril",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400337,
+        "descricao": "Intracath adulto (amarelo) 1814",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405636,
+        "descricao": "Lâmina para tricotomizador",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400171,
+        "descricao": "Placa-terra adulto",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404554,
+        "descricao": "Placa-terra eletroc infantil",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405962,
+        "descricao": "Placa-terra eletroc neonatal",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293953,
+        "descricao": "Scalp nº 21",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293955,
+        "descricao": "Scalp nº 23",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293728,
+        "descricao": "Scalp nº 25",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293734,
+        "descricao": "Scalp nº 27",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400179,
+        "descricao": "Seringa 1 ml sem agulha",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401301,
+        "descricao": "Seringa 3 ml luer slip",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 163430,
+        "descricao": "Tubo endot Nº 3,5 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 163457,
+        "descricao": "Tubo endot Nº 4,0 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 163449,
+        "descricao": "Tubo endot Nº 4,5 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293783,
+        "descricao": "Tubo endot Nº 5,0 com balão",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293785,
+        "descricao": "Tubo endot Nº 5,5 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293787,
+        "descricao": "Tubo endot Nº 6,0 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293788,
+        "descricao": "Tubo endot Nº 6,5 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1040,
+        "descricao": "Tubo endot Nº 7,0 com balão",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "Tubo endot Nº 7,5 com balão",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 293974,
+        "descricao": "Tubo endot Nº 8,0 com balão",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1015,
+        "descricao": "Tubo endot Nº 8,5 com balão",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1023,
+        "descricao": "Tubo endot Nº 9,0 com balão",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400269,
+        "descricao": "Tubo endot aramado nº 3,5",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400270,
+        "descricao": "Tubo endot aramado nº 4,0",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400271,
+        "descricao": "Tubo endot aramado nº 4,5",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400272,
+        "descricao": "Tubo endot aramado nº 5.0",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400279,
+        "descricao": "Tubo endot aramado nº 5,5",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400274,
+        "descricao": "Tubo endot aramado nº 6,0",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400275,
+        "descricao": "Tubo endot aramado nº 6,5",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400276,
+        "descricao": "Tubo endot aramado nº 7,0",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400277,
+        "descricao": "Tubo endot aramado nº 7,5",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400278,
+        "descricao": "Tubo endot aramado nº 8,0",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400273,
+        "descricao": "Tubo endot aramado nº 8,5",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401026,
+        "descricao": "Ag.p/aspirado Medula óssea 16Gx0,5 a 6,8 cm",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400095,
+        "descricao": "Ag.p/biópsia Medula óssea 11G x 110 cm",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404242,
+        "descricao": "Ag.p/biópsia Medula óssea 11G x 150 cm",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400996,
+        "descricao": "Agulha biópsia mama 14 G x 120 mm (verde)",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401025,
+        "descricao": "Agulha para Biópsia 18GA X 250mm",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403940,
+        "descricao": "Cateter Arterial 20 G x 5 cm",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400111,
+        "descricao": "Cateter Peridural Nº 16",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401644,
+        "descricao": "Cateter duplo lúmen 4 F x 13 cm INFANTIL",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294027,
+        "descricao": "Cateter duplo lúmen 5 F x 13 cm INFANTIL",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401280,
+        "descricao": "Cateter duplo lúmen 7 FR x 20 cm ADULTO",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400285,
+        "descricao": "Cateter mono lúmen 14FR x 20 cm ADULTO",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 406857,
+        "descricao": "Cat Embolectomia Forgaty 3FR",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 406860,
+        "descricao": "Cat. Embolectomia Forgaty 4FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 406862,
+        "descricao": "Cat. Embolectomia Forgaty 5FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403908,
+        "descricao": "cateter PICC 1 FR",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401771,
+        "descricao": "cateter PICC 2 FR",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405462,
+        "descricao": "Conj de Drenagem Biliar Pigtail, 10FR",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404858,
+        "descricao": "Dispositivo Intrauterino (DIU)",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 402350,
+        "descricao": "Extrator tipo dormia",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401292,
+        "descricao": "Fio guia duplo \"J\"",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403478,
+        "descricao": "Esponja Hemostatica",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 1961,
+        "descricao": "Grampeador circular 31 mm",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405472,
+        "descricao": "Kit de introdução multiproposito 14 FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 179698,
+        "descricao": "Kit de nefrostomia c/cateter 12 CH ponta cateter",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 239720,
+        "descricao": "Kit sonda uretral duplo \"J\" 6.0 FR c/ fio guia",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 185485,
+        "descricao": "Portocath 6.6 F (cateter total. Implantável)",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401039,
+        "descricao": "Portocath 8.0 F (cateter total. Implantável)",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403642,
+        "descricao": "Sonda Gastrostomia 12 FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401106,
+        "descricao": "Sonda Gastrostomia 14 FR",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 211877,
+        "descricao": "Tubo  carlens nº 35 esquerdo",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 401640,
+        "descricao": "Tubo carlens nº 37 esquerdo",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 201677,
+        "descricao": "Tubo carlens nº 39 esquerdo",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 231550,
+        "descricao": "Tubo carlens nº 41 esquerdo",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405639,
+        "descricao": "Tubo de ventilação Donaldson, estéril",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405640,
+        "descricao": "Tubo ventilação paparella",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400982,
+        "descricao": "Tubo Hipospádia 08",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400979,
+        "descricao": "Tubo Hipospádia 06",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      }
+    ],
+    "fios": [
+      {
+        "codigo": 400345,
+        "descricao": "AÇO 0 s/ag. 3 x 60 cm",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400906,
+        "descricao": "AÇO 1 s/ ag. 3 x 60 cm",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 35,
+        "descricao": "AÇO 2-0 s/ ag. 3 x 60 cm",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400351,
+        "descricao": "Caprofyl (POLIGLECAPRONE)  2-0 70cm 1ag. Cilindrica  2.60cm",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400349,
+        "descricao": "Caprofyl (POLIGLECAPRONE)  2-0 70cm 1ag. Cilindrica  3.50cm",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 405702,
+        "descricao": "Caprofyl (POLIGLECAPRONE)  3-0 70cm 1ag. corpo e ponta cil  3.50cm",
+        "estoque_minimo": 24.0,
+        "ponto_pedido": 24.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 51,
+        "descricao": "Caprofyl (POLIGLECAPRONE)  4-0 1,7 cm ag. Cilíndrica",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 19,
+        "descricao": "CAT GUT CROMADO 0  90cm 1ag. cilindrica 5.00cm",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 78,
+        "descricao": "CAT GUT CROMADO 1 90cm  (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400353,
+        "descricao": "CAT GUT CROMADO 2-0 70cm   (Pedir cx: 24 un.)",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 108,
+        "descricao": "CAT GUT CROMADO 3-0  70cm 1ag.cilindrica 2.50cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 116,
+        "descricao": "CAT GUT CROMADO 4-0  70cm 1ag. cilindrica 1.50cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400355,
+        "descricao": "CAT GUT CROMADO 5-0",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 140,
+        "descricao": "CAT GUT SIMPLES 0 70cm 1ag. cilindrica 3.00cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 159,
+        "descricao": "CAT GUT SIMPLES 2-0 70cm (Pedir cx: 24 un.)",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 191,
+        "descricao": "CAT GUT SIMPLES 3-0  70cm 1ag. cilindrica 3.00cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 213,
+        "descricao": "CAT GUT SIMPLES 4-0 70cm 1ag  cilindrica 2,00cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400357,
+        "descricao": "CAT GUT SIMPLES 5-0 70cm 1ag cilindrica 1,50 cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400365,
+        "descricao": "Clip de ligadura, mat. titânio, médio grande - Liga clip",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 404394,
+        "descricao": "Clip de ligadural (HEM-O-LOK/largo) Roxo",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400981,
+        "descricao": "Clip de ligadura (HEM-O-LOK/extra largo) Dourado",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400359,
+        "descricao": "Ethibond (POLIÉSTER)  2-0 75cm 2ag. 2.50cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400361,
+        "descricao": "Ethibond (POLIÉSTER) 4-0 75 cm c/ 2ag 1,5 cm cardiaca",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400363,
+        "descricao": "Ethibond (POLIÉSTER) 5 4x 75cm (Pedir cx: 12 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400962,
+        "descricao": "FITA CARDÍACA 0,30 x 80 cm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 353,
+        "descricao": "LINHO 0 75cm 1ag. 3.00cm cilíndrica",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 361,
+        "descricao": "LINHO 2-0 15x45cm  S/AG (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400,
+        "descricao": "LINHO 2-0 75cm (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400367,
+        "descricao": "Monocryl (POLIGLECAPRONE) 4-0 (cx 12 unid)",
+        "estoque_minimo": 48.0,
+        "ponto_pedido": 48.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400369,
+        "descricao": "Monocryl (POLIGLECAPRONE) 5-0",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400909,
+        "descricao": "Mononylon (NYLON) 0 ag. 20 mm (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 442,
+        "descricao": "Mononylon (NYLON) 2-0 ag. 3/8 36,4mm (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 450,
+        "descricao": "Mononylon (NYLON) 2-0 ag. 3/8 40 mm (Pedir cx: 24 un.)",
+        "estoque_minimo": 48.0,
+        "ponto_pedido": 48.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400371,
+        "descricao": "Mononylon (NYLON) 3.0 ag. 3/8 19 mm  (Pedir cx: 24 un.)",
+        "estoque_minimo": 48.0,
+        "ponto_pedido": 48.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400942,
+        "descricao": "Mononylon (NYLON) 3-0 ag. 3/8 30 mm (Pedir cx: 24 un.)",
+        "estoque_minimo": 72.0,
+        "ponto_pedido": 72.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400943,
+        "descricao": "Mononylon (NYLON) 4-0 ag. 3/8 20 mm (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400944,
+        "descricao": "Mononylon (NYLON) 4-0 ag. 1/2 20 mm  (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400946,
+        "descricao": "Mononylon (NYLON) 5-0 ag. 3/8 20 mm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 639,
+        "descricao": "Mononylon (NYLON) 6-0 ag. 3/8 20 mm",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400972,
+        "descricao": "POLIDIOXANONA 4-0 70 cm ag 1/2 círculo cilíndrica 22 mm",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400974,
+        "descricao": "POLIDIOXANONA 7-0 75 cm",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 701,
+        "descricao": "Prolene (POLIPROPILENO) 0 ag. 1/2 2,5cm (Pedir cx: 24 un.)",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 728,
+        "descricao": "Prolene (POLIPROPILENO) 0 ag. 40 cm (Pedir cx: 24 un.)",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 787,
+        "descricao": "Prolene (POLIPROPILENO) 2 3x50 1 ag 7,5 cm triangular",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 795,
+        "descricao": "Prolene (POLIPROPILENO) 2-0 75cm ag 2,5cm circ",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 809,
+        "descricao": "Prolene (POLIPROPILENO) 3-0 75cm 2ag. 2.50cm cilíndricas",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 817,
+        "descricao": "Prolene (POLIPROPILENO) 4-0 75cm 2ag. 2.00cm cilíndricas",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 833,
+        "descricao": "Prolene (POLIPROPILENO) 5-0  75 cm 2 ag. 17 mm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400948,
+        "descricao": "Prolene (POLIPROPILENO) 6-0 c/ 2 ag. Cil. 1,3 cm 3/8",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 850,
+        "descricao": "SEDA 1 15x45  S/AG (Pedir cx: 24 un.)",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 876,
+        "descricao": "SEDA 2-0 70cm 1ag. 30 mm (Pedir cx: 24 un.)",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 403076,
+        "descricao": "SEDA 2-0 15 X 45 S/AG (Pedir cx: 24 un.)",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400950,
+        "descricao": "SEDA 3-0 70 CM 1 ag. 3/8 30 mm",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 4545,
+        "descricao": "SEDA 3-0 15 X 45 S/ AG",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 884,
+        "descricao": "Vicryl (POLIGLACTINA) 0 ag. 40 mm  (Pedir cx: 36 un.)",
+        "estoque_minimo": 72.0,
+        "ponto_pedido": 72.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 892,
+        "descricao": "Vicryl (POLIGLACTINA) 1 ag. 48 mm (Pedir cx: 36 un.)",
+        "estoque_minimo": 108.0,
+        "ponto_pedido": 108.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 906,
+        "descricao": "Vicryl (POLIGLACTINA) 2-0 ag. 25 mm (Pedir cx: 36 un.)",
+        "estoque_minimo": 36.0,
+        "ponto_pedido": 36.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400378,
+        "descricao": "Vicryl (POLIGLACTINA) 3-0 150 cm  S/AG",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400377,
+        "descricao": "Vicryl (POLIGLACTINA) 3-0 70cm 1ag. 25 mm",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400951,
+        "descricao": "Vicryl (POLIGLACTINA) 3-0    GASTRO (Pedir cx: 36 un.)",
+        "estoque_minimo": 108.0,
+        "ponto_pedido": 108.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400952,
+        "descricao": "Vicryl (POLIGLACTINA) 3-0 CUTICULAR (Pedir cx: 36 un.)",
+        "estoque_minimo": 42.0,
+        "ponto_pedido": 42.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 922,
+        "descricao": "Vicryl (POLIGLACTINA) 4-0 ag. 20 mm",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 294366,
+        "descricao": "Vicryl (POLIGLACTINA) 5-0 urológico",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      },
+      {
+        "codigo": 400954,
+        "descricao": "Vicryl 8-0 oftálmico",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0,
+        "modelo": "minimo"
+      }
+    ]
+  }
+}

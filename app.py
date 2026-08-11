@@ -66,10 +66,70 @@ WRITABLE = Path("/tmp/pedido-estoque") if ON_VERCEL else DATA
 WRITABLE.mkdir(parents=True, exist_ok=True)
 DATA.mkdir(exist_ok=True)
 
-CATALOGO_PATH = DATA / "catalogo.json"  # fixo no repositório
-ESTOQUE_PATH = WRITABLE / "estoque_atual.json"
+CATALOGO_PATH = DATA / "catalogo.json"  # UFCD (compat)
+ESTOQUE_PATH = WRITABLE / "estoque_atual.json"  # UFCD legado
 USERS_DB = WRITABLE / "users.db"
 PEDIDOS_SQLITE = WRITABLE / "pedidos.db"
+
+UNIDADES = {
+    "ufcd": {
+        "id": "ufcd",
+        "titulo": "UFCD",
+        "catalogo": DATA / "catalogo.json",
+        "estoque_file": "estoque_ufcd.json",
+        "legacy_estoque": ["estoque_atual.json"],
+        "modelo": "ponto",
+        "hint_estoque": "EstoqueFarmacia (saldo farmácia central)",
+        "mostra_ponto_caixa": True,
+        "aba_ordem": None,  # usa ABA_ORDEM_PADRAO
+    },
+    "cc": {
+        "id": "cc",
+        "titulo": "Centro Cirúrgico",
+        "catalogo": DATA / "catalogo_cc.json",
+        "estoque_file": "estoque_cc.json",
+        "legacy_estoque": [],
+        "modelo": "minimo",
+        "hint_estoque": "EstoqueFarmaciaBloco (saldo farmácia do bloco)",
+        "mostra_ponto_caixa": False,
+        "aba_ordem": [
+            "med_caf",
+            "med_farm",
+            "materiais",
+            "fios",
+        ],
+    },
+}
+
+
+def resolve_unidade(raw: str | None = None, *, persist: bool | None = None) -> str:
+    from_request = raw is None
+    if from_request:
+        raw = (
+            request.args.get("unidade")
+            or request.form.get("unidade")
+            or session.get("unidade")
+            or "ufcd"
+        )
+    u = str(raw).strip().lower()
+    if u in ("centro", "centro_cirurgico", "bloco", "cc"):
+        u = "cc"
+    if u not in UNIDADES:
+        u = "ufcd"
+    if persist is None:
+        persist = from_request
+    if persist:
+        session["unidade"] = u
+    return u
+
+
+def unidade_cfg(unidade: str | None = None) -> dict:
+    if unidade is None:
+        uid = resolve_unidade()
+    else:
+        uid = resolve_unidade(unidade, persist=False)
+    return UNIDADES[uid]
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "pedido-estoque-ufcd-local")
@@ -83,10 +143,16 @@ except Exception as exc:  # pragma: no cover
 
 @app.context_processor
 def inject_globals():
+    uid = session.get("unidade") or "ufcd"
+    if uid not in UNIDADES:
+        uid = "ufcd"
     return {
         "user": current_user(),
         "is_admin": is_admin(),
         "usando_neon": using_neon(),
+        "unidades": UNIDADES,
+        "unidade_id": uid,
+        "unidade": UNIDADES[uid],
     }
 
 # Abas na mesma ordem da planilha (exceto Estoque)
@@ -114,45 +180,106 @@ def ceiling_math(value: float, significance: float) -> float:
     return math.ceil(value / significance) * significance
 
 
-def load_catalogo() -> dict:
-    if not CATALOGO_PATH.exists():
-        return {"abas": [], "itens": {}}
-    return json.loads(CATALOGO_PATH.read_text(encoding="utf-8"))
+def load_catalogo(unidade: str | None = None) -> dict:
+    cfg = unidade_cfg(unidade)
+    path = cfg["catalogo"]
+    if not path.exists():
+        # fallback UFCD legado
+        if cfg["id"] == "ufcd" and CATALOGO_PATH.exists():
+            path = CATALOGO_PATH
+        else:
+            return {"abas": [], "itens": {}, "modelo": cfg["modelo"]}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data.setdefault("modelo", cfg["modelo"])
+    return data
 
 
-def save_catalogo(catalogo: dict) -> None:
-    CATALOGO_PATH.write_text(
+def save_catalogo(catalogo: dict, unidade: str | None = None) -> None:
+    cfg = unidade_cfg(unidade)
+    path = cfg["catalogo"]
+    path.write_text(
         json.dumps(catalogo, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
 
-def load_estoque() -> dict:
+def estoque_path_for(unidade: str | None = None) -> Path:
+    cfg = unidade_cfg(unidade)
+    primary = WRITABLE / cfg["estoque_file"]
+    if primary.exists():
+        return primary
+    for name in cfg.get("legacy_estoque") or []:
+        for base in (WRITABLE, DATA):
+            p = base / name
+            if p.exists():
+                return p
+    return primary
+
+
+def load_estoque(unidade: str | None = None) -> dict:
     """Mapa codigo(str) -> saldo (float)."""
-    if not ESTOQUE_PATH.exists():
+    path = estoque_path_for(unidade)
+    if not path.exists():
         return {}
-    return json.loads(ESTOQUE_PATH.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def save_estoque(mapa: dict, meta: dict | None = None) -> None:
+def save_estoque(mapa: dict, meta: dict | None = None, unidade: str | None = None) -> None:
+    cfg = unidade_cfg(unidade)
+    path = WRITABLE / cfg["estoque_file"]
     payload = {"saldos": mapa, "meta": meta or {}}
-    ESTOQUE_PATH.write_text(
+    path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
 
-def estoque_saldos() -> dict:
-    raw = load_estoque()
+def estoque_saldos(unidade: str | None = None) -> dict:
+    raw = load_estoque(unidade)
     if isinstance(raw, dict) and "saldos" in raw:
         return {str(k): v for k, v in raw["saldos"].items()}
     return {str(k): v for k, v in raw.items()}
 
 
-def estoque_meta() -> dict:
-    raw = load_estoque()
+def estoque_meta(unidade: str | None = None) -> dict:
+    raw = load_estoque(unidade)
     if isinstance(raw, dict) and "meta" in raw:
         return raw["meta"]
     return {}
 
+
+def manuais_da_unidade(unidade: str | None = None) -> dict:
+    uid = resolve_unidade(unidade, persist=False) if unidade is not None else resolve_unidade()
+    raw = session.get("manuais", {})
+    if not isinstance(raw, dict):
+        return {}
+    # legado: mapa plano codigo→valor (UFCD)
+    if raw and not any(k in UNIDADES for k in raw):
+        return raw if uid == "ufcd" else {}
+    bucket = raw.get(uid) or {}
+    return bucket if isinstance(bucket, dict) else {}
+
+
+def set_manual_unidade(unidade: str, codigo: str, valor) -> None:
+    uid = resolve_unidade(unidade, persist=False)
+    raw = session.get("manuais", {})
+    if not isinstance(raw, dict):
+        raw = {}
+    if raw and not any(k in UNIDADES for k in raw):
+        raw = {"ufcd": dict(raw)}
+    bucket = dict(raw.get(uid) or {})
+    if valor in (None, ""):
+        bucket.pop(codigo, None)
+    else:
+        bucket[codigo] = valor
+    raw[uid] = bucket
+    session["manuais"] = raw
+    session.modified = True
+
+
+def ordenar_abas(abas: list, unidade: str | None = None) -> list:
+    cfg = unidade_cfg(unidade)
+    ordem_ids = cfg.get("aba_ordem") or ABA_ORDEM_PADRAO
+    ordem = {n: i for i, n in enumerate(ordem_ids)}
+    return sorted(abas, key=lambda a: ordem.get(a["id"], 100 + abas.index(a)))
 
 def normaliza_codigo(val) -> str | None:
     if val is None or val == "":
@@ -193,6 +320,7 @@ def parse_estoque_xlsx(file_storage) -> tuple[dict, dict]:
             cod_idx = i
         if h in (
             "saldo_farmacia_central",
+            "saldo_farmacia_bloco",
             "saldo",
             "estoque",
             "estoque_aghu",
@@ -390,26 +518,33 @@ def _import_via_excel_com(data: bytes, password: str | None) -> dict:
             pass
 
 
-def calcular_item(item: dict, saldo, manual=None) -> dict:
+def calcular_item(item: dict, saldo, manual=None, modelo: str | None = None) -> dict:
     est_min = float(item["estoque_minimo"])
-    ponto = float(item["ponto_pedido"])
-    caixa = float(item["caixa_com"] or 1)
+    ponto = float(item.get("ponto_pedido") if item.get("ponto_pedido") is not None else est_min)
+    caixa = float(item.get("caixa_com") or 1)
     if caixa <= 0:
         caixa = 1
+    modelo = (modelo or item.get("modelo") or "ponto").lower()
 
     estoque = None if saldo is None else float(saldo)
     pedir = False
     quanto = None
 
     if estoque is not None:
-        pedir = ponto > estoque
+        if modelo == "minimo":
+            pedir = estoque < est_min
+        else:
+            pedir = ponto > estoque
         if manual not in (None, ""):
             try:
                 quanto = float(manual)
             except Exception:
                 quanto = None
         elif pedir:
-            quanto = ceiling_math(est_min - estoque, caixa)
+            if modelo == "minimo":
+                quanto = max(0.0, est_min - estoque)
+            else:
+                quanto = ceiling_math(est_min - estoque, caixa)
 
     return {
         **item,
@@ -418,28 +553,41 @@ def calcular_item(item: dict, saldo, manual=None) -> dict:
         "quanto_pedir": quanto,
         "manual": manual if manual not in (None, "") else None,
         "sem_estoque": estoque is None,
+        "modelo": modelo,
     }
 
 
-def montar_aba(aba_id: str, catalogo: dict, saldos: dict, manuais: dict) -> list:
+def montar_aba(
+    aba_id: str,
+    catalogo: dict,
+    saldos: dict,
+    manuais: dict,
+    modelo: str | None = None,
+) -> list:
     itens = catalogo.get("itens", {}).get(aba_id, [])
+    modelo = modelo or catalogo.get("modelo") or "ponto"
     result = []
     for item in itens:
         cod = str(item["codigo"])
         saldo = saldos.get(cod)
-        # se chave não existe, sem_estoque; se existe com None, também
         if cod not in saldos:
             saldo = None
         manual = manuais.get(cod)
-        result.append(calcular_item(item, saldo, manual))
+        result.append(calcular_item(item, saldo, manual, modelo=modelo))
     return result
 
 
-def montar_todos(catalogo: dict, saldos: dict, manuais: dict) -> list:
-    """Todos os itens UFCD, com a categoria de origem."""
+def montar_todos(
+    catalogo: dict,
+    saldos: dict,
+    manuais: dict,
+    modelo: str | None = None,
+) -> list:
+    """Todos os itens da unidade, com a categoria de origem."""
     out = []
+    modelo = modelo or catalogo.get("modelo") or "ponto"
     for aba in catalogo.get("abas", []):
-        for it in montar_aba(aba["id"], catalogo, saldos, manuais):
+        for it in montar_aba(aba["id"], catalogo, saldos, manuais, modelo=modelo):
             row = dict(it)
             row["aba"] = aba["titulo"]
             out.append(row)
@@ -450,23 +598,25 @@ def listar_itens_filtrados(
     aba: str | None = None,
     filtro: str = "todos",
     q: str = "",
+    unidade: str | None = None,
 ) -> tuple[list[dict], dict]:
-    """Lista itens como na tela (aba + filtro + busca)."""
-    catalogo = load_catalogo()
-    saldos = estoque_saldos()
-    manuais = session.get("manuais", {})
+    """Lista itens como na tela (unidade + aba + filtro + busca)."""
+    uid = resolve_unidade(unidade)
+    catalogo = load_catalogo(uid)
+    saldos = estoque_saldos(uid)
+    manuais = manuais_da_unidade(uid)
     abas = catalogo.get("abas") or []
-    ordem = {n: i for i, n in enumerate(ABA_ORDEM_PADRAO)}
-    abas_sorted = sorted(abas, key=lambda a: ordem.get(a["id"], 100 + abas.index(a)))
+    abas_sorted = ordenar_abas(abas, uid)
+    modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
 
     aba_atual = aba or "todos"
     filtro = filtro or "todos"
     q = (q or "").strip().lower()
 
     if aba_atual == "todos":
-        itens = montar_todos(catalogo, saldos, manuais)
+        itens = montar_todos(catalogo, saldos, manuais, modelo=modelo)
     else:
-        itens = montar_aba(aba_atual, catalogo, saldos, manuais)
+        itens = montar_aba(aba_atual, catalogo, saldos, manuais, modelo=modelo)
         titulo = next(
             (a["titulo"] for a in abas_sorted if a["id"] == aba_atual), aba_atual
         )
@@ -494,6 +644,7 @@ def listar_itens_filtrados(
             if q in str(i["codigo"])
             or q in (i["descricao"] or "").lower()
             or q in (i.get("aba") or "").lower()
+            or q in (i.get("grupo") or "").lower()
         ]
 
     meta = {
@@ -503,6 +654,8 @@ def listar_itens_filtrados(
         "ver_todos": aba_atual == "todos",
         "abas": abas_sorted,
         "resumo": resumo,
+        "unidade": uid,
+        "modelo": modelo,
     }
     return itens, meta
 
@@ -536,16 +689,18 @@ def itens_extras_manuais() -> list[dict]:
     return session.get("extras_manuais", [])
 
 
-def coletar_itens_pedido(incluir_extras: bool = True) -> list[dict]:
+def coletar_itens_pedido(incluir_extras: bool = True, unidade: str | None = None) -> list[dict]:
     """Itens com Pedir=Sim (todas as abas) + extras manuais da sessão."""
-    catalogo = load_catalogo()
-    saldos = estoque_saldos()
-    manuais = session.get("manuais", {})
+    uid = resolve_unidade(unidade)
+    catalogo = load_catalogo(uid)
+    saldos = estoque_saldos(uid)
+    manuais = manuais_da_unidade(uid)
+    modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
     out: list[dict] = []
     vistos: set[str] = set()
 
     for aba in catalogo.get("abas", []):
-        for it in montar_aba(aba["id"], catalogo, saldos, manuais):
+        for it in montar_aba(aba["id"], catalogo, saldos, manuais, modelo=modelo):
             if not it.get("pedir") or not it.get("quanto_pedir"):
                 continue
             key = str(it["codigo"])
@@ -562,6 +717,7 @@ def coletar_itens_pedido(incluir_extras: bool = True) -> list[dict]:
                     "ponto_pedido": it.get("ponto_pedido"),
                     "caixa_com": it.get("caixa_com"),
                     "pedir": True,
+                    "unidade": uid,
                 }
             )
 
@@ -581,6 +737,9 @@ def coletar_itens_pedido(incluir_extras: bool = True) -> list[dict]:
                     "estoque_aghu": None,
                     "estoque_minimo": None,
                     "ponto_pedido": None,
+                    "caixa_com": None,
+                    "pedir": True,
+                    "unidade": uid,
                 }
             )
     return out
@@ -682,31 +841,54 @@ def usuarios_senha(user_id: int):
 @app.route("/")
 @login_required
 def index():
-    catalogo = load_catalogo()
-    saldos = estoque_saldos()
-    meta = estoque_meta()
+    uid = resolve_unidade()
+    cfg = unidade_cfg(uid)
+    catalogo = load_catalogo(uid)
+    saldos = estoque_saldos(uid)
+    meta = estoque_meta(uid)
     abas = catalogo.get("abas") or []
-    ordem = {n: i for i, n in enumerate(ABA_ORDEM_PADRAO)}
-    abas_sorted = sorted(
-        abas, key=lambda a: ordem.get(a["id"], 100 + abas.index(a))
-    )
+    abas_sorted = ordenar_abas(abas, uid)
 
     aba_atual = request.args.get("aba") or "todos"
     filtro = request.args.get("filtro", "todos")
     q = (request.args.get("q") or "").strip().lower()
 
-    manuais = session.get("manuais", {})
-    itens, view_meta = listar_itens_filtrados(aba_atual, filtro, q)
+    manuais = manuais_da_unidade(uid)
+    modelo = catalogo.get("modelo") or cfg["modelo"]
+    itens, view_meta = listar_itens_filtrados(aba_atual, filtro, q, unidade=uid)
     resumo = view_meta["resumo"]
     ver_todos = view_meta["ver_todos"]
 
     contagens = {}
     total_pedir = 0
     for a in abas_sorted:
-        lista = montar_aba(a["id"], catalogo, saldos, manuais)
+        lista = montar_aba(a["id"], catalogo, saldos, manuais, modelo=modelo)
         contagens[a["id"]] = sum(1 for i in lista if i["pedir"])
         total_pedir += contagens[a["id"]]
     contagens["todos"] = total_pedir
+
+    # contagens de pedir por unidade (sidebar)
+    contagens_unidade = {uid: total_pedir}
+    for other_id in UNIDADES:
+        if other_id == uid:
+            continue
+        try:
+            other_cat = load_catalogo(other_id)
+            other_saldos = estoque_saldos(other_id)
+            other_manuais = manuais_da_unidade(other_id)
+            other_modelo = other_cat.get("modelo") or UNIDADES[other_id]["modelo"]
+            n = 0
+            for a in other_cat.get("abas") or []:
+                n += sum(
+                    1
+                    for i in montar_aba(
+                        a["id"], other_cat, other_saldos, other_manuais, modelo=other_modelo
+                    )
+                    if i["pedir"]
+                )
+            contagens_unidade[other_id] = n
+        except Exception:
+            contagens_unidade[other_id] = 0
 
     return render_template(
         "index.html",
@@ -721,26 +903,31 @@ def index():
         tem_estoque=bool(saldos),
         estoque_meta=meta,
         contagens=contagens,
+        contagens_unidade=contagens_unidade,
         hoje=date.today().strftime("%d/%m/%Y"),
         total_catalogo=sum(a.get("count", 0) for a in abas_sorted),
         extras=itens_extras_manuais(),
+        unidade_id=uid,
+        unidade=cfg,
+        mostra_ponto_caixa=cfg.get("mostra_ponto_caixa", True),
     )
 
 
 @app.route("/importar/catalogo", methods=["POST"])
 @login_required
 def importar_catalogo():
+    uid = resolve_unidade()
     f = request.files.get("arquivo")
     password = (request.form.get("senha") or "").strip() or None
     if not f or not f.filename:
         flash("Selecione o arquivo de pedidos (catálogo).", "erro")
-        return redirect(url_for("index"))
+        return redirect(url_for("index", unidade=uid))
     try:
         catalog = import_pedido_file(f.read(), f.filename, password)
         if not catalog["abas"]:
             flash("Nenhuma aba de pedido encontrada no arquivo.", "erro")
-            return redirect(url_for("index"))
-        save_catalogo(catalog)
+            return redirect(url_for("index", unidade=uid))
+        save_catalogo(catalog, uid)
         total = sum(a["count"] for a in catalog["abas"])
         flash(
             f"Catálogo importado: {len(catalog['abas'])} abas, {total} itens.",
@@ -748,41 +935,38 @@ def importar_catalogo():
         )
     except Exception as e:
         flash(str(e), "erro")
-    return redirect(url_for("index"))
+    return redirect(url_for("index", unidade=uid))
 
 
 @app.route("/importar/estoque", methods=["POST"])
 @login_required
 def importar_estoque():
+    uid = resolve_unidade()
+    cfg = unidade_cfg(uid)
     f = request.files.get("arquivo")
     if not f or not f.filename:
-        flash("Selecione o arquivo EstoqueFarmacia.xlsx.", "erro")
-        return redirect(url_for("index"))
+        flash(f"Selecione o arquivo de estoque ({cfg['hint_estoque']}).", "erro")
+        return redirect(url_for("index", unidade=uid))
     try:
         mapa, meta = parse_estoque_xlsx(f)
         if not mapa:
             flash("Nenhum item de estoque encontrado.", "erro")
-            return redirect(url_for("index"))
-        save_estoque(mapa, meta)
+            return redirect(url_for("index", unidade=uid))
+        save_estoque(mapa, meta, uid)
         flash(f"Estoque importado: {len(mapa)} códigos ({meta.get('arquivo')}).", "ok")
     except Exception as e:
         flash(f"Erro ao ler estoque: {e}", "erro")
-    return redirect(url_for("index"))
+    return redirect(url_for("index", unidade=uid))
 
 
 @app.route("/api/manual", methods=["POST"])
 @login_required
 def api_manual():
     data = request.get_json(force=True)
+    uid = resolve_unidade(data.get("unidade"))
     cod = str(data.get("codigo", ""))
     valor = data.get("valor")
-    manuais = session.get("manuais", {})
-    if valor in (None, ""):
-        manuais.pop(cod, None)
-    else:
-        manuais[cod] = valor
-    session["manuais"] = manuais
-    session.modified = True
+    set_manual_unidade(uid, cod, valor)
     return jsonify({"ok": True})
 
 
@@ -838,18 +1022,24 @@ def manual_extra_remover(idx: int):
 @app.route("/pedido/salvar", methods=["POST"])
 @login_required
 def pedido_salvar():
+    uid = resolve_unidade()
     data_ped = parse_data_pedido(request.form.get("data_pedido"))
     observacao = (request.form.get("observacao") or "").strip()
-    itens = coletar_itens_pedido(incluir_extras=True)
+    itens = coletar_itens_pedido(incluir_extras=True, unidade=uid)
     if not itens:
         flash("Não há itens para salvar (Pedir = Sim ou manuais).", "erro")
-        return redirect(url_for("index"))
+        return redirect(url_for("index", unidade=uid))
     try:
         user = current_user() or {}
+        # prefixa observação com a unidade para distinguir no histórico
+        obs = observacao
+        tag = f"[{unidade_cfg(uid)['titulo']}]"
+        if not (obs or "").startswith(tag):
+            obs = f"{tag} {obs}".strip()
         pid = criar_pedido(
             data_pedido=data_ped,
             usuario=user.get("nome") or user.get("username"),
-            observacao=observacao,
+            observacao=obs,
             itens=itens,
             sqlite_path=_db_path(),
         )
@@ -859,27 +1049,30 @@ def pedido_salvar():
         return redirect(url_for("historico_detalhe", pedido_id=pid))
     except Exception as e:
         flash(f"Erro ao salvar pedido: {e}", "erro")
-        return redirect(url_for("index"))
+        return redirect(url_for("index", unidade=uid))
 
 
 @app.route("/pedido/pdf")
 @login_required
 def pedido_pdf_atual():
+    uid = resolve_unidade()
+    cfg = unidade_cfg(uid)
     data_ped = parse_data_pedido(request.args.get("data"))
     aba = request.args.get("aba") or "todos"
     filtro = request.args.get("filtro") or "todos"
     q = request.args.get("q") or ""
 
-    itens_view, meta = listar_itens_filtrados(aba, filtro, q)
+    itens_view, meta = listar_itens_filtrados(aba, filtro, q, unidade=uid)
     itens = itens_para_pdf(itens_view)
     if not itens:
         flash("Nenhum item no filtro atual para gerar PDF.", "erro")
-        return redirect(url_for("index", aba=aba, filtro=filtro, q=q))
+        return redirect(url_for("index", unidade=uid, aba=aba, filtro=filtro, q=q))
 
+    nome = cfg["titulo"]
     if meta["ver_todos"]:
-        titulo = "Pedido UFCD — visão atual (todas as categorias)"
+        titulo = f"Pedido {nome} — visão atual (todas as categorias)"
     else:
-        titulo = f"Pedido UFCD — {itens[0].get('aba') or aba}"
+        titulo = f"Pedido {nome} — {itens[0].get('aba') or aba}"
     if filtro == "pedir":
         titulo += " · só a pedir"
     elif filtro == "sem":
@@ -897,7 +1090,7 @@ def pedido_pdf_atual():
     return send_file(
         io.BytesIO(pdf),
         as_attachment=True,
-        download_name=f"pedido_filtro_{data_ped.isoformat()}.pdf",
+        download_name=f"pedido_{uid}_{data_ped.isoformat()}.pdf",
         mimetype="application/pdf",
     )
 
@@ -976,11 +1169,13 @@ def historico_excluir(pedido_id: int):
 @app.route("/exportar")
 @login_required
 def exportar():
+    uid = resolve_unidade()
+    cfg = unidade_cfg(uid)
     data_ped = parse_data_pedido(request.args.get("data"))
     aba = request.args.get("aba") or "todos"
     filtro = request.args.get("filtro") or "todos"
     q = request.args.get("q") or ""
-    itens, meta = listar_itens_filtrados(aba, filtro, q)
+    itens, meta = listar_itens_filtrados(aba, filtro, q, unidade=uid)
 
     wb = Workbook()
     ws = wb.active
@@ -997,22 +1192,33 @@ def exportar():
         bottom=Side(style="thin", color="CCCCCC"),
     )
 
-    ws["A1"] = f"PEDIDO UFCD — DATA: {data_ped.strftime('%d/%m/%Y')}"
+    ws["A1"] = f"PEDIDO {cfg['titulo'].upper()} — DATA: {data_ped.strftime('%d/%m/%Y')}"
     ws["A2"] = (
         f"Filtro: aba={meta['aba']} · {meta['filtro']}"
         + (f" · busca={meta['q']}" if meta["q"] else "")
     )
-    headers = [
-        "Categoria",
-        "Cód. AGHU",
-        "Medicamento",
-        "Est. Mínimo",
-        "Ponto de Pedido",
-        "Caixa com",
-        "Estoque AGHU",
-        "Pedir?",
-        "Quanto Pedir?",
-    ]
+    if cfg.get("mostra_ponto_caixa", True):
+        headers = [
+            "Categoria",
+            "Cód. AGHU",
+            "Medicamento",
+            "Est. Mínimo",
+            "Ponto de Pedido",
+            "Caixa com",
+            "Estoque",
+            "Pedir?",
+            "Quanto Pedir?",
+        ]
+    else:
+        headers = [
+            "Categoria",
+            "Cód. AGHU",
+            "Item",
+            "Est. Mínimo",
+            "Estoque",
+            "Pedir?",
+            "Quanto Pedir?",
+        ]
     for c, h in enumerate(headers, 1):
         cell = ws.cell(4, c, h)
         cell.fill = header_fill
@@ -1020,26 +1226,39 @@ def exportar():
         cell.border = thin
 
     for r, it in enumerate(itens, 5):
-        vals = [
-            it.get("aba") or "",
-            it["codigo"],
-            it["descricao"],
-            it["estoque_minimo"],
-            it["ponto_pedido"],
-            it["caixa_com"],
-            "" if it["estoque_aghu"] is None else it["estoque_aghu"],
-            "Sim" if it["pedir"] else "Não",
-            "" if it["quanto_pedir"] is None else it["quanto_pedir"],
-        ]
+        if cfg.get("mostra_ponto_caixa", True):
+            vals = [
+                it.get("aba") or "",
+                it["codigo"],
+                it["descricao"],
+                it["estoque_minimo"],
+                it["ponto_pedido"],
+                it["caixa_com"],
+                "" if it["estoque_aghu"] is None else it["estoque_aghu"],
+                "Sim" if it["pedir"] else "Não",
+                "" if it["quanto_pedir"] is None else it["quanto_pedir"],
+            ]
+            estoque_col = 7
+        else:
+            vals = [
+                it.get("aba") or "",
+                it["codigo"],
+                it["descricao"],
+                it["estoque_minimo"],
+                "" if it["estoque_aghu"] is None else it["estoque_aghu"],
+                "Sim" if it["pedir"] else "Não",
+                "" if it["quanto_pedir"] is None else it["quanto_pedir"],
+            ]
+            estoque_col = 5
         for c, v in enumerate(vals, 1):
             cell = ws.cell(r, c, v)
             cell.border = thin
             if it["pedir"]:
                 cell.fill = sim_fill
-            elif c == 7:
+            elif c == estoque_col:
                 cell.fill = estoque_fill
 
-    ws.column_dimensions["A"].width = 18
+    ws.column_dimensions["A"].width = 22
     ws.column_dimensions["B"].width = 12
     ws.column_dimensions["C"].width = 42
     for col in "DEFGHI":
@@ -1051,7 +1270,7 @@ def exportar():
     buf = io.BytesIO()
     wb.save(buf)
     buf.seek(0)
-    fname = f"pedido_filtro_{data_ped.isoformat()}.xlsx"
+    fname = f"pedido_{uid}_{data_ped.isoformat()}.xlsx"
     return send_file(
         buf,
         as_attachment=True,
