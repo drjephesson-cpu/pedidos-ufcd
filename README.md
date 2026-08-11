@@ -26,12 +26,14 @@ Ou dê dois cliques em `iniciar.bat`.
 - **Quanto Pedir?** = arredonda para cima até o estoque mínimo (múltiplo da caixa)  
 - Coluna **Manual** sobrescreve a quantidade  
 
-### Atualizar o catálogo (raro)
+### Histórico e Neon
 
-Se a planilha mestre mudar:
+Na Vercel o disco é temporário. Para **guardar pedidos por data**, conecte o Neon:
 
-```powershell
-py extrair_catalogo_fix.py
-```
+1. No [Neon Console](https://console.neon.tech), crie um projeto e copie a connection string.
+2. Na Vercel → Project **ufcd** → **Settings → Environment Variables**, adicione:
+   - `DATABASE_URL` = `postgresql://...?...sslmode=require`
+   - `SECRET_KEY` = uma chave aleatória
+3. Faça Redeploy.
 
-(Digite a senha do Excel se pedir.)
+Localmente, copie `.env.example` para `.env` e preencha o mesmo `DATABASE_URL`. Sem Neon, o histórico usa SQLite em `data/pedidos.db` (só na máquina local).
