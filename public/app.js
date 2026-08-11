@@ -125,7 +125,7 @@ document.addEventListener("submit", (e) => {
 });
 
 async function salvarManual(codigo, valor, unidade) {
-  await neonFetch(
+  const res = await neonFetch(
     "/api/manual",
     {
       method: "POST",
@@ -138,6 +138,13 @@ async function salvarManual(codigo, valor, unidade) {
     },
     "Salvando ajuste no Neon…"
   );
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (e) {
+    data = { ok: false };
+  }
+
   const row = document.querySelector(
     `.item-row[data-codigo="${CSS.escape(String(codigo))}"]`
   );
@@ -146,18 +153,51 @@ async function salvarManual(codigo, valor, unidade) {
     window.location.reload();
     return;
   }
+
+  const pedir = Boolean(data.pedir);
+  const quanto = data.quanto_pedir;
   const qtdeCell = row.querySelector(".quanto");
-  if (valor === "") return;
-  const n = Number(valor);
-  if (qtdeCell && Number.isFinite(n)) {
-    qtdeCell.textContent = String(Math.trunc(n));
-    qtdeCell.classList.add("col-qtde-pedir");
-  }
   const pill = row.querySelector(".pill");
-  if (pill && Number.isFinite(n) && n > 0) {
-    pill.className = "pill sim";
-    pill.textContent = "Sim";
+
+  if (qtdeCell) {
+    if (quanto != null && Number.isFinite(Number(quanto))) {
+      qtdeCell.textContent = String(Math.trunc(Number(quanto)));
+      qtdeCell.classList.toggle("col-qtde-pedir", pedir);
+    } else {
+      qtdeCell.innerHTML = '<span class="muted">—</span>';
+      qtdeCell.classList.remove("col-qtde-pedir");
+    }
   }
+  if (pill) {
+    if (data.estoque_aghu == null && data.manual == null) {
+      pill.className = "pill neutro";
+      pill.textContent = "?";
+    } else if (pedir) {
+      pill.className = "pill sim";
+      pill.textContent = "Sim";
+    } else {
+      pill.className = "pill nao";
+      pill.textContent = "Não";
+    }
+  }
+
+  // Atualiza pedido do dia em segundo plano (não trava a linha)
+  const dataPedido =
+    document.getElementById("dataPedido")?.value.trim() ||
+    document.getElementById("dataPedidoHidden")?.value ||
+    "";
+  neonFetch(
+    "/api/autosave-pedido",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        unidade: unidade || row.dataset.unidade,
+        data_pedido: dataPedido,
+      }),
+    },
+    "Atualizando pedido do dia…"
+  ).catch(() => {});
 }
 
 document.querySelectorAll(".manual-input").forEach((input) => {

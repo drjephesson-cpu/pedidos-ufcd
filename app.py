@@ -617,23 +617,28 @@ def calcular_item(item: dict, saldo, manual=None, modelo: str | None = None) -> 
             pedir = estoque < est_min
         else:
             pedir = ponto > estoque
-        if manual not in (None, ""):
-            try:
-                quanto = float(manual)
-            except Exception:
-                quanto = None
-        elif pedir:
+        if pedir:
             if modelo == "minimo":
                 quanto = max(0.0, est_min - estoque)
             else:
                 quanto = ceiling_math(est_min - estoque, caixa)
+
+    # Quantidade manual manda: > 0 vira Pedir=Sim; 0 força Não
+    manual_val = None
+    if manual not in (None, ""):
+        try:
+            manual_val = float(manual)
+            quanto = manual_val
+            pedir = manual_val > 0
+        except Exception:
+            manual_val = None
 
     return {
         **item,
         "estoque_aghu": estoque,
         "pedir": pedir,
         "quanto_pedir": quanto,
-        "manual": manual if manual not in (None, "") else None,
+        "manual": manual_val,
         "sem_estoque": estoque is None,
         "modelo": modelo,
     }
@@ -867,7 +872,10 @@ def coletar_itens_pedido(incluir_extras: bool = True, unidade: str | None = None
         for it in montar_aba(
             aba["id"], catalogo, saldos, manuais, modelo=modelo, parametros=parametros
         ):
-            if not it.get("pedir") or not it.get("quanto_pedir"):
+            if not it.get("quanto_pedir"):
+                continue
+            # Pedir automático OU quantidade manual > 0
+            if not it.get("pedir"):
                 continue
             key = str(it["codigo"])
             vistos.add(key)
@@ -1144,11 +1152,54 @@ def api_autosave_pedido():
 def api_manual():
     data = request.get_json(force=True)
     uid = resolve_unidade(data.get("unidade"))
-    cod = str(data.get("codigo", ""))
+    cod = str(data.get("codigo", "")).strip()
     valor = data.get("valor")
     set_manual_unidade(uid, cod, valor)
-    # Sem autosave: edição fica rápida; histórico via Salvar / pós-Excel
-    return jsonify({"ok": True})
+
+    # Recalcula o item pra devolver Pedir/Qtde atualizados
+    catalogo = load_catalogo(uid)
+    saldos = estoque_saldos(uid)
+    manuais = manuais_da_unidade(uid)
+    parametros = load_catalogo_parametros(uid, _db_path())
+    modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
+    item_raw = None
+    aba_titulo = ""
+    for aba in catalogo.get("abas") or []:
+        for it in catalogo.get("itens", {}).get(aba["id"], []) or []:
+            if str(it.get("codigo")) == cod:
+                item_raw = dict(it)
+                aba_titulo = aba.get("titulo") or ""
+                break
+        if item_raw is not None:
+            break
+
+    payload = {
+        "ok": True,
+        "codigo": cod,
+        "pedir": False,
+        "quanto_pedir": None,
+        "manual": None,
+        "aba": aba_titulo,
+    }
+    if item_raw is not None:
+        ov = parametros.get(cod) or {}
+        if ov.get("estoque_minimo") is not None:
+            item_raw["estoque_minimo"] = float(ov["estoque_minimo"])
+        if ov.get("ponto_pedido") is not None:
+            item_raw["ponto_pedido"] = float(ov["ponto_pedido"])
+        if ov.get("caixa_com") is not None:
+            item_raw["caixa_com"] = float(ov["caixa_com"])
+        saldo = saldos.get(cod) if cod in saldos else None
+        calc = calcular_item(item_raw, saldo, manuais.get(cod), modelo=modelo)
+        payload.update(
+            {
+                "pedir": bool(calc.get("pedir")),
+                "quanto_pedir": calc.get("quanto_pedir"),
+                "manual": calc.get("manual"),
+                "estoque_aghu": calc.get("estoque_aghu"),
+            }
+        )
+    return jsonify(payload)
 
 
 @app.route("/api/parametros", methods=["POST"])
