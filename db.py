@@ -73,7 +73,7 @@ def init_db(sqlite_path: Path | None = None) -> None:
     )
     ts_default = "NOW()" if dialect == "postgresql" else "CURRENT_TIMESTAMP"
 
-    stmts = [
+    create_stmts = [
         f"""
         CREATE TABLE IF NOT EXISTS pedidos (
             id {id_type},
@@ -99,21 +99,25 @@ def init_db(sqlite_path: Path | None = None) -> None:
             FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
         )
         """,
+    ]
+    index_stmts = [
         "CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos (data_pedido DESC)",
         "CREATE INDEX IF NOT EXISTS idx_pedidos_unidade ON pedidos (unidade)",
         "CREATE INDEX IF NOT EXISTS idx_pedidos_usuario ON pedidos (usuario)",
         "CREATE INDEX IF NOT EXISTS idx_itens_aba ON pedido_itens (aba)",
     ]
     with connect(sqlite_path) as conn:
-        for s in stmts:
+        for s in create_stmts:
             conn.execute(text(s))
-        # migração: coluna unidade em bases antigas
+        # migração ANTES dos índices que usam a coluna
         if dialect == "postgresql":
             exists = conn.execute(
                 text(
                     """
                     SELECT 1 FROM information_schema.columns
-                    WHERE table_name = 'pedidos' AND column_name = 'unidade'
+                    WHERE table_schema = 'public'
+                      AND table_name = 'pedidos'
+                      AND column_name = 'unidade'
                     """
                 )
             ).first()
@@ -126,6 +130,54 @@ def init_db(sqlite_path: Path | None = None) -> None:
             }
             if "unidade" not in names:
                 conn.execute(text("ALTER TABLE pedidos ADD COLUMN unidade TEXT"))
+
+        # backfill simples a partir da observação
+        conn.execute(
+            text(
+                """
+                UPDATE pedidos
+                SET unidade = 'cc'
+                WHERE (unidade IS NULL OR TRIM(unidade) = '')
+                  AND observacao ILIKE '%Centro Cir_rgico%'
+                """
+                if dialect == "postgresql"
+                else """
+                UPDATE pedidos
+                SET unidade = 'cc'
+                WHERE (unidade IS NULL OR TRIM(unidade) = '')
+                  AND observacao LIKE '%Centro Cir_rgico%'
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                UPDATE pedidos
+                SET unidade = 'ufcd'
+                WHERE (unidade IS NULL OR TRIM(unidade) = '')
+                  AND observacao ILIKE '%UFCD%'
+                """
+                if dialect == "postgresql"
+                else """
+                UPDATE pedidos
+                SET unidade = 'ufcd'
+                WHERE (unidade IS NULL OR TRIM(unidade) = '')
+                  AND observacao LIKE '%UFCD%'
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                UPDATE pedidos
+                SET unidade = 'ufcd'
+                WHERE unidade IS NULL OR TRIM(unidade) = ''
+                """
+            )
+        )
+
+        for s in index_stmts:
+            conn.execute(text(s))
 
 
 def _infer_unidade(unidade: str | None, observacao: str | None) -> str:
