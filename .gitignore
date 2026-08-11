@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.DS_Store
+Thumbs.db
+data/estoque_atual.json
+*.xlsx
+!data/EstoqueFarmacia-exemplo.xlsx
+.idea/
+.vscode/

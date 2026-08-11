@@ -1,0 +1,2624 @@
+{
+  "abas": [
+    {
+      "id": "COMPRIMIDOS",
+      "titulo": "COMPRIMIDOS",
+      "count": 109
+    },
+    {
+      "id": "SOLUÇÕES",
+      "titulo": "SOLUÇÕES",
+      "count": 9
+    },
+    {
+      "id": "Geladeira",
+      "titulo": "Geladeira",
+      "count": 14
+    },
+    {
+      "id": "PÓS",
+      "titulo": "PÓS",
+      "count": 3
+    },
+    {
+      "id": "CREMES e Pomadas",
+      "titulo": "CREMES e Pomadas",
+      "count": 17
+    },
+    {
+      "id": "M.P.P.S",
+      "titulo": "M.P.P.S",
+      "count": 12
+    },
+    {
+      "id": "SOROS",
+      "titulo": "SOROS",
+      "count": 19
+    },
+    {
+      "id": "LÍQUIDOS E GOTAS",
+      "titulo": "LÍQUIDOS E GOTAS",
+      "count": 50
+    },
+    {
+      "id": "AMPOLAS",
+      "titulo": "AMPOLAS",
+      "count": 77
+    },
+    {
+      "id": "RESERVA TERPÊUTICA",
+      "titulo": "RESERVA TERPÊUTICA",
+      "count": 49
+    },
+    {
+      "id": "ALMOXARIFADO",
+      "titulo": "ALMOXARIFADO",
+      "count": 4
+    }
+  ],
+  "itens": {
+    "COMPRIMIDOS": [
+      {
+        "codigo": 13544,
+        "descricao": "AAS 100 mg",
+        "estoque_minimo": 230.0,
+        "ponto_pedido": 160.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 16926,
+        "descricao": "Aciclovir 200 mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 400227,
+        "descricao": "Ácido Fólico 5 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 114081,
+        "descricao": "Ácido Folínico 15 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 151300,
+        "descricao": "Ácido Ursodesoxicólico 150",
+        "estoque_minimo": 180.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 153451,
+        "descricao": "Albendazol 400 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 13684,
+        "descricao": "Alopurinol 100 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 288935,
+        "descricao": "Alopurinol 300 mg",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 170.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 13900,
+        "descricao": "Aminofilina 100mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 13757,
+        "descricao": "Amiodarona 200 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900016,
+        "descricao": "Amoxacilina 500+clavu.125",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 6.0
+      },
+      {
+        "codigo": 18627,
+        "descricao": "Amoxacilina 500mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 13773,
+        "descricao": "Ampicilina 500mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 284408,
+        "descricao": "Anlodipina 5mg",
+        "estoque_minimo": 800.0,
+        "ponto_pedido": 500.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 293617,
+        "descricao": "Atenolol 25 mg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 264849,
+        "descricao": "Atorvastatina cálcica 10 mg",
+        "estoque_minimo": 800.0,
+        "ponto_pedido": 500.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 13870,
+        "descricao": "Azatioprina 50 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 900106,
+        "descricao": "Azitromicina 500mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 154130,
+        "descricao": "Baclofeno 10 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 181315,
+        "descricao": "Bisacodil 5 mg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 279234,
+        "descricao": "Budesonida 200 mcg",
+        "estoque_minimo": 800.0,
+        "ponto_pedido": 500.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 269695,
+        "descricao": "Cabergolina 0,5 mg - cp",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 8.0
+      },
+      {
+        "codigo": 900004,
+        "descricao": "Captopril 25 mg cp",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 284077,
+        "descricao": "Carbonato de Cálcio 1250 mg",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 160.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 280632,
+        "descricao": "Carvedilol 3,125 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 275882,
+        "descricao": "Carvedilol 6,25 mg",
+        "estoque_minimo": 180.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 14052,
+        "descricao": "Cefalexina 500mg",
+        "estoque_minimo": 180.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 290575,
+        "descricao": "Ciclobenzaprina 10 mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 288956,
+        "descricao": "Cilostazol 100 mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 238813,
+        "descricao": "Ciprofloxacina 500mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 136280,
+        "descricao": "Ciproterona 50mg",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 140.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 224685,
+        "descricao": "Claritromicina 500 mg",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 206636,
+        "descricao": "Clindamicina 300mg",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 180.0,
+        "caixa_com": 8.0
+      },
+      {
+        "codigo": 14214,
+        "descricao": "Clonidina 150mcg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 273025,
+        "descricao": "clopidogrel 75 mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 16381,
+        "descricao": "Cloreto Potássio 600 mg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 210.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 14451,
+        "descricao": "colchicina 0,5 mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 14508,
+        "descricao": "dapsona 100 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 273615,
+        "descricao": "dapsona 50 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 16390,
+        "descricao": "Dexametasona 4 mg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 14583,
+        "descricao": "Dexclorfeniramina 2mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 16403,
+        "descricao": "Diclofenaco sódico 50 mg",
+        "estoque_minimo": 500.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 14745,
+        "descricao": "Digoxina 0,25 mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 188182,
+        "descricao": "Diltiazem 30 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900159,
+        "descricao": "Dimenidrinato 50mg +Piridoxin10mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 14800,
+        "descricao": "Dipirona 500 mg",
+        "estoque_minimo": 2000.0,
+        "ponto_pedido": 1400.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 175358,
+        "descricao": "Domperidona 10 mg",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 263095,
+        "descricao": "Doxazosina 2 mg",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 17027,
+        "descricao": "Doxiciclina 100mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 142077,
+        "descricao": "Enalapril 10 mg",
+        "estoque_minimo": 500.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 162345,
+        "descricao": "Enalapril 5 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 287440,
+        "descricao": "Esomeprazol magn. revestido 20mg",
+        "estoque_minimo": 210.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 28.0
+      },
+      {
+        "codigo": 14931,
+        "descricao": "Espironolactona 100 mg",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 14923,
+        "descricao": "Espironolactona 25 mg",
+        "estoque_minimo": 210.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 269585,
+        "descricao": "Estradiol valerato 2mg",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 28.0
+      },
+      {
+        "codigo": 272344,
+        "descricao": "Finasterida 5 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 288997,
+        "descricao": "Fluconazol 150 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 2.0
+      },
+      {
+        "codigo": 274106,
+        "descricao": "Formoterol,fum. 12 mcg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 15172,
+        "descricao": "Furosemida 40 mg",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 15237,
+        "descricao": "Glibenclamida 5 mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 203300,
+        "descricao": "Hidralazina 25 mg",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 160.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 281190,
+        "descricao": "Hidroclorotiazida 25 mg",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 263885,
+        "descricao": "Hidroxizina 25 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 15563,
+        "descricao": "Hioscina 10 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 900143,
+        "descricao": "Hioscina 10 mg + dipirona 250 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 18724,
+        "descricao": "Ibuprofeno 600 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 15776,
+        "descricao": "Isossorbida 10mg,Dinitrato",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 16497,
+        "descricao": "Isossorbida 5 mg comp SL",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 175706,
+        "descricao": "Isossorbida mono 20 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 189197,
+        "descricao": "Itraconazol 100 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 265217,
+        "descricao": "ivemerctina 6 mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 289058,
+        "descricao": "Levodopa+Bensera(100+25)mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 248614,
+        "descricao": "Levofloxacino 500mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 15911,
+        "descricao": "Loperamida 2 mg",
+        "estoque_minimo": 210.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 4.0
+      },
+      {
+        "codigo": 271187,
+        "descricao": "Loratadina 10 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 273751,
+        "descricao": "Losartan 25 mg",
+        "estoque_minimo": 1200.0,
+        "ponto_pedido": 900.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 289018,
+        "descricao": "L-tiroxina sódica 100 mcg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 289019,
+        "descricao": "L-tiroxina sódica 25 mcg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 174793,
+        "descricao": "Mesalazina 800mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 292982,
+        "descricao": "Metformina XR 500 mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 136123,
+        "descricao": "Metildopa 250 mg",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 16080,
+        "descricao": "Metoclopramida 10mg",
+        "estoque_minimo": 210.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 16128,
+        "descricao": "Metronidazol 250mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 272580,
+        "descricao": "Metropolol 25mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 209970,
+        "descricao": "Nifedipina 10 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 281488,
+        "descricao": "Nitazoxanida 500 mg",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 6.0
+      },
+      {
+        "codigo": 17418,
+        "descricao": "Nitrofurantoína 100 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 28.0
+      },
+      {
+        "codigo": 13480,
+        "descricao": "Norfloxacino 400mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 14.0
+      },
+      {
+        "codigo": 136085,
+        "descricao": "Omeprazol 20 mg",
+        "estoque_minimo": 1200.0,
+        "ponto_pedido": 800.0,
+        "caixa_com": 56.0
+      },
+      {
+        "codigo": 202215,
+        "descricao": "Ondansetrom 8 mg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 900070,
+        "descricao": "Paracetamol 750 mg",
+        "estoque_minimo": 500.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 17620,
+        "descricao": "Pirimetamina 25",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 17680,
+        "descricao": "Prednisona 20 mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 17671,
+        "descricao": "Prednisona 5 mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 283884,
+        "descricao": "Progesterona Micronizada 200mg",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 14.0
+      },
+      {
+        "codigo": 17752,
+        "descricao": "Prometazina 25",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 175722,
+        "descricao": "Propatilnitrato 10",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 17809,
+        "descricao": "Propranolol 40 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 230979,
+        "descricao": "Saccharomyc boulardii 100",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 17914,
+        "descricao": "Simeticona 40 mg",
+        "estoque_minimo": 900.0,
+        "ponto_pedido": 600.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 271617,
+        "descricao": "Sinvastatina 20 mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 900001,
+        "descricao": "Sulf.Ferroso 40 mg",
+        "estoque_minimo": 1200.0,
+        "ponto_pedido": 800.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 18406,
+        "descricao": "Sulfametox400+trimetop80mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 294277,
+        "descricao": "Tiamazol 10 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 235369,
+        "descricao": "Varfarina sód 5mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 18244,
+        "descricao": "Verapamil 80 mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 18570,
+        "descricao": "Vitamina B1 300 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 279772,
+        "descricao": "Vitamina B3 (nicotinamida) 50 mg",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 180165,
+        "descricao": "Vitamina B6 50 mg",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 30.0
+      }
+    ],
+    "SOLUÇÕES": [
+      {
+        "codigo": 11096,
+        "descricao": "Água Oxigenada 10v",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 205125,
+        "descricao": "Clorexidine 0,5% sol alc c/ cor",
+        "estoque_minimo": 260.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 24.0
+      },
+      {
+        "codigo": 403472,
+        "descricao": "Clorexidine 0,2% sol aqu c/ cor",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 24.0
+      },
+      {
+        "codigo": 400303,
+        "descricao": "Clorexid 2,0% c/ tensoat. cirurg 1 Lt",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 401608,
+        "descricao": "Clorexid 2,0 % c/ tensoat. 100ml",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 24.0
+      },
+      {
+        "codigo": 400224,
+        "descricao": "Iodopovidona sol aqu (PVPI)1 LT",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 401076,
+        "descricao": "Sol. Ácida Hemodiálise",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 293693,
+        "descricao": "Sol. Básica Hemodiálise",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 403482,
+        "descricao": "Álcool etíl.gel. 70% 55g",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 48.0
+      }
+    ],
+    "Geladeira": [
+      {
+        "codigo": 13838,
+        "descricao": "Anfotericina B 50 mg",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900148,
+        "descricao": "Atracúrio 10 mg/mL amp 5 mL",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900132,
+        "descricao": "Eritropoetina  4000 UI/1ml",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 141631,
+        "descricao": "Filgrastima 300mcg",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400209,
+        "descricao": "Imun.Anti RH 300 mcg",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900035,
+        "descricao": "Imun.Anti tetânica 250 ui",
+        "estoque_minimo": 1.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900037,
+        "descricao": "Insulina NPH 100UI/mL",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900038,
+        "descricao": "Insulina Regular 100UI/mL",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 276410,
+        "descricao": "INSULINA GLARGINA 100UI/ml",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900058,
+        "descricao": "Ocitocina 5ui/ml ampola",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 213659,
+        "descricao": "Octreotida 0,1 mg/mL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 75.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 900066,
+        "descricao": "Pancurônio 4mg/ml",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900100,
+        "descricao": "Rocurônio 10 mg/mL",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 239739,
+        "descricao": "Surfactante 240mg/3mL",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      }
+    ],
+    "PÓS": [
+      {
+        "codigo": 270976,
+        "descricao": "Acetilcisteína 600 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 14460,
+        "descricao": "Colestiramina 4 g/env - VO",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900093,
+        "descricao": "Sais p/ reidratação oral",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      }
+    ],
+    "CREMES e Pomadas": [
+      {
+        "codigo": 270384,
+        "descricao": "Cetoconazol 2% creme 30g",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900121,
+        "descricao": "Dexametasona 0,1% 10g",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17256,
+        "descricao": "Hidrocortisona 1% Creme 30g",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400194,
+        "descricao": "Lanete Creme 60 g - bisnaga",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 290223,
+        "descricao": "Lidocaína gel 2% 30g tb",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 15865,
+        "descricao": "Lidocaina 2% gel, seringa preenchida 10G",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 279587,
+        "descricao": "Metronidazol geléia 100mg/g 50g",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 256137,
+        "descricao": "Miconazol 2%  creme vaginal",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400244,
+        "descricao": "Mucopolissacarídeo 40g",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 150746,
+        "descricao": "Mupirocina 2% 15g tb.",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17337,
+        "descricao": "Neomicin5mg+Bacitra 250UI/g  15g",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17370,
+        "descricao": "Nistatina Creme 25000 UI/g 60g",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 290226,
+        "descricao": "Óxido de zinco+vit.A+D pomada",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 289181,
+        "descricao": "Sulfadiazina de Prata 1 % 30 g",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 272877,
+        "descricao": "Papaína gel 2% 30 g",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 403896,
+        "descricao": "Papaína gel 6% 30 g",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 403897,
+        "descricao": "Hidrogel 30g-Bisnaga",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 10.0
+      }
+    ],
+    "M.P.P.S": [
+      {
+        "codigo": 900079,
+        "descricao": "Cloreto de sódio 20% - 10 ml",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 140.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 900161,
+        "descricao": "Cloreto de potássio 19,1% - 10 ml",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 140.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 900134,
+        "descricao": "Enoxaparina 40mg",
+        "estoque_minimo": 500.0,
+        "ponto_pedido": 350.0,
+        "caixa_com": 90.0
+      },
+      {
+        "codigo": 900084,
+        "descricao": "Enoxaparina 60mg",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 2.0
+      },
+      {
+        "codigo": 14885,
+        "descricao": "Epinefrina 1mg/ml - amp 1ml",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 900022,
+        "descricao": "Fosfato de Potássio 2meq´ml amp 10ml",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900024,
+        "descricao": "Glicose 50% 10ml",
+        "estoque_minimo": 700.0,
+        "ponto_pedido": 500.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 207772,
+        "descricao": "Gluconato de cálcio 10% 10ml",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900023,
+        "descricao": "Heparina 5.000 UI/0,25ml SC",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900030,
+        "descricao": "Heparina 5.000 UI/ml - 5ml",
+        "estoque_minimo": 75.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900062,
+        "descricao": "Norepinefrina 2mg/ml - 4ml",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900075,
+        "descricao": "Sulfato de magnésio 50% 10ml",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 1.0
+      }
+    ],
+    "SOROS": [
+      {
+        "codigo": 253812,
+        "descricao": "Agua destilada 10 mL",
+        "estoque_minimo": 4000.0,
+        "ponto_pedido": 3000.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 12998,
+        "descricao": "Água Dest. 1000ml",
+        "estoque_minimo": 90.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 16.0
+      },
+      {
+        "codigo": 13153,
+        "descricao": "Água Dest. 250ml",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 24.0
+      },
+      {
+        "codigo": 400294,
+        "descricao": "Álcool etíl. hid. 70% 100 ml",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 288962,
+        "descricao": "Cloreto de sódio 0,9% 10 mL",
+        "estoque_minimo": 4000.0,
+        "ponto_pedido": 3000.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 6599,
+        "descricao": "S. F. 0,9% 1000ml",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 48.0
+      },
+      {
+        "codigo": 6637,
+        "descricao": "S. F. 0,9% 500ml",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 80.0
+      },
+      {
+        "codigo": 6629,
+        "descricao": "S. F. 0,9% 250ml",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 16.0
+      },
+      {
+        "codigo": 6602,
+        "descricao": "S. F. 0,9% 100 ml",
+        "estoque_minimo": 1200.0,
+        "ponto_pedido": 900.0,
+        "caixa_com": 24.0
+      },
+      {
+        "codigo": 900122,
+        "descricao": "S. G. 5% 1000 ml",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 48.0
+      },
+      {
+        "codigo": 12807,
+        "descricao": "S. G. 5% 500 ml",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 70.0
+      },
+      {
+        "codigo": 12777,
+        "descricao": "S. G. 5% 250 ml",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 12750,
+        "descricao": "S. G. 5% 100 ml",
+        "estoque_minimo": 110.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 48.0
+      },
+      {
+        "codigo": 12696,
+        "descricao": "S. G. 10% 500 ml",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 11657,
+        "descricao": "S. G. 10% 250 ml",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 48.0
+      },
+      {
+        "codigo": 12874,
+        "descricao": "S.Glicer.12% 500",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 12831,
+        "descricao": "S. manitol 20% 250ml",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 12840,
+        "descricao": "S.Ring c/Lac 500ml",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 290261,
+        "descricao": "NPT  baxter 986ml",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 6.0
+      }
+    ],
+    "LÍQUIDOS E GOTAS": [
+      {
+        "codigo": 243442,
+        "descricao": "Albendazol 40mg/mL Fr 10 mL",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900017,
+        "descricao": "Amoxacilina 250+Clavulan.62,5/5mL",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900015,
+        "descricao": "Amoxacilina 250mg/5mL",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 157678,
+        "descricao": "Azitromicina 600mg/15mL",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 282790,
+        "descricao": "Benzidamina 1,5mg/ml - flogoral frasco",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900109,
+        "descricao": "Bromoprida 4mg/mL - Fr 20mL",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400206,
+        "descricao": "Cafeína 10 mg/ml sol oral fr 50 ml",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 289125,
+        "descricao": "Captopril 5mg/ml xarope fr 100 ml",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 14060,
+        "descricao": "Cefalexina 250mg/5 mL",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 197769,
+        "descricao": "Ciprofloxacino 0,35% sol oftál fr5mL",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 14311,
+        "descricao": "CLORETO DE POTASSIO 6% (0,8 mEq/mL solução",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 14.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 230294,
+        "descricao": "Clorexidine,digluc 0,12% 250ml",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 14567,
+        "descricao": "Dexametasona elixir",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 14540,
+        "descricao": "Dexametasona  0.1% sol. Oftálmica",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400199,
+        "descricao": "Dextrano 70+Hipromelose",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17922,
+        "descricao": "Dimeticona 75 mg/mL - Fr 10mL",
+        "estoque_minimo": 140.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 900080,
+        "descricao": "Dipirona  500 mg/mL Fr 10 mL",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 270215,
+        "descricao": "Domperidona 1mg/mL Fr 100mL",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 289137,
+        "descricao": "Espironolactona 10 mg/ml susp oral",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 136166,
+        "descricao": "Furosemida 10 mg/ml sol oral",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 289101,
+        "descricao": "Hidroclorotiazida 1 mg/ml susp oral fr 50 ml",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400204,
+        "descricao": "Hidroxido Al + Mg + Dim 150 mL",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 174661,
+        "descricao": "ipratrópio spray aerosol",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 293643,
+        "descricao": "Ibuprofeno 100mg/mL   20 mL",
+        "estoque_minimo": 8.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 150916,
+        "descricao": "Ipratrópio 0,25 mg/mL Fr 20 mL",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 148261,
+        "descricao": "Lactulose 667 mg/mL -Fr 120 mL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 294109,
+        "descricao": "Loratadina 1 mg/mL fr 100 mL",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900044,
+        "descricao": "Lidocaína spray 10% 50mL",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 19534,
+        "descricao": "Loção Protetora Epitelial",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 401196,
+        "descricao": "Lugol 3 % 50 mL",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 401974,
+        "descricao": "Lugol 5% forte sol oral 30 ml",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 16136,
+        "descricao": "Metronidazol  40 mg/mL Fr 100 mL",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17388,
+        "descricao": "Nistatina 100.000UI/mL  50 mL",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 294859,
+        "descricao": "OXIBUPROCAINA, 4 MG/ML, SOL. oftalmica , 10 ML",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17442,
+        "descricao": "Óleo mineral 100 mL",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 900071,
+        "descricao": "Paracetamol 200mg/mL 15 mL",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 195359,
+        "descricao": "Permetrina 5% Frasco 60 mL",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 294261,
+        "descricao": "Permetrina 1% frasco 60 mL",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 270975,
+        "descricao": "Prednisolona 3mg/mL 60 mL",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 404692,
+        "descricao": "Picosulfato de sódio 7.5 mg/ml",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 403397,
+        "descricao": "PVPI colírio 2,5%",
+        "estoque_minimo": 5.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 4.0
+      },
+      {
+        "codigo": 18554,
+        "descricao": "S Fer125mg/mL Fe 25mg/mL",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 8.0
+      },
+      {
+        "codigo": 900094,
+        "descricao": "Salbutamol Spray 100mcg",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 17906,
+        "descricao": "Salbutamol sol. nebulização",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 404874,
+        "descricao": "Sucralfato 2g/10ml",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 18414,
+        "descricao": "Sulfamet 200+Trimetop 40mg/ 5 mL Fr",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 403932,
+        "descricao": "Sulfato de zinco 2,5 mg/ml sol oral fr 50 ml",
+        "estoque_minimo": 6.0,
+        "ponto_pedido": 4.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 253340,
+        "descricao": "Tobramicina 0,3% Sol Oftálm. 5 mL",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 2.0
+      },
+      {
+        "codigo": 18198,
+        "descricao": "Tropicamida 1% Sol Oftálmica 5 mL",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 2.0
+      },
+      {
+        "codigo": 407166,
+        "descricao": "Vitamina D3 200 UI/GT",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 30.0
+      }
+    ],
+    "AMPOLAS": [
+      {
+        "codigo": 400185,
+        "descricao": "Ácido folíco 50mg - ampola",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 145050,
+        "descricao": "Ác tranexâmico 250 mg/5 mL ap 5mL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 16934,
+        "descricao": "Aciclovir 250mg",
+        "estoque_minimo": 130.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 900103,
+        "descricao": "Adenosina 6mg/2mL",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900085,
+        "descricao": "Albumina humana 20% 50ml",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 272642,
+        "descricao": "Alprostadil 20 mcg",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 15954,
+        "descricao": "Amicacina 100 mg/2 mL",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 13692,
+        "descricao": "Amicacina 500 mg/2 mL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900169,
+        "descricao": "Aminofilina 240mg/10 mL",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 900101,
+        "descricao": "Amiodarona 150 mg/3 mL",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 235334,
+        "descricao": "Ampi 2g+sulbact 1g - (3g)",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 13811,
+        "descricao": "Ampicilina 1 g",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900086,
+        "descricao": "Atropina 0,25 mg/1mL",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 273311,
+        "descricao": "Azitromicina  500mg ev",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 284962,
+        "descricao": "Azul de metileno 1% amp 5 mL",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17540,
+        "descricao": "B Penic.5000 000 UI",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 17531,
+        "descricao": "B Penic.Benz 1200000 UI",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 277780,
+        "descricao": "Betametas acet +fosf beta3mg/ml+3mg/ml",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900107,
+        "descricao": "Bicarbonato Sódio 8,4% 10mL",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 900108,
+        "descricao": "Bupivacaina 0,5% 20ml",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 285704,
+        "descricao": "Cafeína citrato 20mg/mL amp.1mL",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 14079,
+        "descricao": "Cefalotina 1 g",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 248681,
+        "descricao": "cefazolina 1g",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 253944,
+        "descricao": "Cefepime 2g",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 16845,
+        "descricao": "Cefotaxima 1 g",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 16640,
+        "descricao": "Cefoxitina 1 g",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 18660,
+        "descricao": "Ceftazidima 1 g",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 16969,
+        "descricao": "Ceftriaxona 1 g",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 167401,
+        "descricao": "Cefuroxima 750 mg",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900149,
+        "descricao": "Cetoprofeno 100mg I.V.",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 174653,
+        "descricao": "Ciprofloxacina 200mg/100 mL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 60.0
+      },
+      {
+        "codigo": 14168,
+        "descricao": "Clindamicina 600 mg/4mL",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900112,
+        "descricao": "Clonidina 150 mcg amp 1mL",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 12769,
+        "descricao": "Deslanosídeo 0,4 mg/2 mL",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900123,
+        "descricao": "Dexametasona 10 mg/2,5 mL",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 269618,
+        "descricao": "Dimen.+ Vit. B6 DL",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 900081,
+        "descricao": "Dipirona 500 mg/mL- amp 2 mL",
+        "estoque_minimo": 1500.0,
+        "ponto_pedido": 1000.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 900128,
+        "descricao": "Dobutamina 250 mg/20 mL",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 900019,
+        "descricao": "Dopamina 50 mg/10 mL",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 279445,
+        "descricao": "ESMOLOL 10MG/ML 10ML AMPOLA",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 151041,
+        "descricao": "Fluconazol 200 mg inj",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 6.0
+      },
+      {
+        "codigo": 900020,
+        "descricao": "Furosemida 20 mg/2 mL",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 401188,
+        "descricao": "Ganciclovir bolsa",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 15202,
+        "descricao": "Gentamicina 80 mg amp 2 mL",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900025,
+        "descricao": "Hidralazina 20 mg amp 1mL",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 15474,
+        "descricao": "Hidrocortisona 100 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 15482,
+        "descricao": "Hidrocortisona 500 mg",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 273795,
+        "descricao": "Hioscina 20 mg/1mL",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 900036,
+        "descricao": "Isossorbida 10mg/mL ap 1 ml",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 248622,
+        "descricao": "Levofloxacino 500 mg inj",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 6.0
+      },
+      {
+        "codigo": 900178,
+        "descricao": "Lido 2% c/v Fr/amp 20 mL",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 16543,
+        "descricao": "Lidocaína 1% S/V Fr/amp 20 mL",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 25.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 16489,
+        "descricao": "Lidocaína 2% S/V Fr/amp 20 mL",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900039,
+        "descricao": "Lido 1% c/v Fr/amp 20 mL",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 213780,
+        "descricao": "Meropenen 500 mg",
+        "estoque_minimo": 500.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 900047,
+        "descricao": "Metilergometrina, maleato 0,2 mg/mL 1 mL",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 900053,
+        "descricao": "Metilprednisolona 500 mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900055,
+        "descricao": "Metoclopramida 10 mg - amp 2 mL",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 400242,
+        "descricao": "Metronidazol 500mg/100 mL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900061,
+        "descricao": "Nitroglicerina 50mg/10mL",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 900167,
+        "descricao": "Nitroprussiato Sod. 50 mg",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 201790,
+        "descricao": "Omeprazol 40 mg",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900068,
+        "descricao": "Ondansetrona 8mg - amp 4 mL",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 17469,
+        "descricao": "Oxacilina 500 mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 248665,
+        "descricao": "Piperacilina 4+Tazobactam0,5g",
+        "estoque_minimo": 350.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 120.0
+      },
+      {
+        "codigo": 272925,
+        "descricao": "Polimixina B 500.000 UI",
+        "estoque_minimo": 160.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 900090,
+        "descricao": "Prometazina 50 mg/2 mL",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 17825,
+        "descricao": "Protamina 1000 UI/mL amp 5 mL",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 248584,
+        "descricao": "Ropivacaína 7,5 mg/mL Fr/amp 20mL",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 400243,
+        "descricao": "SMT 400+TMP 80 amp 5mL IV",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 289072,
+        "descricao": "Suxametônio 100mg",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900074,
+        "descricao": "Terbutalina 0,5 mg/mL amp 1 mL",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 402978,
+        "descricao": "Tiamina 100 mg/mL amp",
+        "estoque_minimo": 140.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 18465,
+        "descricao": "Vancomicina 500 mg",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900010,
+        "descricao": "Vit K1 IM/SC",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 19356,
+        "descricao": "Vit. B 12 5000 mcg/2mL",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 18333,
+        "descricao": "Vitaminas do Complexo B",
+        "estoque_minimo": 70.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 50.0
+      }
+    ],
+    "RESERVA TERPÊUTICA": [
+      {
+        "codigo": 401384,
+        "descricao": "ACIDO ACETICO 5% 100ML",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 401182,
+        "descricao": "Ácido tricloroacético 80% - frasco 30ml",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 273221,
+        "descricao": "Ácido zoledrônico 4mg - ampola",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 292946,
+        "descricao": "Alteplase 10mg",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 181439,
+        "descricao": "Alteplase 50 mg",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 127930,
+        "descricao": "Aztreonam 1G",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 406914,
+        "descricao": "Baricitinibe 4mg",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 16950,
+        "descricao": "Calcitriol 0,25 mcg",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 404816,
+        "descricao": "Ceftazidima + Avibactam",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 407078,
+        "descricao": "ciclossilicato de zircônio sódico hidratado - 5 g",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900119,
+        "descricao": "Dantrole 20 mg",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 288736,
+        "descricao": "Daptomicina 500 mg",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 135666,
+        "descricao": "Desmopressina 0,1mg/ml",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900117,
+        "descricao": "DIFENIDRAMINA 50 MG/ML",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 12.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 292981,
+        "descricao": "Eltrombopague Olamina 25 mg",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 14.0
+      },
+      {
+        "codigo": 277846,
+        "descricao": "Ertapenem 1G",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 211907,
+        "descricao": "Fludrocortisona 0,1mg",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 258210,
+        "descricao": "Flutamida 250 mg",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 401568,
+        "descricao": "Formalina 4% solução",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 289000,
+        "descricao": "Glicose 25% 10ml",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 227200,
+        "descricao": "Glucagon 1 mg",
+        "estoque_minimo": 3.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 402030,
+        "descricao": "Histoacryl (geladeira)",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 3.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 400198,
+        "descricao": "Imunoglobulina 5% (geladeira)",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 265039,
+        "descricao": "Leuprorrelina 3,75mg",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 270058,
+        "descricao": "Linezolida 600mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 401634,
+        "descricao": "Lipiodol 10ml",
+        "estoque_minimo": 4.0,
+        "ponto_pedido": 2.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 181803,
+        "descricao": "Mesalazina supositório",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 15.0
+      },
+      {
+        "codigo": 287969,
+        "descricao": "Micafungina 100 mg",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 401262,
+        "descricao": "Milrinona 1 mg/ml ampola 10ml",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900176,
+        "descricao": "Monoetanolamina",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 6.0
+      },
+      {
+        "codigo": 288963,
+        "descricao": "NAFAZOLINA 0,5MG/ML",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 260819,
+        "descricao": "NICOTINA ADESIVO 21 mg",
+        "estoque_minimo": 21.0,
+        "ponto_pedido": 14.0,
+        "caixa_com": 7.0
+      },
+      {
+        "codigo": 136026,
+        "descricao": "Oligoelementos para uso adulto ampola 2 ML",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 17493,
+        "descricao": "Pancreatina 25.000UI",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 282154,
+        "descricao": "Polivitaminico adulto e pediátrico",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 17787,
+        "descricao": "Propiltiouracila 100mg cp",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 279457,
+        "descricao": "Regencel pomada oftálmica",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 406524,
+        "descricao": "Rifaximina 500mg",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 28.0
+      },
+      {
+        "codigo": 293674,
+        "descricao": "Sacarato de Hidróxido Férrico 100mg/5ml",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 289113,
+        "descricao": "Sildenafil 5 mg/ml sol oral fr 100 ml",
+        "estoque_minimo": 2.0,
+        "ponto_pedido": 1.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 272124,
+        "descricao": "Subgalato de bismuto (gramas)",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 294270,
+        "descricao": "Sugamadex 100mg/ml",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 143855,
+        "descricao": "TEICOPLANINA, 400 MG, PÓ LIOFILIZADO INJETÁVEL FRASCO-AMPOLA",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 273427,
+        "descricao": "Terlipressina 1mg/ml",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 279816,
+        "descricao": "Tgeciclina 50mg",
+        "estoque_minimo": 60.0,
+        "ponto_pedido": 40.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 269913,
+        "descricao": "Triancinolona hexacetonida 20mg/ml",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 136239,
+        "descricao": "VASOPRESSINA 20 UI/ML, AMPOLA 1 ML",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 273627,
+        "descricao": "Voriconazol 200mg comprimido",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 14.0
+      },
+      {
+        "codigo": 273312,
+        "descricao": "Voriconazol 200mg injetável",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 1.0
+      }
+    ],
+    "ALMOXARIFADO": [
+      {
+        "codigo": 402694,
+        "descricao": "Equipo com filtro",
+        "estoque_minimo": 7.0,
+        "ponto_pedido": 5.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 255157,
+        "descricao": "Lacre para carro de parada",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 407018,
+        "descricao": "Filtro para Concentrado de Hemácias",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 407016,
+        "descricao": "Filtro para Concentrado de Plaquetas",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 10.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pedidos UFCD — Farmácia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark">UFCD</span>
+      <div>
+        <h1>Pedidos UFCD</h1>
+        <p class="subtitle">Farmácia · catálogo fixo · match por Cód. AGHU</p>
+      </div>
+    </div>
+    <div class="top-meta">
+      <label class="date-field">
+        Data do pedido
+        <input type="text" id="dataPedido" value="{{ hoje }}" />
+      </label>
+      <a class="btn btn-primary" href="{{ url_for('exportar', so_pedir=1) }}">Exportar pedido (.xlsx)</a>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for cat, msg in messages %}
+          <div class="flash flash-{{ cat }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <section class="panel imports">
+    <div class="import-box">
+      <h2>Catálogo de pedidos</h2>
+      <p>Fixo no sistema, com as abas da planilha (COMPRIMIDOS, SOLUÇÕES, Geladeira…).</p>
+      {% if tem_catalogo %}
+        <span class="badge ok">{{ total_catalogo }} itens em {{ abas|length }} abas</span>
+      {% else %}
+        <span class="badge warn">Aguardando carga do catálogo fixo</span>
+      {% endif %}
+    </div>
+
+    <form class="import-box" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
+      <h2>Estoque atual (AGHU)</h2>
+      <p>Envie o <strong>EstoqueFarmacia-*.xlsx</strong> do dia. O match é pelo código.</p>
+      <input type="file" name="arquivo" accept=".xlsx,.xls" required />
+      <button type="submit" class="btn">Atualizar estoque</button>
+      {% if tem_estoque %}
+        <span class="badge ok">
+          {{ estoque_meta.get('itens', 0) }} códigos
+          {% if estoque_meta.get('arquivo') %} · {{ estoque_meta.get('arquivo') }}{% endif %}
+        </span>
+      {% else %}
+        <span class="badge warn">Pendente</span>
+      {% endif %}
+    </form>
+  </section>
+
+  {% if tem_catalogo %}
+  <nav class="tabs" role="tablist">
+    {% for a in abas %}
+      <a
+        class="tab {% if a.id == aba_atual %}active{% endif %}"
+        href="{{ url_for('index', aba=a.id, filtro=filtro, q=q) }}"
+        title="{{ a.titulo }}"
+      >
+        <span class="tab-name">{{ a.titulo }}</span>
+        {% if contagens.get(a.id, 0) %}
+          <span class="tab-count">{{ contagens[a.id] }}</span>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </nav>
+
+  <section class="toolbar">
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Itens na aba</span>
+        <strong>{{ resumo.total }}</strong>
+      </div>
+      <div class="stat accent">
+        <span class="stat-label">Precisam pedir</span>
+        <strong>{{ resumo.pedir }}</strong>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Sem saldo no arquivo</span>
+        <strong>{{ resumo.sem_saldo }}</strong>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Qtde a pedir</span>
+        <strong>{{ resumo.qtd_pedir | int }}</strong>
+      </div>
+    </div>
+
+    <form class="filters" method="get">
+      <input type="hidden" name="aba" value="{{ aba_atual }}" />
+      <input type="search" name="q" value="{{ q }}" placeholder="Buscar código ou nome…" />
+      <select name="filtro">
+        <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
+        <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
+        <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque no arquivo</option>
+      </select>
+      <button type="submit" class="btn">Filtrar</button>
+    </form>
+  </section>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Cód. AGHU</th>
+          <th>Medicamento</th>
+          <th>Est. Mínimo</th>
+          <th>Ponto de Pedido</th>
+          <th>Caixa com</th>
+          <th class="col-estoque">Estoque AGHU</th>
+          <th>Pedir?</th>
+          <th>Quanto Pedir?</th>
+          <th>Manual</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in itens %}
+        <tr class="{% if it.pedir %}row-pedir{% endif %} {% if it.sem_estoque %}row-sem{% endif %}">
+          <td class="mono">{{ it.codigo }}</td>
+          <td class="desc">{{ it.descricao }}</td>
+          <td class="num">{{ it.estoque_minimo | int }}</td>
+          <td class="num">{{ it.ponto_pedido | int }}</td>
+          <td class="num">{{ it.caixa_com | int }}</td>
+          <td class="num col-estoque">
+            {% if it.estoque_aghu is none %}
+              <span class="muted">—</span>
+            {% else %}
+              {{ it.estoque_aghu | int }}
+            {% endif %}
+          </td>
+          <td>
+            {% if it.estoque_aghu is none %}
+              <span class="pill neutro">?</span>
+            {% elif it.pedir %}
+              <span class="pill sim">Sim</span>
+            {% else %}
+              <span class="pill nao">Não</span>
+            {% endif %}
+          </td>
+          <td class="num quanto">
+            {% if it.quanto_pedir is not none %}
+              {{ it.quanto_pedir | int }}
+            {% else %}
+              <span class="muted">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <input
+              class="manual-input"
+              type="number"
+              min="0"
+              step="1"
+              data-codigo="{{ it.codigo }}"
+              value="{{ it.manual if it.manual is not none else '' }}"
+              placeholder="opc."
+            />
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="empty">Nenhum item neste filtro.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <section class="empty-state">
+    <h2>Catálogo fixo indisponível</h2>
+    <p>O arquivo <code>data/catalogo.json</code> não foi encontrado.</p>
+  </section>
+  {% endif %}
+
+  <footer class="foot">
+    Lógica: Pedir se estoque &lt; ponto de pedido · Quanto = arredonda para cima até o est. mínimo (múltiplo da caixa)
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
