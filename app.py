@@ -1239,6 +1239,7 @@ def exportar():
                 "" if it["quanto_pedir"] is None else it["quanto_pedir"],
             ]
             estoque_col = 7
+            qtde_col = 9
         else:
             vals = [
                 it.get("aba") or "",
@@ -1250,11 +1251,15 @@ def exportar():
                 "" if it["quanto_pedir"] is None else it["quanto_pedir"],
             ]
             estoque_col = 5
+            qtde_col = 7
         for c, v in enumerate(vals, 1):
             cell = ws.cell(r, c, v)
             cell.border = thin
-            if it["pedir"]:
+            if it["pedir"] and c == qtde_col:
                 cell.fill = sim_fill
+                cell.font = Font(bold=True, color="8A3B00")
+            elif c == estoque_col and not it["pedir"]:
+                cell.fill = estoque_fill
             elif c == estoque_col:
                 cell.fill = estoque_fill
 

@@ -398,8 +398,13 @@ td {
 .desc { max-width: 20rem; }
 .muted { color: #8b9a92; }
 .cat-cell { font-size: 0.75rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
-.row-pedir { background: var(--pedir); }
 .row-sem { opacity: 0.8; }
+th.col-qtde { background: #c45a1a !important; color: #fff !important; }
+td.col-qtde-pedir {
+  background: #fdebd0 !important;
+  color: #8a3b00;
+  font-weight: 800;
+}
 
 .pill {
   display: inline-grid;

@@ -179,9 +179,11 @@ def gerar_pdf_pedido(
             ("RIGHTPADDING", (0, 0), (-1, -1), 3),
         ]
         highlight = colors.HexColor("#FDEBD0")
+        qtde_col = 8  # última coluna: Qtde
         for row in highlight_rows:
-            style_cmds.append(("BACKGROUND", (0, row), (-1, row), highlight))
-            style_cmds.append(("FONTNAME", (7, row), (8, row), "Helvetica-Bold"))
+            style_cmds.append(("BACKGROUND", (qtde_col, row), (qtde_col, row), highlight))
+            style_cmds.append(("FONTNAME", (qtde_col, row), (qtde_col, row), "Helvetica-Bold"))
+            style_cmds.append(("TEXTCOLOR", (qtde_col, row), (qtde_col, row), colors.HexColor("#8a3b00")))
 
         table.setStyle(TableStyle(style_cmds))
         story.append(table)

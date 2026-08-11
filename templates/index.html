@@ -120,18 +120,16 @@
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <input type="hidden" name="aba" value="{{ aba_atual }}" />
       <input type="search" name="q" value="{{ q }}" placeholder="Código ou medicamento…" />
-      <select name="filtro">
+      <select name="filtro" id="filtroSelect" onchange="this.form.submit()">
         <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
         <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
         <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
       </select>
-      <button type="submit" class="btn">Filtrar</button>
       <a
         class="btn export-link"
         id="pdfExportBtn"
         href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
-      >PDF</a>
-      <a
+      >PDF</a>      <a
         class="btn export-link"
         id="excelExportBtn"
         href="{{ url_for('exportar', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
@@ -153,14 +151,14 @@
           {% endif %}
           <th class="col-estoque">Estoque</th>
           <th>Pedir?</th>
-          <th>Qtde</th>
+          <th class="col-qtde">Qtde</th>
           <th>Manual</th>
         </tr>
       </thead>
       <tbody>
         {% set cols = (9 if mostra_ponto_caixa else 7) + (1 if ver_todos else 0) %}
         {% for it in itens %}
-        <tr class="{% if it.pedir %}row-pedir{% endif %} {% if it.sem_estoque %}row-sem{% endif %}">
+        <tr class="{% if it.sem_estoque %}row-sem{% endif %}">
           {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
           <td class="mono">{{ it.codigo }}</td>
           <td class="desc">{{ it.descricao }}</td>
@@ -181,10 +179,9 @@
               <span class="pill nao">Não</span>
             {% endif %}
           </td>
-          <td class="num quanto">
+          <td class="num quanto {% if it.pedir and it.quanto_pedir is not none %}col-qtde-pedir{% endif %}">
             {% if it.quanto_pedir is not none %}{{ it.quanto_pedir | int }}{% else %}<span class="muted">—</span>{% endif %}
-          </td>
-          <td>
+          </td>          <td>
             <input
               class="manual-input"
               type="number"
