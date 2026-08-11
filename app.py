@@ -59,6 +59,7 @@ from db import (
     obter_pedido,
     save_catalogo_parametro,
     save_estoque_db,
+    salvar_pedido_dia,
     using_neon,
 )
 from pdf_util import gerar_pdf_pedido
@@ -744,6 +745,44 @@ def _db_path():
     return None if using_neon() else PEDIDOS_SQLITE
 
 
+def autosave_pedido_dia(
+    unidade: str,
+    data_ped: date | None = None,
+    observacao: str | None = None,
+    *,
+    quiet: bool = True,
+) -> tuple[int, int] | None:
+    """
+    Salva/atualiza automaticamente o pedido da unidade na data.
+    Retorna (pedido_id, qtd_itens) ou None se não houver o que salvar.
+    """
+    data_ped = data_ped or date.today()
+    itens = coletar_itens_pedido(incluir_extras=True, unidade=unidade)
+    if not itens:
+        return None
+    user = current_user() or {}
+    tag = f"[{unidade_cfg(unidade)['titulo']}]"
+    obs = (observacao or "").strip()
+    if not obs:
+        obs = f"{tag} salvamento automático"
+    elif not obs.startswith(tag):
+        obs = f"{tag} {obs}".strip()
+    pid, _criado = salvar_pedido_dia(
+        data_pedido=data_ped,
+        usuario=user.get("nome") or user.get("username"),
+        observacao=obs,
+        itens=itens,
+        sqlite_path=_db_path(),
+        unidade=unidade,
+    )
+    if not quiet:
+        flash(
+            f"Pedido do dia salvo automaticamente (#{pid}) — {len(itens)} itens.",
+            "ok",
+        )
+    return pid, len(itens)
+
+
 def itens_extras_manuais() -> list[dict]:
     return session.get("extras_manuais", [])
 
@@ -961,6 +1000,14 @@ def index():
         except Exception:
             contagens_unidade[other_id] = 0
 
+    # Auto-salva o pedido do dia quando há estoque e itens a pedir
+    autosave_info = None
+    if saldos and resumo.get("pedir", 0) > 0:
+        try:
+            autosave_info = autosave_pedido_dia(uid, date.today(), quiet=True)
+        except Exception as e:
+            print("aviso autosave:", e)
+
     return render_template(
         "index.html",
         abas=abas_sorted,
@@ -980,7 +1027,8 @@ def index():
         extras=itens_extras_manuais(),
         unidade_id=uid,
         unidade=cfg,
-        mostra_ponto_caixa=cfg.get("mostra_ponto_caixa", True),
+        mostra_ponto_caixa=True,
+        autosave_info=autosave_info,
     )
 
 
@@ -1024,7 +1072,15 @@ def importar_estoque():
             flash("Nenhum item de estoque encontrado.", "erro")
             return redirect(url_for("index", unidade=uid))
         save_estoque(mapa, meta, uid)
-        flash(f"Estoque importado: {len(mapa)} códigos ({meta.get('arquivo')}).", "ok")
+        dest = "Neon" if using_neon() else "disco"
+        flash(
+            f"Estoque salvo ({dest}): {len(mapa)} códigos ({meta.get('arquivo')}).",
+            "ok",
+        )
+        try:
+            autosave_pedido_dia(uid, date.today(), quiet=False)
+        except Exception as e:
+            flash(f"Estoque ok, mas falhou o auto-salvamento do pedido: {e}", "erro")
     except Exception as e:
         flash(f"Erro ao ler estoque: {e}", "erro")
     return redirect(url_for("index", unidade=uid))
@@ -1038,6 +1094,10 @@ def api_manual():
     cod = str(data.get("codigo", ""))
     valor = data.get("valor")
     set_manual_unidade(uid, cod, valor)
+    try:
+        autosave_pedido_dia(uid, date.today(), quiet=True)
+    except Exception:
+        pass
     return jsonify({"ok": True})
 
 
@@ -1070,6 +1130,10 @@ def api_parametros():
         )
     except Exception as e:
         return jsonify({"ok": False, "erro": str(e)}), 500
+    try:
+        autosave_pedido_dia(uid, date.today(), quiet=True)
+    except Exception:
+        pass
     return jsonify({"ok": True})
 
 
@@ -1134,12 +1198,11 @@ def pedido_salvar():
         return redirect(url_for("index", unidade=uid))
     try:
         user = current_user() or {}
-        # prefixa observação com a unidade para distinguir no histórico
         obs = observacao
         tag = f"[{unidade_cfg(uid)['titulo']}]"
         if not (obs or "").startswith(tag):
             obs = f"{tag} {obs}".strip()
-        pid = criar_pedido(
+        pid, criado = salvar_pedido_dia(
             data_pedido=data_ped,
             usuario=user.get("nome") or user.get("username"),
             observacao=obs,
@@ -1149,7 +1212,11 @@ def pedido_salvar():
         )
         session["extras_manuais"] = []
         session.modified = True
-        flash(f"Pedido #{pid} salvo ({data_ped.strftime('%d/%m/%Y')}) — {len(itens)} itens.", "ok")
+        acao = "criado" if criado else "atualizado"
+        flash(
+            f"Pedido #{pid} {acao} ({data_ped.strftime('%d/%m/%Y')}) — {len(itens)} itens.",
+            "ok",
+        )
         return redirect(url_for("historico_detalhe", pedido_id=pid))
     except Exception as e:
         flash(f"Erro ao salvar pedido: {e}", "erro")

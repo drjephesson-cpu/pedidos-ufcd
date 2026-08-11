@@ -226,6 +226,9 @@ a { color: inherit; }
   display: inline-flex;
   align-items: center;
 }
+.btn[hidden], .icon-btn[hidden], [hidden] {
+  display: none !important;
+}
 .btn:hover, .icon-btn:hover { background: #f7faf8; }
 .btn-primary {
   background: var(--accent);

@@ -305,6 +305,136 @@ def criar_pedido(
     return int(pedido_id)
 
 
+def buscar_pedido_id_dia(
+    unidade: str,
+    data_pedido: date,
+    sqlite_path: Path | None = None,
+) -> int | None:
+    unidade_id = _infer_unidade(unidade, None)
+    with connect(sqlite_path) as conn:
+        row = conn.execute(
+            text(
+                """
+                SELECT id FROM pedidos
+                WHERE unidade = :unidade AND data_pedido = :data_pedido
+                ORDER BY id DESC
+                LIMIT 1
+                """
+            ),
+            {
+                "unidade": unidade_id,
+                "data_pedido": data_pedido.isoformat(),
+            },
+        ).first()
+    return int(row[0]) if row else None
+
+
+def salvar_pedido_dia(
+    data_pedido: date,
+    usuario: str | None,
+    observacao: str | None,
+    itens: list[dict[str, Any]],
+    sqlite_path: Path | None = None,
+    unidade: str | None = None,
+) -> tuple[int, bool]:
+    """
+    Cria ou atualiza o pedido da unidade na data (1 por unidade/dia).
+    Retorna (pedido_id, criado_novo).
+    """
+    if not itens:
+        raise ValueError("Pedido sem itens.")
+
+    unidade_id = _infer_unidade(
+        unidade or (itens[0].get("unidade") if itens else None), observacao
+    )
+    existing = buscar_pedido_id_dia(unidade_id, data_pedido, sqlite_path)
+    is_pg = get_engine(sqlite_path).dialect.name == "postgresql"
+
+    with connect(sqlite_path) as conn:
+        if existing:
+            pedido_id = existing
+            conn.execute(
+                text("DELETE FROM pedido_itens WHERE pedido_id = :id"),
+                {"id": pedido_id},
+            )
+            conn.execute(
+                text(
+                    """
+                    UPDATE pedidos
+                    SET usuario = :usuario, observacao = :observacao
+                    WHERE id = :id
+                    """
+                ),
+                {
+                    "usuario": usuario or "",
+                    "observacao": observacao or "",
+                    "id": pedido_id,
+                },
+            )
+            criado = False
+        else:
+            if is_pg:
+                pedido_id = conn.execute(
+                    text(
+                        """
+                        INSERT INTO pedidos (data_pedido, usuario, observacao, unidade)
+                        VALUES (:data_pedido, :usuario, :observacao, :unidade)
+                        RETURNING id
+                        """
+                    ),
+                    {
+                        "data_pedido": data_pedido.isoformat(),
+                        "usuario": usuario or "",
+                        "observacao": observacao or "",
+                        "unidade": unidade_id,
+                    },
+                ).scalar_one()
+            else:
+                res = conn.execute(
+                    text(
+                        """
+                        INSERT INTO pedidos (data_pedido, usuario, observacao, unidade)
+                        VALUES (:data_pedido, :usuario, :observacao, :unidade)
+                        """
+                    ),
+                    {
+                        "data_pedido": data_pedido.isoformat(),
+                        "usuario": usuario or "",
+                        "observacao": observacao or "",
+                        "unidade": unidade_id,
+                    },
+                )
+                pedido_id = int(res.lastrowid)
+            criado = True
+
+        for it in itens:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO pedido_itens (
+                        pedido_id, codigo, descricao, aba, quantidade, origem,
+                        estoque_aghu, estoque_minimo, ponto_pedido
+                    ) VALUES (
+                        :pedido_id, :codigo, :descricao, :aba, :quantidade, :origem,
+                        :estoque_aghu, :estoque_minimo, :ponto_pedido
+                    )
+                    """
+                ),
+                {
+                    "pedido_id": pedido_id,
+                    "codigo": it.get("codigo"),
+                    "descricao": it.get("descricao") or "",
+                    "aba": it.get("aba") or "",
+                    "quantidade": float(it.get("quantidade") or 0),
+                    "origem": it.get("origem") or "auto",
+                    "estoque_aghu": it.get("estoque_aghu"),
+                    "estoque_minimo": it.get("estoque_minimo"),
+                    "ponto_pedido": it.get("ponto_pedido"),
+                },
+            )
+    return int(pedido_id), criado
+
+
 def listar_filtros_historico(sqlite_path: Path | None = None) -> dict:
     with connect(sqlite_path) as conn:
         usuarios = [

@@ -65,7 +65,7 @@
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
         <h2>Estoque {{ 'Bloco' if unidade_id == 'cc' else 'AGHU' }}</h2>
-        <p>{{ unidade.hint_estoque }}</p>
+        <p>{{ unidade.hint_estoque }} · salvo no Neon</p>
       </div>
       <div class="panel-card-body">
         <input type="file" name="arquivo" accept=".xlsx,.xls" required onchange="this.form.submit()" />
@@ -80,12 +80,19 @@
     <form class="panel-card" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
-        <h2>Salvar no histórico</h2>
-        <p>Grava itens com Pedir = Sim e ajustes manuais.</p>
+        <h2>Pedido do dia</h2>
+        <p>
+          {% if autosave_info %}
+            Salvo automaticamente #{{ autosave_info[0] }} · {{ autosave_info[1] }} itens
+          {% else %}
+            Ao atualizar o estoque, o pedido do dia é gravado sozinho no histórico
+          {% endif %}
+        </p>
       </div>
       <div class="panel-card-body">
         <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
         <input type="text" name="observacao" placeholder="Observação (opcional)" class="grow-input" />
+        <button type="submit" class="btn">Salvar / atualizar agora</button>
       </div>
     </form>
   </section>
