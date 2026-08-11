@@ -1,0 +1,12 @@
+[project]
+name = "pedidos-ufcd"
+version = "0.1.0"
+requires-python = "==3.12.*"
+dependencies = [
+  "flask>=3.0",
+  "openpyxl>=3.1",
+  "msoffcrypto-tool>=5.0",
+]
+
+[tool.vercel]
+entrypoint = "main.py"
