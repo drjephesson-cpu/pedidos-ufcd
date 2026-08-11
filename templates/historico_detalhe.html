@@ -1,10 +1,11 @@
 {% set nav_active = 'historico' %}
 {% extends "base.html" %}
 
-{% block title %}Pedido #{{ pedido.id }} — UFCD{% endblock %}
+{% block title %}Pedido #{{ pedido.id }} — {{ unidade_titulo }}{% endblock %}
 {% block page_title %}Pedido #{{ pedido.id }}{% endblock %}
 {% block page_sub %}
-  {{ pedido.data_pedido.strftime('%d/%m/%Y') if pedido.data_pedido.strftime is defined else pedido.data_pedido }}
+  {{ unidade_titulo }}
+  · {{ pedido.data_pedido.strftime('%d/%m/%Y') if pedido.data_pedido.strftime is defined else pedido.data_pedido }}
   · {{ pedido.usuario or '—' }}
 {% endblock %}
 
@@ -18,30 +19,38 @@
   <div class="flash-wrap"><div class="flash flash-ok">Obs.: {{ pedido.observacao }}</div></div>
   {% endif %}
 
-  <div class="table-wrap users-table">
-    <table>
-      <thead>
-        <tr>
-          <th>Aba</th>
-          <th>Cód. AGHU</th>
-          <th>Medicamento</th>
-          <th>Quanto pedir</th>
-          <th>Origem</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for it in pedido.itens %}
-        <tr class="{% if it.origem == 'manual' %}row-pedir{% endif %}">
-          <td>{{ it.aba or '—' }}</td>
-          <td class="mono">{{ it.codigo if it.codigo is not none else '—' }}</td>
-          <td class="desc">{{ it.descricao }}</td>
-          <td class="num"><strong>{{ it.quantidade | int }}</strong></td>
-          <td>{% if it.origem == 'manual' %}<span class="pill sim">Manual</span>{% else %}<span class="pill nao">Auto</span>{% endif %}</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="5" class="empty">Sem itens.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  {% for bloco in por_aba %}
+  <section class="hist-group">
+    <header class="hist-group-head">
+      <h2>{{ bloco.aba }}</h2>
+      <span class="meta-pill">{{ bloco.itens | length }} itens</span>
+    </header>
+    <div class="table-wrap users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Cód. AGHU</th>
+            <th>Item</th>
+            <th class="col-qtde">Qtde</th>
+            <th>Origem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in bloco.itens %}
+          <tr>
+            <td class="mono">{{ it.codigo if it.codigo is not none else '—' }}</td>
+            <td class="desc">{{ it.descricao }}</td>
+            <td class="num col-qtde-pedir"><strong>{{ it.quantidade | int }}</strong></td>
+            <td>{% if it.origem == 'manual' %}<span class="pill sim">Manual</span>{% else %}<span class="pill nao">Auto</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% else %}
+  <section class="empty-state">
+    <h2>Sem itens</h2>
+  </section>
+  {% endfor %}
 {% endblock %}

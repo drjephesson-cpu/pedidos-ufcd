@@ -613,3 +613,37 @@ td.col-qtde-pedir {
   .filters { margin-left: 0; width: 100%; }
   .table-wrap { max-height: calc(100vh - 12rem); }
 }
+
+.hist-group { margin-bottom: 1.4rem; }
+.hist-group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.55rem;
+}
+.hist-group-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.hist-user-block { margin: 0 0 1rem; }
+.hist-user-title {
+  margin: 0 0 0.4rem 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 750;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+.hist-abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  max-width: 22rem;
+}
+.hist-abas .meta-pill {
+  font-size: 0.68rem;
+  padding: 0.18rem 0.5rem;
+  background: #eef3f0;
+  color: #355548;
+}

@@ -1,51 +1,101 @@
 {% set nav_active = 'historico' %}
 {% extends "base.html" %}
 
-{% block title %}Histórico — Pedidos UFCD{% endblock %}
+{% block title %}Histórico — Pedidos{% endblock %}
 {% block page_title %}Histórico{% endblock %}
-{% block page_sub %}Pedidos salvos por data{% endblock %}
+{% block page_sub %}Separado por unidade, categoria e usuário{% endblock %}
 
 {% block top_actions %}
   <a class="btn" href="{{ url_for('index') }}">Novo pedido</a>
 {% endblock %}
 
 {% block content %}
-  <div class="table-wrap users-table">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Data do pedido</th>
-          <th>Usuário</th>
-          <th>Itens</th>
-          <th>Qtde total</th>
-          <th>Criado em</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in pedidos %}
-        <tr>
-          <td class="mono">{{ p.id }}</td>
-          <td><strong>{{ p.data_pedido.strftime('%d/%m/%Y') if p.data_pedido.strftime is defined else p.data_pedido }}</strong></td>
-          <td>{{ p.usuario or '—' }}</td>
-          <td class="num">{{ p.qtd_itens }}</td>
-          <td class="num">{{ p.qtd_total | int }}</td>
-          <td class="muted">{{ p.criado_em }}</td>
-          <td class="actions">
-            <a class="btn" href="{{ url_for('historico_detalhe', pedido_id=p.id) }}">Abrir</a>
-            <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=p.id) }}">PDF</a>
-            {% if is_admin %}
-            <form method="post" action="{{ url_for('historico_excluir', pedido_id=p.id) }}" class="inline-form" onsubmit="return confirm('Excluir pedido #{{ p.id }}?');">
-              <button type="submit" class="btn btn-danger">Excluir</button>
-            </form>
-            {% endif %}
-          </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="7" class="empty">Nenhum pedido salvo ainda.</td></tr>
+  <section class="panel-card filter-card">
+    <div class="panel-card-head">
+      <h2>Filtrar histórico</h2>
+      <p>Aplica na hora ao selecionar</p>
+    </div>
+    <form class="panel-card-body filters" method="get">
+      <select name="unidade" onchange="this.form.submit()">
+        <option value="">Todas as unidades</option>
+        {% for u in unidade_opcoes %}
+        <option value="{{ u.id }}" {% if f_unidade == u.id %}selected{% endif %}>{{ u.titulo }}</option>
         {% endfor %}
-      </tbody>
-    </table>
-  </div>
+      </select>
+      <select name="aba" onchange="this.form.submit()">
+        <option value="">Todas as categorias</option>
+        {% for a in filtros.abas %}
+        <option value="{{ a }}" {% if f_aba == a %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
+      <select name="usuario" onchange="this.form.submit()">
+        <option value="">Todos os usuários</option>
+        {% for u in filtros.usuarios %}
+        <option value="{{ u }}" {% if f_usuario == u %}selected{% endif %}>{{ u }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </section>
+
+  {% if grupos %}
+    {% for g in grupos %}
+    <section class="hist-group">
+      <header class="hist-group-head">
+        <h2>{{ g.unidade_titulo }}</h2>
+      </header>
+      {% for ug in g.usuarios %}
+      <div class="hist-user-block">
+        <h3 class="hist-user-title">{{ ug.usuario }}</h3>
+        <div class="table-wrap users-table">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Data</th>
+                <th>Categorias</th>
+                <th>Itens</th>
+                <th>Qtde</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in ug.pedidos %}
+              <tr>
+                <td class="mono">{{ p.id }}</td>
+                <td><strong>{{ p.data_pedido.strftime('%d/%m/%Y') if p.data_pedido.strftime is defined else p.data_pedido }}</strong></td>
+                <td class="hist-abas">
+                  {% for a in p.abas_lista %}
+                    <span class="meta-pill">{{ a }}</span>
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endfor %}
+                </td>
+                <td class="num">{{ p.qtd_itens }}</td>
+                <td class="num col-qtde-pedir">{{ p.qtd_total | int }}</td>
+                <td class="muted">{{ p.criado_em }}</td>
+                <td class="actions">
+                  <a class="btn" href="{{ url_for('historico_detalhe', pedido_id=p.id) }}">Abrir</a>
+                  <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=p.id) }}">PDF</a>
+                  {% if is_admin %}
+                  <form method="post" action="{{ url_for('historico_excluir', pedido_id=p.id) }}" class="inline-form" onsubmit="return confirm('Excluir pedido #{{ p.id }}?');">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  {% else %}
+    <section class="empty-state">
+      <h2>Nenhum pedido neste filtro</h2>
+      <p>Ajuste unidade, categoria ou usuário — ou salve um novo pedido.</p>
+    </section>
+  {% endif %}
 {% endblock %}

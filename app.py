@@ -52,6 +52,7 @@ from db import (
     criar_pedido,
     excluir_pedido,
     init_db,
+    listar_filtros_historico,
     listar_pedidos,
     obter_pedido,
     using_neon,
@@ -1042,6 +1043,7 @@ def pedido_salvar():
             observacao=obs,
             itens=itens,
             sqlite_path=_db_path(),
+            unidade=uid,
         )
         session["extras_manuais"] = []
         session.modified = True
@@ -1098,14 +1100,67 @@ def pedido_pdf_atual():
 @app.route("/historico")
 @login_required
 def historico():
+    f_unidade = (request.args.get("unidade") or "").strip() or None
+    f_aba = (request.args.get("aba") or "").strip() or None
+    f_usuario = (request.args.get("usuario") or "").strip() or None
+    if f_unidade in ("centro", "centro_cirurgico", "bloco"):
+        f_unidade = "cc"
     try:
-        pedidos = listar_pedidos(_db_path())
+        # garante coluna unidade
+        init_db(_db_path())
+        pedidos = listar_pedidos(
+            _db_path(), unidade=f_unidade, aba=f_aba, usuario=f_usuario
+        )
+        filtros = listar_filtros_historico(_db_path())
     except Exception as e:
         pedidos = []
+        filtros = {"usuarios": [], "abas": [], "unidades": []}
         flash(f"Erro ao carregar histórico: {e}", "erro")
+
+    # títulos de unidade conhecidos + ids vindos do banco
+    unidade_opcoes = []
+    seen = set()
+    for uid, cfg in UNIDADES.items():
+        unidade_opcoes.append({"id": uid, "titulo": cfg["titulo"]})
+        seen.add(uid)
+    for uid in filtros.get("unidades") or []:
+        if uid and uid not in seen:
+            unidade_opcoes.append({"id": uid, "titulo": uid})
+            seen.add(uid)
+
+    # agrupar para exibição: unidade → usuário → pedidos
+    grupos = []
+    atual_u = object()
+    atual_user = object()
+    bloco_u = None
+    bloco_user = None
+    for p in pedidos:
+        uid = p.get("unidade") or "ufcd"
+        user_name = p.get("usuario") or "—"
+        if uid != atual_u:
+            atual_u = uid
+            atual_user = object()
+            bloco_u = {
+                "unidade_id": uid,
+                "unidade_titulo": UNIDADES.get(uid, {}).get("titulo") or uid,
+                "usuarios": [],
+            }
+            grupos.append(bloco_u)
+        if user_name != atual_user:
+            atual_user = user_name
+            bloco_user = {"usuario": user_name, "pedidos": []}
+            bloco_u["usuarios"].append(bloco_user)
+        bloco_user["pedidos"].append(p)
+
     return render_template(
         "historico.html",
         pedidos=pedidos,
+        grupos=grupos,
+        filtros=filtros,
+        unidade_opcoes=unidade_opcoes,
+        f_unidade=f_unidade or "",
+        f_aba=f_aba or "",
+        f_usuario=f_usuario or "",
         user=current_user(),
         is_admin=is_admin(),
         usando_neon=using_neon(),
@@ -1119,9 +1174,23 @@ def historico_detalhe(pedido_id: int):
     if not ped:
         flash("Pedido não encontrado.", "erro")
         return redirect(url_for("historico"))
+    uid = ped.get("unidade") or "ufcd"
+    # agrupa itens por categoria (subitem)
+    por_aba = []
+    atual = None
+    bloco = None
+    for it in ped.get("itens") or []:
+        aba = it.get("aba") or "Sem categoria"
+        if aba != atual:
+            atual = aba
+            bloco = {"aba": aba, "itens": []}
+            por_aba.append(bloco)
+        bloco["itens"].append(it)
     return render_template(
         "historico_detalhe.html",
         pedido=ped,
+        por_aba=por_aba,
+        unidade_titulo=UNIDADES.get(uid, {}).get("titulo") or uid,
         user=current_user(),
         is_admin=is_admin(),
     )
@@ -1142,7 +1211,7 @@ def historico_pdf(pedido_id: int):
         data_str = str(data_ped)
         data_iso = str(data_ped)
     pdf = gerar_pdf_pedido(
-        titulo=f"Pedido #{pedido_id}",
+        titulo=f"Pedido #{pedido_id} — {UNIDADES.get(ped.get('unidade') or 'ufcd', {}).get('titulo') or ped.get('unidade') or 'UFCD'}",
         data_pedido=data_str,
         usuario=ped.get("usuario"),
         itens=ped.get("itens") or [],

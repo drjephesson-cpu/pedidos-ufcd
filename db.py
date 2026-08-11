@@ -80,6 +80,7 @@ def init_db(sqlite_path: Path | None = None) -> None:
             data_pedido DATE NOT NULL,
             usuario TEXT,
             observacao TEXT,
+            unidade TEXT,
             criado_em TIMESTAMP NOT NULL DEFAULT {ts_default}
         )
         """,
@@ -99,10 +100,46 @@ def init_db(sqlite_path: Path | None = None) -> None:
         )
         """,
         "CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos (data_pedido DESC)",
+        "CREATE INDEX IF NOT EXISTS idx_pedidos_unidade ON pedidos (unidade)",
+        "CREATE INDEX IF NOT EXISTS idx_pedidos_usuario ON pedidos (usuario)",
+        "CREATE INDEX IF NOT EXISTS idx_itens_aba ON pedido_itens (aba)",
     ]
     with connect(sqlite_path) as conn:
         for s in stmts:
             conn.execute(text(s))
+        # migração: coluna unidade em bases antigas
+        if dialect == "postgresql":
+            exists = conn.execute(
+                text(
+                    """
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'pedidos' AND column_name = 'unidade'
+                    """
+                )
+            ).first()
+            if not exists:
+                conn.execute(text("ALTER TABLE pedidos ADD COLUMN unidade TEXT"))
+        else:
+            names = {
+                r[1]
+                for r in conn.execute(text("PRAGMA table_info(pedidos)")).fetchall()
+            }
+            if "unidade" not in names:
+                conn.execute(text("ALTER TABLE pedidos ADD COLUMN unidade TEXT"))
+
+
+def _infer_unidade(unidade: str | None, observacao: str | None) -> str:
+    u = (unidade or "").strip().lower()
+    if u in ("cc", "centro", "centro_cirurgico", "bloco"):
+        return "cc"
+    if u in ("ufcd",):
+        return "ufcd"
+    obs = observacao or ""
+    if "Centro Cirúrgico" in obs or "[cc]" in obs.lower():
+        return "cc"
+    if "UFCD" in obs:
+        return "ufcd"
+    return u or "ufcd"
 
 
 def criar_pedido(
@@ -111,18 +148,20 @@ def criar_pedido(
     observacao: str | None,
     itens: list[dict[str, Any]],
     sqlite_path: Path | None = None,
+    unidade: str | None = None,
 ) -> int:
     if not itens:
         raise ValueError("Pedido sem itens.")
 
+    unidade_id = _infer_unidade(unidade or (itens[0].get("unidade") if itens else None), observacao)
     is_pg = get_engine(sqlite_path).dialect.name == "postgresql"
     with connect(sqlite_path) as conn:
         if is_pg:
             pedido_id = conn.execute(
                 text(
                     """
-                    INSERT INTO pedidos (data_pedido, usuario, observacao)
-                    VALUES (:data_pedido, :usuario, :observacao)
+                    INSERT INTO pedidos (data_pedido, usuario, observacao, unidade)
+                    VALUES (:data_pedido, :usuario, :observacao, :unidade)
                     RETURNING id
                     """
                 ),
@@ -130,20 +169,22 @@ def criar_pedido(
                     "data_pedido": data_pedido.isoformat(),
                     "usuario": usuario or "",
                     "observacao": observacao or "",
+                    "unidade": unidade_id,
                 },
             ).scalar_one()
         else:
             res = conn.execute(
                 text(
                     """
-                    INSERT INTO pedidos (data_pedido, usuario, observacao)
-                    VALUES (:data_pedido, :usuario, :observacao)
+                    INSERT INTO pedidos (data_pedido, usuario, observacao, unidade)
+                    VALUES (:data_pedido, :usuario, :observacao, :unidade)
                     """
                 ),
                 {
                     "data_pedido": data_pedido.isoformat(),
                     "usuario": usuario or "",
                     "observacao": observacao or "",
+                    "unidade": unidade_id,
                 },
             )
             pedido_id = int(res.lastrowid)
@@ -176,22 +217,115 @@ def criar_pedido(
     return int(pedido_id)
 
 
-def listar_pedidos(sqlite_path: Path | None = None) -> list[dict]:
+def listar_filtros_historico(sqlite_path: Path | None = None) -> dict:
     with connect(sqlite_path) as conn:
-        rows = conn.execute(
-            text(
-                """
-                SELECT p.id, p.data_pedido, p.usuario, p.observacao, p.criado_em,
-                       COUNT(i.id) AS qtd_itens,
-                       COALESCE(SUM(i.quantidade), 0) AS qtd_total
-                FROM pedidos p
-                LEFT JOIN pedido_itens i ON i.pedido_id = p.id
-                GROUP BY p.id, p.data_pedido, p.usuario, p.observacao, p.criado_em
-                ORDER BY p.data_pedido DESC, p.id DESC
-                """
-            )
-        ).mappings().all()
-    return [dict(r) for r in rows]
+        usuarios = [
+            r[0]
+            for r in conn.execute(
+                text(
+                    """
+                    SELECT DISTINCT usuario FROM pedidos
+                    WHERE usuario IS NOT NULL AND TRIM(usuario) <> ''
+                    ORDER BY usuario
+                    """
+                )
+            ).fetchall()
+        ]
+        abas = [
+            r[0]
+            for r in conn.execute(
+                text(
+                    """
+                    SELECT DISTINCT aba FROM pedido_itens
+                    WHERE aba IS NOT NULL AND TRIM(aba) <> ''
+                    ORDER BY aba
+                    """
+                )
+            ).fetchall()
+        ]
+        unidades = [
+            r[0]
+            for r in conn.execute(
+                text(
+                    """
+                    SELECT DISTINCT unidade FROM pedidos
+                    WHERE unidade IS NOT NULL AND TRIM(unidade) <> ''
+                    ORDER BY unidade
+                    """
+                )
+            ).fetchall()
+        ]
+    return {"usuarios": usuarios, "abas": abas, "unidades": unidades}
+
+
+def listar_pedidos(
+    sqlite_path: Path | None = None,
+    *,
+    unidade: str | None = None,
+    aba: str | None = None,
+    usuario: str | None = None,
+) -> list[dict]:
+    is_pg = get_engine(sqlite_path).dialect.name == "postgresql"
+    abas_expr = (
+        "STRING_AGG(DISTINCT NULLIF(TRIM(i.aba), ''), ', ')"
+        if is_pg
+        else "GROUP_CONCAT(DISTINCT NULLIF(TRIM(i.aba), ''))"
+    )
+    where = ["1=1"]
+    params: dict[str, Any] = {}
+    if unidade:
+        where.append("COALESCE(p.unidade, '') = :unidade")
+        params["unidade"] = unidade
+    if usuario:
+        where.append("COALESCE(p.usuario, '') = :usuario")
+        params["usuario"] = usuario
+    if aba:
+        where.append(
+            "EXISTS (SELECT 1 FROM pedido_itens ix WHERE ix.pedido_id = p.id AND ix.aba = :aba)"
+        )
+        params["aba"] = aba
+
+    sql = f"""
+        SELECT p.id, p.data_pedido, p.usuario, p.observacao, p.unidade, p.criado_em,
+               COUNT(i.id) AS qtd_itens,
+               COALESCE(SUM(i.quantidade), 0) AS qtd_total,
+               {abas_expr} AS abas
+        FROM pedidos p
+        LEFT JOIN pedido_itens i ON i.pedido_id = p.id
+        WHERE {' AND '.join(where)}
+        GROUP BY p.id, p.data_pedido, p.usuario, p.observacao, p.unidade, p.criado_em
+        ORDER BY p.unidade ASC NULLS LAST, p.usuario ASC NULLS LAST,
+                 p.data_pedido DESC, p.id DESC
+    """
+    # SQLite não tem NULLS LAST — ordem simples
+    if not is_pg:
+        sql = f"""
+        SELECT p.id, p.data_pedido, p.usuario, p.observacao, p.unidade, p.criado_em,
+               COUNT(i.id) AS qtd_itens,
+               COALESCE(SUM(i.quantidade), 0) AS qtd_total,
+               {abas_expr} AS abas
+        FROM pedidos p
+        LEFT JOIN pedido_itens i ON i.pedido_id = p.id
+        WHERE {' AND '.join(where)}
+        GROUP BY p.id, p.data_pedido, p.usuario, p.observacao, p.unidade, p.criado_em
+        ORDER BY COALESCE(p.unidade, ''), COALESCE(p.usuario, ''),
+                 p.data_pedido DESC, p.id DESC
+        """
+
+    with connect(sqlite_path) as conn:
+        rows = conn.execute(text(sql), params).mappings().all()
+
+    out = []
+    for r in rows:
+        d = dict(r)
+        d["unidade"] = _infer_unidade(d.get("unidade"), d.get("observacao"))
+        abas_raw = d.get("abas") or ""
+        if isinstance(abas_raw, str):
+            d["abas_lista"] = [a.strip() for a in abas_raw.split(",") if a.strip()]
+        else:
+            d["abas_lista"] = []
+        out.append(d)
+    return out
 
 
 def obter_pedido(pedido_id: int, sqlite_path: Path | None = None) -> dict | None:
@@ -199,7 +333,7 @@ def obter_pedido(pedido_id: int, sqlite_path: Path | None = None) -> dict | None
         ped = conn.execute(
             text(
                 """
-                SELECT id, data_pedido, usuario, observacao, criado_em
+                SELECT id, data_pedido, usuario, observacao, unidade, criado_em
                 FROM pedidos WHERE id = :id
                 """
             ),
@@ -220,6 +354,7 @@ def obter_pedido(pedido_id: int, sqlite_path: Path | None = None) -> dict | None
             {"id": pedido_id},
         ).mappings().all()
     out = dict(ped)
+    out["unidade"] = _infer_unidade(out.get("unidade"), out.get("observacao"))
     out["itens"] = [dict(i) for i in itens]
     return out
 
