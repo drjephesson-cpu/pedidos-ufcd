@@ -10,7 +10,18 @@
     Data
     <input type="text" id="dataPedido" value="{{ hoje }}" form="formSalvar" />
   </label>
-  <a class="btn" id="btnPdf" href="{{ url_for('pedido_pdf_atual') }}">PDF</a>
+  <div class="pdf-menu" id="pdfMenu">
+    <button type="button" class="btn" id="pdfToggle">PDF ▾</button>
+    <div class="pdf-menu-panel" hidden>
+      <a class="pdf-link" data-modo="todos" href="{{ url_for('pedido_pdf_atual', modo='todos') }}">Todos os itens</a>
+      <a class="pdf-link" data-modo="pedir" href="{{ url_for('pedido_pdf_atual', modo='pedir') }}">Todos a pedir</a>
+      <div class="pdf-divider"></div>
+      <p class="pdf-hint">Por categoria</p>
+      {% for a in abas %}
+      <a class="pdf-link" data-modo="aba" data-aba="{{ a.id }}" href="{{ url_for('pedido_pdf_atual', modo='aba', aba=a.id) }}">{{ a.titulo }}</a>
+      {% endfor %}
+    </div>
+  </div>
   <a class="btn" href="{{ url_for('exportar', so_pedir=1) }}">Excel</a>
   <button type="submit" class="btn btn-primary" form="formSalvar">Salvar</button>
 {% endblock %}
@@ -18,8 +29,17 @@
 {% block sidebar_extra %}
   {% if tem_catalogo and abas %}
   <div class="sidebar-section">
-    <p class="sidebar-label">Categorias</p>
+    <p class="sidebar-label">UFCD · Categorias</p>
     <div class="side-cats">
+      <a
+        class="side-cat {% if aba_atual == 'todos' %}active{% endif %}"
+        href="{{ url_for('index', aba='todos', filtro=filtro, q=q) }}"
+      >
+        <span>Todos</span>
+        {% if contagens.get('todos', 0) %}
+          <em>{{ contagens['todos'] }}</em>
+        {% endif %}
+      </a>
       {% for a in abas %}
       <a
         class="side-cat {% if a.id == aba_atual %}active{% endif %}"
@@ -103,6 +123,7 @@
     <table>
       <thead>
         <tr>
+          {% if ver_todos %}<th>Categoria</th>{% endif %}
           <th>Cód. AGHU</th>
           <th>Medicamento</th>
           <th>Est. Mínimo</th>
@@ -117,6 +138,7 @@
       <tbody>
         {% for it in itens %}
         <tr class="{% if it.pedir %}row-pedir{% endif %} {% if it.sem_estoque %}row-sem{% endif %}">
+          {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
           <td class="mono">{{ it.codigo }}</td>
           <td class="desc">{{ it.descricao }}</td>
           <td class="num">{{ it.estoque_minimo | int }}</td>
@@ -159,7 +181,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="9" class="empty">Nenhum item neste filtro.</td>
+          <td colspan="{{ 10 if ver_todos else 9 }}" class="empty">Nenhum item neste filtro.</td>
         </tr>
         {% endfor %}
       </tbody>

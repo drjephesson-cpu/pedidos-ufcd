@@ -435,6 +435,89 @@ def montar_aba(aba_id: str, catalogo: dict, saldos: dict, manuais: dict) -> list
     return result
 
 
+def montar_todos(catalogo: dict, saldos: dict, manuais: dict) -> list:
+    """Todos os itens UFCD, com a categoria de origem."""
+    out = []
+    for aba in catalogo.get("abas", []):
+        for it in montar_aba(aba["id"], catalogo, saldos, manuais):
+            row = dict(it)
+            row["aba"] = aba["titulo"]
+            out.append(row)
+    return out
+
+
+def coletar_itens_pdf(modo: str = "pedir", aba_id: str | None = None) -> tuple[list[dict], str]:
+    """
+    modo:
+      - todos: catálogo completo (qtde só quando há pedido)
+      - pedir: só itens a pedir (todas as categorias)
+      - aba: só a categoria informada (itens a pedir dessa aba)
+    """
+    catalogo = load_catalogo()
+    saldos = estoque_saldos()
+    manuais = session.get("manuais", {})
+    modo = (modo or "pedir").lower()
+
+    if modo == "todos":
+        itens_src = montar_todos(catalogo, saldos, manuais)
+        titulo = "Pedido UFCD — todos os itens"
+        itens = []
+        for it in itens_src:
+            itens.append(
+                {
+                    "codigo": it["codigo"],
+                    "descricao": it["descricao"],
+                    "aba": it.get("aba") or "",
+                    "quantidade": float(it["quanto_pedir"] or 0)
+                    if it.get("quanto_pedir") is not None
+                    else 0,
+                    "origem": "manual" if it.get("manual") is not None else "auto",
+                    "pedir": it.get("pedir"),
+                }
+            )
+        return itens, titulo
+
+    if modo == "aba":
+        if not aba_id or aba_id == "todos":
+            # fallback: todos a pedir
+            modo = "pedir"
+        else:
+            titulo_aba = next(
+                (a["titulo"] for a in catalogo.get("abas", []) if a["id"] == aba_id),
+                aba_id,
+            )
+            itens = []
+            for it in montar_aba(aba_id, catalogo, saldos, manuais):
+                if not it.get("pedir") or not it.get("quanto_pedir"):
+                    continue
+                itens.append(
+                    {
+                        "codigo": it["codigo"],
+                        "descricao": it["descricao"],
+                        "aba": titulo_aba,
+                        "quantidade": float(it["quanto_pedir"]),
+                        "origem": "manual" if it.get("manual") is not None else "auto",
+                    }
+                )
+            for ex in itens_extras_manuais():
+                if (ex.get("aba") or "") == titulo_aba or (ex.get("aba") or "") == aba_id:
+                    itens.append(
+                        {
+                            "codigo": ex.get("codigo"),
+                            "descricao": ex.get("descricao") or "",
+                            "aba": ex.get("aba") or titulo_aba,
+                            "quantidade": float(ex.get("quantidade") or 0),
+                            "origem": "manual",
+                        }
+                    )
+            return itens, f"Pedido UFCD — {titulo_aba}"
+
+    # pedir (default)
+    return (
+        coletar_itens_pedido(incluir_extras=True),
+        "Pedido UFCD — itens a pedir",
+    )
+
 def _db_path():
     return None if using_neon() else PEDIDOS_SQLITE
 
@@ -597,47 +680,61 @@ def index():
         abas, key=lambda a: ordem.get(a["id"], 100 + abas.index(a))
     )
 
-    aba_atual = request.args.get("aba") or (abas_sorted[0]["id"] if abas_sorted else None)
+    aba_atual = request.args.get("aba") or "todos"
     filtro = request.args.get("filtro", "todos")  # todos | pedir | sem
     q = (request.args.get("q") or "").strip().lower()
 
     manuais = session.get("manuais", {})
     itens = []
     resumo = {"total": 0, "pedir": 0, "sem_saldo": 0, "qtd_pedir": 0}
+    ver_todos = aba_atual == "todos"
 
-    if aba_atual:
+    if ver_todos:
+        itens = montar_todos(catalogo, saldos, manuais)
+    elif aba_atual:
         itens = montar_aba(aba_atual, catalogo, saldos, manuais)
-        resumo["total"] = len(itens)
         for it in itens:
-            if it["sem_estoque"]:
-                resumo["sem_saldo"] += 1
-            if it["pedir"]:
-                resumo["pedir"] += 1
-                if it["quanto_pedir"]:
-                    resumo["qtd_pedir"] += it["quanto_pedir"]
+            it["aba"] = next(
+                (a["titulo"] for a in abas_sorted if a["id"] == aba_atual), aba_atual
+            )
 
-        if filtro == "pedir":
-            itens = [i for i in itens if i["pedir"]]
-        elif filtro == "sem":
-            itens = [i for i in itens if i["sem_estoque"]]
+    resumo["total"] = len(itens)
+    for it in itens:
+        if it["sem_estoque"]:
+            resumo["sem_saldo"] += 1
+        if it["pedir"]:
+            resumo["pedir"] += 1
+            if it["quanto_pedir"]:
+                resumo["qtd_pedir"] += it["quanto_pedir"]
 
-        if q:
-            itens = [
-                i
-                for i in itens
-                if q in str(i["codigo"]) or q in (i["descricao"] or "").lower()
-            ]
+    if filtro == "pedir":
+        itens = [i for i in itens if i["pedir"]]
+    elif filtro == "sem":
+        itens = [i for i in itens if i["sem_estoque"]]
+
+    if q:
+        itens = [
+            i
+            for i in itens
+            if q in str(i["codigo"])
+            or q in (i["descricao"] or "").lower()
+            or q in (i.get("aba") or "").lower()
+        ]
 
     # resumo global por aba
     contagens = {}
+    total_pedir = 0
     for a in abas_sorted:
         lista = montar_aba(a["id"], catalogo, saldos, manuais)
         contagens[a["id"]] = sum(1 for i in lista if i["pedir"])
+        total_pedir += contagens[a["id"]]
+    contagens["todos"] = total_pedir
 
     return render_template(
         "index.html",
         abas=abas_sorted,
         aba_atual=aba_atual,
+        ver_todos=ver_todos,
         itens=itens,
         resumo=resumo,
         filtro=filtro,
@@ -648,10 +745,7 @@ def index():
         contagens=contagens,
         hoje=date.today().strftime("%d/%m/%Y"),
         total_catalogo=sum(a.get("count", 0) for a in abas_sorted),
-        user=current_user(),
-        is_admin=is_admin(),
         extras=itens_extras_manuais(),
-        usando_neon=using_neon(),
     )
 
 
@@ -794,21 +888,29 @@ def pedido_salvar():
 @login_required
 def pedido_pdf_atual():
     data_ped = parse_data_pedido(request.args.get("data"))
-    itens = coletar_itens_pedido(incluir_extras=True)
-    if not itens:
-        flash("Nenhum item a pedir para gerar PDF.", "erro")
-        return redirect(url_for("index"))
+    modo = (request.args.get("modo") or "pedir").lower()
+    aba = request.args.get("aba")
+    itens, titulo = coletar_itens_pdf(modo=modo, aba_id=aba)
+
+    # Em "todos", PDF lista o catálogo; nos demais, só quem tem quantidade > 0
+    if modo != "todos":
+        itens = [i for i in itens if float(i.get("quantidade") or 0) > 0]
+        if not itens:
+            flash("Nenhum item a pedir para gerar PDF.", "erro")
+            return redirect(url_for("index", aba=aba or "todos"))
+
     user = current_user() or {}
     pdf = gerar_pdf_pedido(
-        titulo="Pedido de medicamentos (itens a pedir)",
+        titulo=titulo,
         data_pedido=data_ped.strftime("%d/%m/%Y"),
         usuario=user.get("nome") or user.get("username"),
         itens=itens,
     )
+    sufixo = modo if modo != "aba" else (aba or "categoria")
     return send_file(
         io.BytesIO(pdf),
         as_attachment=True,
-        download_name=f"pedido_{data_ped.isoformat()}.pdf",
+        download_name=f"pedido_{sufixo}_{data_ped.isoformat()}.pdf",
         mimetype="application/pdf",
     )
 

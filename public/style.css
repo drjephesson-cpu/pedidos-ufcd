@@ -555,6 +555,61 @@ td {
   font-size: 0.8rem;
 }
 
+.cat-cell {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.pdf-menu {
+  position: relative;
+}
+
+.pdf-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  min-width: 220px;
+  max-height: min(70vh, 420px);
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 0.35rem;
+  z-index: 30;
+  display: grid;
+}
+
+.pdf-menu-panel a {
+  text-decoration: none;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 560;
+  color: var(--ink);
+}
+
+.pdf-menu-panel a:hover {
+  background: #eef6f1;
+}
+
+.pdf-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 0.3rem 0.35rem;
+}
+
+.pdf-hint {
+  margin: 0.2rem 0.7rem 0.15rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
 /* Login */
 .login-page {
   min-height: 100vh;
