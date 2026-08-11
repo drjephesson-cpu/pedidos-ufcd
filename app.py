@@ -54,8 +54,10 @@ from db import (
     init_db,
     listar_filtros_historico,
     listar_pedidos,
+    load_catalogo_parametros,
     load_estoque_db,
     obter_pedido,
+    save_catalogo_parametro,
     save_estoque_db,
     using_neon,
 )
@@ -591,17 +593,29 @@ def montar_aba(
     saldos: dict,
     manuais: dict,
     modelo: str | None = None,
+    parametros: dict | None = None,
 ) -> list:
     itens = catalogo.get("itens", {}).get(aba_id, [])
     modelo = modelo or catalogo.get("modelo") or "ponto"
+    parametros = parametros or {}
     result = []
     for item in itens:
-        cod = str(item["codigo"])
+        row = dict(item)
+        cod = str(row["codigo"])
+        ov = parametros.get(cod)
+        if ov:
+            if ov.get("estoque_minimo") is not None:
+                row["estoque_minimo"] = float(ov["estoque_minimo"])
+            if ov.get("ponto_pedido") is not None:
+                row["ponto_pedido"] = float(ov["ponto_pedido"])
+            if ov.get("caixa_com") is not None:
+                row["caixa_com"] = float(ov["caixa_com"])
+            row["param_editado"] = True
         saldo = saldos.get(cod)
         if cod not in saldos:
             saldo = None
         manual = manuais.get(cod)
-        result.append(calcular_item(item, saldo, manual, modelo=modelo))
+        result.append(calcular_item(row, saldo, manual, modelo=modelo))
     return result
 
 
@@ -610,12 +624,15 @@ def montar_todos(
     saldos: dict,
     manuais: dict,
     modelo: str | None = None,
+    parametros: dict | None = None,
 ) -> list:
     """Todos os itens da unidade, com a categoria de origem."""
     out = []
     modelo = modelo or catalogo.get("modelo") or "ponto"
     for aba in catalogo.get("abas", []):
-        for it in montar_aba(aba["id"], catalogo, saldos, manuais, modelo=modelo):
+        for it in montar_aba(
+            aba["id"], catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+        ):
             row = dict(it)
             row["aba"] = aba["titulo"]
             out.append(row)
@@ -633,6 +650,7 @@ def listar_itens_filtrados(
     catalogo = load_catalogo(uid)
     saldos = estoque_saldos(uid)
     manuais = manuais_da_unidade(uid)
+    parametros = load_catalogo_parametros(uid, _db_path())
     abas = catalogo.get("abas") or []
     abas_sorted = ordenar_abas(abas, uid)
     modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
@@ -642,9 +660,13 @@ def listar_itens_filtrados(
     q = (q or "").strip().lower()
 
     if aba_atual == "todos":
-        itens = montar_todos(catalogo, saldos, manuais, modelo=modelo)
+        itens = montar_todos(
+            catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+        )
     else:
-        itens = montar_aba(aba_atual, catalogo, saldos, manuais, modelo=modelo)
+        itens = montar_aba(
+            aba_atual, catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+        )
         titulo = next(
             (a["titulo"] for a in abas_sorted if a["id"] == aba_atual), aba_atual
         )
@@ -723,12 +745,15 @@ def coletar_itens_pedido(incluir_extras: bool = True, unidade: str | None = None
     catalogo = load_catalogo(uid)
     saldos = estoque_saldos(uid)
     manuais = manuais_da_unidade(uid)
+    parametros = load_catalogo_parametros(uid, _db_path())
     modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
     out: list[dict] = []
     vistos: set[str] = set()
 
     for aba in catalogo.get("abas", []):
-        for it in montar_aba(aba["id"], catalogo, saldos, manuais, modelo=modelo):
+        for it in montar_aba(
+            aba["id"], catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+        ):
             if not it.get("pedir") or not it.get("quanto_pedir"):
                 continue
             key = str(it["codigo"])
@@ -883,6 +908,7 @@ def index():
 
     manuais = manuais_da_unidade(uid)
     modelo = catalogo.get("modelo") or cfg["modelo"]
+    parametros = load_catalogo_parametros(uid, _db_path())
     itens, view_meta = listar_itens_filtrados(aba_atual, filtro, q, unidade=uid)
     resumo = view_meta["resumo"]
     ver_todos = view_meta["ver_todos"]
@@ -890,7 +916,9 @@ def index():
     contagens = {}
     total_pedir = 0
     for a in abas_sorted:
-        lista = montar_aba(a["id"], catalogo, saldos, manuais, modelo=modelo)
+        lista = montar_aba(
+            a["id"], catalogo, saldos, manuais, modelo=modelo, parametros=parametros
+        )
         contagens[a["id"]] = sum(1 for i in lista if i["pedir"])
         total_pedir += contagens[a["id"]]
     contagens["todos"] = total_pedir
@@ -904,13 +932,19 @@ def index():
             other_cat = load_catalogo(other_id)
             other_saldos = estoque_saldos(other_id)
             other_manuais = manuais_da_unidade(other_id)
+            other_params = load_catalogo_parametros(other_id, _db_path())
             other_modelo = other_cat.get("modelo") or UNIDADES[other_id]["modelo"]
             n = 0
             for a in other_cat.get("abas") or []:
                 n += sum(
                     1
                     for i in montar_aba(
-                        a["id"], other_cat, other_saldos, other_manuais, modelo=other_modelo
+                        a["id"],
+                        other_cat,
+                        other_saldos,
+                        other_manuais,
+                        modelo=other_modelo,
+                        parametros=other_params,
                     )
                     if i["pedir"]
                 )
@@ -995,6 +1029,38 @@ def api_manual():
     cod = str(data.get("codigo", ""))
     valor = data.get("valor")
     set_manual_unidade(uid, cod, valor)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/parametros", methods=["POST"])
+@login_required
+def api_parametros():
+    data = request.get_json(force=True)
+    uid = resolve_unidade(data.get("unidade"))
+    cod = str(data.get("codigo") or "").strip()
+    if not cod:
+        return jsonify({"ok": False, "erro": "Código inválido."}), 400
+    try:
+        est_min = float(data.get("estoque_minimo"))
+        ponto = float(data.get("ponto_pedido"))
+        caixa = float(data.get("caixa_com"))
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "erro": "Valores inválidos."}), 400
+    if est_min < 0 or ponto < 0 or caixa <= 0:
+        return jsonify(
+            {"ok": False, "erro": "Est. mínimo e ponto ≥ 0; caixa deve ser > 0."}
+        ), 400
+    try:
+        save_catalogo_parametro(
+            uid,
+            cod,
+            estoque_minimo=est_min,
+            ponto_pedido=ponto,
+            caixa_com=caixa,
+            sqlite_path=_db_path(),
+        )
+    except Exception as e:
+        return jsonify({"ok": False, "erro": str(e)}), 500
     return jsonify({"ok": True})
 
 

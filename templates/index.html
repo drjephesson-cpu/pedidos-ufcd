@@ -144,28 +144,38 @@
           <th>Cód. AGHU</th>
           <th>{% if unidade_id == 'cc' %}Item{% else %}Medicamento{% endif %}</th>
           <th>Est. Mín.</th>
-          {% if mostra_ponto_caixa %}
           <th>Ponto</th>
           <th>Caixa</th>
-          {% endif %}
           <th class="col-estoque">Estoque</th>
           <th>Pedir?</th>
           <th class="col-qtde">Qtde</th>
           <th>Manual</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        {% set cols = (9 if mostra_ponto_caixa else 7) + (1 if ver_todos else 0) %}
+        {% set cols = 10 + (1 if ver_todos else 0) %}
         {% for it in itens %}
-        <tr class="{% if it.sem_estoque %}row-sem{% endif %}">
+        <tr
+          class="item-row {% if it.sem_estoque %}row-sem{% endif %}"
+          data-codigo="{{ it.codigo }}"
+          data-unidade="{{ unidade_id }}"
+        >
           {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
           <td class="mono">{{ it.codigo }}</td>
           <td class="desc">{{ it.descricao }}</td>
-          <td class="num">{{ it.estoque_minimo | int }}</td>
-          {% if mostra_ponto_caixa %}
-          <td class="num">{{ it.ponto_pedido | int }}</td>
-          <td class="num">{{ it.caixa_com | int }}</td>
-          {% endif %}
+          <td class="num param-cell" data-field="estoque_minimo">
+            <span class="param-view">{{ it.estoque_minimo | int }}</span>
+            <input class="param-input" type="number" min="0" step="1" value="{{ it.estoque_minimo | int }}" hidden />
+          </td>
+          <td class="num param-cell" data-field="ponto_pedido">
+            <span class="param-view">{{ it.ponto_pedido | int }}</span>
+            <input class="param-input" type="number" min="0" step="1" value="{{ it.ponto_pedido | int }}" hidden />
+          </td>
+          <td class="num param-cell" data-field="caixa_com">
+            <span class="param-view">{{ it.caixa_com | int }}</span>
+            <input class="param-input" type="number" min="1" step="1" value="{{ it.caixa_com | int }}" hidden />
+          </td>
           <td class="num col-estoque">
             {% if it.estoque_aghu is none %}<span class="muted">—</span>{% else %}{{ it.estoque_aghu | int }}{% endif %}
           </td>
@@ -180,7 +190,8 @@
           </td>
           <td class="num quanto {% if it.pedir and it.quanto_pedir is not none %}col-qtde-pedir{% endif %}">
             {% if it.quanto_pedir is not none %}{{ it.quanto_pedir | int }}{% else %}<span class="muted">—</span>{% endif %}
-          </td>          <td>
+          </td>
+          <td>
             <input
               class="manual-input"
               type="number"
@@ -191,6 +202,11 @@
               value="{{ it.manual if it.manual is not none else '' }}"
               placeholder="—"
             />
+          </td>
+          <td class="actions param-actions">
+            <button type="button" class="btn btn-quiet btn-edit-param">Editar</button>
+            <button type="button" class="btn btn-primary btn-save-param" hidden>Salvar</button>
+            <button type="button" class="btn btn-quiet btn-cancel-param" hidden>Cancelar</button>
           </td>
         </tr>
         {% else %}

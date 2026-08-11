@@ -68,3 +68,67 @@ document.querySelectorAll(".unit-toggle").forEach((btn) => {
     if (panel) panel.classList.toggle("is-open", open);
   });
 });
+
+function setRowEditing(row, editing) {
+  row.classList.toggle("is-editing", editing);
+  row.querySelectorAll(".param-view").forEach((el) => {
+    el.hidden = editing;
+  });
+  row.querySelectorAll(".param-input").forEach((el) => {
+    el.hidden = !editing;
+  });
+  const editBtn = row.querySelector(".btn-edit-param");
+  const saveBtn = row.querySelector(".btn-save-param");
+  const cancelBtn = row.querySelector(".btn-cancel-param");
+  if (editBtn) editBtn.hidden = editing;
+  if (saveBtn) saveBtn.hidden = !editing;
+  if (cancelBtn) cancelBtn.hidden = !editing;
+}
+
+document.querySelectorAll(".item-row").forEach((row) => {
+  const editBtn = row.querySelector(".btn-edit-param");
+  const saveBtn = row.querySelector(".btn-save-param");
+  const cancelBtn = row.querySelector(".btn-cancel-param");
+  if (!editBtn) return;
+
+  editBtn.addEventListener("click", () => setRowEditing(row, true));
+
+  cancelBtn?.addEventListener("click", () => {
+    row.querySelectorAll(".param-cell").forEach((cell) => {
+      const view = cell.querySelector(".param-view");
+      const input = cell.querySelector(".param-input");
+      if (view && input) input.value = view.textContent.trim();
+    });
+    setRowEditing(row, false);
+  });
+
+  saveBtn?.addEventListener("click", async () => {
+    const payload = {
+      unidade: row.dataset.unidade,
+      codigo: row.dataset.codigo,
+    };
+    row.querySelectorAll(".param-cell").forEach((cell) => {
+      const field = cell.dataset.field;
+      const input = cell.querySelector(".param-input");
+      if (field && input) payload[field] = Number(input.value);
+    });
+    saveBtn.disabled = true;
+    try {
+      const res = await fetch("/api/parametros", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.erro || "Não foi possível salvar.");
+        saveBtn.disabled = false;
+        return;
+      }
+      window.location.href = new URL(window.location.href).toString();
+    } catch (err) {
+      alert("Erro ao salvar parâmetros.");
+      saveBtn.disabled = false;
+    }
+  });
+});

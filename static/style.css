@@ -428,6 +428,25 @@ td.col-qtde-pedir {
   text-align: right;
   background: #fffaf4;
 }
+.param-input {
+  width: 4.2rem;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.25rem 0.3rem;
+  font: inherit;
+  text-align: right;
+  background: #fff;
+}
+.param-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+.item-row.is-editing {
+  background: #f3faf6;
+}
+}
 
 .actions { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
 .inline-form { display: inline-flex; gap: 0.3rem; align-items: center; margin: 0; }

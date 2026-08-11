@@ -118,6 +118,16 @@ def init_db(sqlite_path: Path | None = None) -> None:
             atualizado_em TIMESTAMP NOT NULL DEFAULT {ts_default}
         )
         """,
+        """
+        CREATE TABLE IF NOT EXISTS catalogo_parametros (
+            unidade TEXT NOT NULL,
+            codigo TEXT NOT NULL,
+            estoque_minimo REAL,
+            ponto_pedido REAL,
+            caixa_com REAL,
+            PRIMARY KEY (unidade, codigo)
+        )
+        """,
     ]
     index_stmts = [
         "CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos (data_pedido DESC)",
@@ -436,6 +446,83 @@ def excluir_pedido(pedido_id: int, sqlite_path: Path | None = None) -> bool:
             text("DELETE FROM pedidos WHERE id = :id"), {"id": pedido_id}
         )
         return (res.rowcount or 0) > 0
+
+
+def load_catalogo_parametros(
+    unidade: str, sqlite_path: Path | None = None
+) -> dict[str, dict]:
+    """codigo(str) -> {estoque_minimo, ponto_pedido, caixa_com}."""
+    with connect(sqlite_path) as conn:
+        rows = conn.execute(
+            text(
+                """
+                SELECT codigo, estoque_minimo, ponto_pedido, caixa_com
+                FROM catalogo_parametros
+                WHERE unidade = :unidade
+                """
+            ),
+            {"unidade": unidade},
+        ).mappings().all()
+    out: dict[str, dict] = {}
+    for r in rows:
+        out[str(r["codigo"])] = {
+            "estoque_minimo": r["estoque_minimo"],
+            "ponto_pedido": r["ponto_pedido"],
+            "caixa_com": r["caixa_com"],
+        }
+    return out
+
+
+def save_catalogo_parametro(
+    unidade: str,
+    codigo: str,
+    *,
+    estoque_minimo: float | None,
+    ponto_pedido: float | None,
+    caixa_com: float | None,
+    sqlite_path: Path | None = None,
+) -> None:
+    is_pg = get_engine(sqlite_path).dialect.name == "postgresql"
+    params = {
+        "unidade": unidade,
+        "codigo": str(codigo),
+        "estoque_minimo": estoque_minimo,
+        "ponto_pedido": ponto_pedido,
+        "caixa_com": caixa_com,
+    }
+    with connect(sqlite_path) as conn:
+        if is_pg:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO catalogo_parametros
+                        (unidade, codigo, estoque_minimo, ponto_pedido, caixa_com)
+                    VALUES
+                        (:unidade, :codigo, :estoque_minimo, :ponto_pedido, :caixa_com)
+                    ON CONFLICT (unidade, codigo) DO UPDATE SET
+                        estoque_minimo = EXCLUDED.estoque_minimo,
+                        ponto_pedido = EXCLUDED.ponto_pedido,
+                        caixa_com = EXCLUDED.caixa_com
+                    """
+                ),
+                params,
+            )
+        else:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO catalogo_parametros
+                        (unidade, codigo, estoque_minimo, ponto_pedido, caixa_com)
+                    VALUES
+                        (:unidade, :codigo, :estoque_minimo, :ponto_pedido, :caixa_com)
+                    ON CONFLICT(unidade, codigo) DO UPDATE SET
+                        estoque_minimo = excluded.estoque_minimo,
+                        ponto_pedido = excluded.ponto_pedido,
+                        caixa_com = excluded.caixa_com
+                    """
+                ),
+                params,
+            )
 
 
 def load_estoque_db(unidade: str, sqlite_path: Path | None = None) -> dict | None:
