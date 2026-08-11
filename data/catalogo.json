@@ -54,6 +54,11 @@
       "id": "ALMOXARIFADO",
       "titulo": "ALMOXARIFADO",
       "count": 4
+    },
+    {
+      "id": "CONTROLADOS",
+      "titulo": "CONTROLADOS",
+      "count": 61
     }
   ],
   "itens": {
@@ -2618,6 +2623,435 @@
         "estoque_minimo": 10.0,
         "ponto_pedido": 8.0,
         "caixa_com": 10.0
+      }
+    ],
+    "CONTROLADOS": [
+      {
+        "codigo": 900140,
+        "descricao": "ACIDO VALPROICO 50MG/ML FRASCO 100ML",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 18600,
+        "descricao": "ALPRAZOLAM 0.5 MG",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 13820,
+        "descricao": "AMITRIPTILINA 25 MG",
+        "estoque_minimo": 500.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 16772,
+        "descricao": "BIPERIDENO 2MG",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 100.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 13994,
+        "descricao": "CARBAMAZEPINA 200 MG COMP",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900088,
+        "descricao": "CARBAMAZEPINA SUSP. FR/100ML - 100MG/5ML",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 14184,
+        "descricao": "CLONAZEPAM 0.5 MG COMP",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900111,
+        "descricao": "CLONAZEPAM 2,5 MG/ML SOL. ORAL FR",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 14362,
+        "descricao": "CLORPROMAZINA 25 MG COMP",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 900114,
+        "descricao": "CLORPROMAZINA 5 MG/ML 5 ML AMP",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900115,
+        "descricao": "CLORPROMAZINA SOL. ORAL 4% FR",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 900116,
+        "descricao": "CODEINA 3 MG/ML SOL ORAL FR",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 139882,
+        "descricao": "CODEINA + PARACETAMOL (30+500MG) COMP",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 250.0,
+        "caixa_com": 96.0
+      },
+      {
+        "codigo": 900125,
+        "descricao": "DEXMEDETOMEDINA 100 MCG/ML  AMPOLA 2ML",
+        "estoque_minimo": 150.0,
+        "ponto_pedido": 120.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 900087,
+        "descricao": "DEXTROCETAMINA S 50MG/ML 10 ML FRA",
+        "estoque_minimo": 130.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900078,
+        "descricao": "DEXTROCETAMINA S 50MG/ML 2ML FRA",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900021,
+        "descricao": "DIAZEPAM 10MG/2ML EV/IM AMP 2ML",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 14648,
+        "descricao": "DIAZEPAM 10 MG COMPRIMIDO",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 14630,
+        "descricao": "DIAZEPAM 5 MG COMPRIMIDO",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 154431,
+        "descricao": "DROPERIDOL 2,5MG/ML 1ML AMP",
+        "estoque_minimo": 50.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 400225,
+        "descricao": "DULOXETINA 30MG",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 273735,
+        "descricao": "ESCITALOPRAN 10 MG COMP.",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900138,
+        "descricao": "ETOMIDATO 2 MG/ML AMP DE 10 ML",
+        "estoque_minimo": 25.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 15024,
+        "descricao": "FENITOINA 100 MG COMPRIMIDO",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900173,
+        "descricao": "FENITOINA 50 MG/ML 5 ML AMP",
+        "estoque_minimo": 130.0,
+        "ponto_pedido": 90.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 15059,
+        "descricao": "FENOBARBITAL 100 MG COMPRIMIDO",
+        "estoque_minimo": 200.0,
+        "ponto_pedido": 150.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 201090,
+        "descricao": "FENOBARBITAL 100MG/ML EV/IM AMP 2ML",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900139,
+        "descricao": "FENOBARBITAL 40 MG/ML SOL. ORAL FR",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 115240,
+        "descricao": "FENTANIL 0,05 MG/ML SOL INJETAVEL, AMP 2ML",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 50.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900137,
+        "descricao": "FENTANIL 0,05 MG/ML EV/IM FR/AMP 10ML",
+        "estoque_minimo": 450.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900141,
+        "descricao": "FLUMAZENIL 0,5 MG/5ML INJ AMP",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 237051,
+        "descricao": "FLUNITRAZEPAM 1MG COMPRIMIDO",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 161349,
+        "descricao": "FLUOXETINA 20 MG COMPRIMIDO",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 261807,
+        "descricao": "GABAPENTINA 300MG CAPSULA",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900028,
+        "descricao": "HALOPERIDOL 5 MG/ML 1 ML AMP",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900027,
+        "descricao": "HALOPERIDOL SOL.ORAL 2MG/ML FR",
+        "estoque_minimo": 15.0,
+        "ponto_pedido": 10.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 289022,
+        "descricao": "LORAZEPAN (COMPRIMIDO 2MG)",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 80.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 247278,
+        "descricao": "METADONA 5MG, COMPRIMIDO",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 247286,
+        "descricao": "METADONA 10MG COMPRIMIDO",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 271992,
+        "descricao": "METADONA 10 MG/ML AMP",
+        "estoque_minimo": 300.0,
+        "ponto_pedido": 200.0,
+        "caixa_com": 25.0
+      },
+      {
+        "codigo": 900174,
+        "descricao": "MIDAZOLAM  2MG/ML (SOLUÇÃO ORAL) FRASCO 10ML",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 6.0,
+        "caixa_com": 12.0
+      },
+      {
+        "codigo": 900051,
+        "descricao": "MIDAZOLAM, 5 MG/ML, SOLUÇÃO INJETÁVEL, 10 ML",
+        "estoque_minimo": 250.0,
+        "ponto_pedido": 160.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 900048,
+        "descricao": "MIDAZOLAM, 5 MG/ML, SOLUÇÃO INJETÁVEL, 3 ML",
+        "estoque_minimo": 120.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 172707,
+        "descricao": "MISOPROSTOL 200MCG COMPRIMIDO",
+        "estoque_minimo": 80.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 272320,
+        "descricao": "MISOPROSTOL 25 MCG COMPRIMIDO",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 403032,
+        "descricao": "MORFINA 0,1MG/ML ESTERIL",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 60.0,
+        "caixa_com": 50.0
+      },
+      {
+        "codigo": 900177,
+        "descricao": "MORFINA  10 MG/ML AMP 1 ML",
+        "estoque_minimo": 1300.0,
+        "ponto_pedido": 900.0,
+        "caixa_com": 500.0
+      },
+      {
+        "codigo": 270362,
+        "descricao": "MORFINA 10MG/ML FR C/60ML   SOL. ORAL(1%)",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900006,
+        "descricao": "MORFINA COMPRIMIDO 10 MG*",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 20.0
+      },
+      {
+        "codigo": 900008,
+        "descricao": "NALOXONA 0.4 MG/ML AMP 1 ML",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 900091,
+        "descricao": "PROPOFOL 10 MG/ML 20 ML AMP EV",
+        "estoque_minimo": 400.0,
+        "ponto_pedido": 300.0,
+        "caixa_com": 10.0
+      },
+      {
+        "codigo": 268798,
+        "descricao": "REMIFENTANILA 2MG AMPOLA",
+        "estoque_minimo": 40.0,
+        "ponto_pedido": 30.0,
+        "caixa_com": 5.0
+      },
+      {
+        "codigo": 900098,
+        "descricao": "RISPERIDONA 1MG CMP",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 200.0
+      },
+      {
+        "codigo": 205249,
+        "descricao": "SERTRALINA 50 MG COMPRIMIDO",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 900092,
+        "descricao": "SEVOFLURANO  FRASCO 250ML",
+        "estoque_minimo": 10.0,
+        "ponto_pedido": 7.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 289184,
+        "descricao": "SUFENTANILA 5MCG/ML 2ML",
+        "estoque_minimo": 30.0,
+        "ponto_pedido": 20.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 259837,
+        "descricao": "TESTOSTERONA CIPIONATO 100MG/ML",
+        "estoque_minimo": 12.0,
+        "ponto_pedido": 8.0,
+        "caixa_com": 3.0
+      },
+      {
+        "codigo": 230510,
+        "descricao": "TESTOSTERONA  UNDECILATO 250MG/ML",
+        "estoque_minimo": 20.0,
+        "ponto_pedido": 15.0,
+        "caixa_com": 1.0
+      },
+      {
+        "codigo": 900077,
+        "descricao": "TRAMADOL 50 MG CAPSULA",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 30.0
+      },
+      {
+        "codigo": 290232,
+        "descricao": "TRAMADOL 50MG INJ",
+        "estoque_minimo": 600.0,
+        "ponto_pedido": 400.0,
+        "caixa_com": 100.0
+      },
+      {
+        "codigo": 293689,
+        "descricao": "TRETINOINA 10MG",
+        "estoque_minimo": 100.0,
+        "ponto_pedido": 70.0,
+        "caixa_com": 100.0
       }
     ]
   }
