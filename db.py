@@ -99,6 +99,25 @@ def init_db(sqlite_path: Path | None = None) -> None:
             FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE
         )
         """,
+        f"""
+        CREATE TABLE IF NOT EXISTS users (
+            id {id_type},
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL,
+            nome TEXT NOT NULL DEFAULT '',
+            ativo INTEGER NOT NULL DEFAULT 1,
+            criado_em TIMESTAMP NOT NULL DEFAULT {ts_default}
+        )
+        """,
+        f"""
+        CREATE TABLE IF NOT EXISTS estoque_unidade (
+            unidade TEXT PRIMARY KEY,
+            saldos_json TEXT NOT NULL,
+            meta_json TEXT,
+            atualizado_em TIMESTAMP NOT NULL DEFAULT {ts_default}
+        )
+        """,
     ]
     index_stmts = [
         "CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos (data_pedido DESC)",
@@ -417,3 +436,80 @@ def excluir_pedido(pedido_id: int, sqlite_path: Path | None = None) -> bool:
             text("DELETE FROM pedidos WHERE id = :id"), {"id": pedido_id}
         )
         return (res.rowcount or 0) > 0
+
+
+def load_estoque_db(unidade: str, sqlite_path: Path | None = None) -> dict | None:
+    """Retorna {saldos, meta} do banco, ou None se não houver."""
+    import json
+
+    with connect(sqlite_path) as conn:
+        row = conn.execute(
+            text(
+                """
+                SELECT saldos_json, meta_json FROM estoque_unidade
+                WHERE unidade = :unidade
+                """
+            ),
+            {"unidade": unidade},
+        ).mappings().first()
+    if not row:
+        return None
+    try:
+        saldos = json.loads(row["saldos_json"] or "{}")
+    except Exception:
+        saldos = {}
+    try:
+        meta = json.loads(row["meta_json"] or "{}")
+    except Exception:
+        meta = {}
+    return {"saldos": saldos, "meta": meta}
+
+
+def save_estoque_db(
+    unidade: str,
+    saldos: dict,
+    meta: dict | None = None,
+    sqlite_path: Path | None = None,
+) -> None:
+    import json
+
+    saldos_json = json.dumps(saldos, ensure_ascii=False)
+    meta_json = json.dumps(meta or {}, ensure_ascii=False)
+    is_pg = get_engine(sqlite_path).dialect.name == "postgresql"
+    with connect(sqlite_path) as conn:
+        if is_pg:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO estoque_unidade (unidade, saldos_json, meta_json, atualizado_em)
+                    VALUES (:unidade, :saldos_json, :meta_json, NOW())
+                    ON CONFLICT (unidade) DO UPDATE SET
+                        saldos_json = EXCLUDED.saldos_json,
+                        meta_json = EXCLUDED.meta_json,
+                        atualizado_em = NOW()
+                    """
+                ),
+                {
+                    "unidade": unidade,
+                    "saldos_json": saldos_json,
+                    "meta_json": meta_json,
+                },
+            )
+        else:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO estoque_unidade (unidade, saldos_json, meta_json, atualizado_em)
+                    VALUES (:unidade, :saldos_json, :meta_json, CURRENT_TIMESTAMP)
+                    ON CONFLICT(unidade) DO UPDATE SET
+                        saldos_json = excluded.saldos_json,
+                        meta_json = excluded.meta_json,
+                        atualizado_em = CURRENT_TIMESTAMP
+                    """
+                ),
+                {
+                    "unidade": unidade,
+                    "saldos_json": saldos_json,
+                    "meta_json": meta_json,
+                },
+            )

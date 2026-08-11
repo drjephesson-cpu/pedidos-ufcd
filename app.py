@@ -54,7 +54,9 @@ from db import (
     init_db,
     listar_filtros_historico,
     listar_pedidos,
+    load_estoque_db,
     obter_pedido,
+    save_estoque_db,
     using_neon,
 )
 from pdf_util import gerar_pdf_pedido
@@ -134,7 +136,8 @@ def unidade_cfg(unidade: str | None = None) -> dict:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "pedido-estoque-ufcd-local")
-users = UserStore(USERS_DB)
+# Mesmo banco dos pedidos (Neon na nuvem; SQLite local). /tmp no Vercel é efêmero.
+users = UserStore(None if using_neon() else PEDIDOS_SQLITE)
 
 try:
     init_db(None if using_neon() else PEDIDOS_SQLITE)
@@ -216,18 +219,42 @@ def estoque_path_for(unidade: str | None = None) -> Path:
     return primary
 
 
+def _uid_storage(unidade: str | None = None) -> str:
+    if unidade:
+        return resolve_unidade(unidade, persist=False)
+    try:
+        from flask import has_request_context
+
+        if has_request_context():
+            u = session.get("unidade")
+            if u in UNIDADES:
+                return u
+    except Exception:
+        pass
+    return "ufcd"
+
+
 def load_estoque(unidade: str | None = None) -> dict:
-    """Mapa codigo(str) -> saldo (float)."""
-    path = estoque_path_for(unidade)
+    """Payload {saldos, meta} ou legado."""
+    uid = _uid_storage(unidade)
+    if using_neon():
+        return load_estoque_db(uid, None) or {}
+    path = estoque_path_for(uid)
     if not path.exists():
         return {}
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def save_estoque(mapa: dict, meta: dict | None = None, unidade: str | None = None) -> None:
-    cfg = unidade_cfg(unidade)
+    uid = _uid_storage(unidade)
+    payload_meta = meta or {}
+    if using_neon():
+        save_estoque_db(uid, mapa, payload_meta, None)
+        return
+    cfg = UNIDADES[uid]
     path = WRITABLE / cfg["estoque_file"]
-    payload = {"saldos": mapa, "meta": meta or {}}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"saldos": mapa, "meta": payload_meta}
     path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
