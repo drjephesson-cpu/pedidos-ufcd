@@ -56,6 +56,7 @@
       </div>
       {% endfor %}
     </div>
+    <button type="button" class="btn-add-unit" id="btnAddUnidade">+ Adicionar unidade</button>
   </div>
 {% endblock %}
 
@@ -64,7 +65,7 @@
     <form class="panel-card" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
-        <h2>Estoque {{ 'Bloco' if unidade_id == 'cc' else 'AGHU' }}</h2>
+        <h2>Estoque {{ 'Bloco' if unidade.modelo == 'minimo' else 'AGHU' }}</h2>
         <p>{{ unidade.hint_estoque }} · salvo no Neon</p>
       </div>
       <div class="panel-card-body">
@@ -135,7 +136,8 @@
         class="btn export-link"
         id="pdfExportBtn"
         href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
-      >PDF</a>      <a
+      >PDF</a>
+      <a
         class="btn export-link"
         id="excelExportBtn"
         href="{{ url_for('exportar', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
@@ -149,7 +151,7 @@
         <tr>
           {% if ver_todos %}<th>Categoria</th>{% endif %}
           <th>Cód. AGHU</th>
-          <th>{% if unidade_id == 'cc' %}Item{% else %}Medicamento{% endif %}</th>
+          <th>{% if unidade.modelo == 'minimo' %}Item{% else %}Medicamento{% endif %}</th>
           <th>Est. Mín.</th>
           <th>Ponto</th>
           <th>Caixa</th>
@@ -226,9 +228,70 @@
   </div>
   {% else %}
   <section class="empty-state">
-    <h2>Catálogo indisponível</h2>
-    <p>Arquivo de catálogo da unidade {{ unidade.titulo }} não encontrado.</p>
+    <h2>Catálogo pendente — {{ unidade.titulo }}</h2>
+    <p>Importe a planilha de pedidos (abas com Cód. AGHU) para começar.</p>
+    <form
+      class="panel-card"
+      style="max-width:28rem;margin:1rem auto 0;text-align:left"
+      action="{{ url_for('importar_catalogo') }}"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <input type="hidden" name="unidade" value="{{ unidade_id }}" />
+      <div class="panel-card-body" style="flex-direction:column;align-items:stretch;gap:0.6rem">
+        <input type="file" name="arquivo" accept=".xlsx,.xls" required />
+        <input type="password" name="senha" placeholder="Senha do Excel (se houver)" />
+        <button type="submit" class="btn btn-primary">Importar catálogo</button>
+      </div>
+    </form>
+    {% if unidade.dinamica and is_admin %}
+    <form
+      method="post"
+      action="{{ url_for('unidades_excluir', uid=unidade_id) }}"
+      style="margin-top:1rem"
+      onsubmit="return confirm('Excluir a unidade {{ unidade.titulo }}?');"
+    >
+      <button type="submit" class="btn btn-quiet">Excluir esta unidade</button>
+    </form>
+    {% endif %}
   </section>
   {% endif %}
 
+  <div id="modalAddUnidade" class="modal" hidden>
+    <div class="modal-backdrop" data-close-unidade></div>
+    <div class="modal-card" role="dialog" aria-labelledby="modalAddUnidadeTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalAddUnidadeTitle">Nova unidade</h2>
+          <p>Fica salva no Neon, como UFCD e Centro Cirúrgico.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-unidade aria-label="Fechar">×</button>
+      </div>
+      <form class="modal-body" method="post" action="{{ url_for('unidades_criar') }}">
+        <label>
+          Nome da unidade
+          <input type="text" name="titulo" required placeholder="Ex.: Pronto Socorro" autofocus />
+        </label>
+        <label>
+          Id (opcional)
+          <input type="text" name="id" placeholder="Gerado do nome (ex.: pronto_socorro)" />
+        </label>
+        <label>
+          Modelo de pedido
+          <select name="modelo">
+            <option value="ponto">Ponto de pedido (como UFCD)</option>
+            <option value="minimo">Estoque mínimo (como Centro Cirúrgico)</option>
+          </select>
+        </label>
+        <label>
+          Dica do Excel de estoque
+          <input type="text" name="hint_estoque" placeholder="Ex.: EstoqueFarmacia…" />
+        </label>
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.4rem">
+          <button type="button" class="btn btn-quiet" data-close-unidade>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Criar unidade</button>
+        </div>
+      </form>
+    </div>
+  </div>
 {% endblock %}

@@ -50,14 +50,19 @@ from auth import (
 )
 from db import (
     criar_pedido,
+    criar_unidade_db,
     excluir_pedido,
+    excluir_unidade_db,
     init_db,
     listar_filtros_historico,
     listar_pedidos,
+    listar_unidades_db,
     load_catalogo_parametros,
+    load_catalogo_unidade_db,
     load_estoque_db,
     obter_pedido,
     save_catalogo_parametro,
+    save_catalogo_unidade_db,
     save_estoque_db,
     salvar_pedido_dia,
     using_neon,
@@ -77,7 +82,7 @@ ESTOQUE_PATH = WRITABLE / "estoque_atual.json"  # UFCD legado
 USERS_DB = WRITABLE / "users.db"
 PEDIDOS_SQLITE = WRITABLE / "pedidos.db"
 
-UNIDADES = {
+UNIDADES_FIXAS = {
     "ufcd": {
         "id": "ufcd",
         "titulo": "UFCD",
@@ -88,6 +93,7 @@ UNIDADES = {
         "hint_estoque": "EstoqueFarmacia (saldo farmácia central)",
         "mostra_ponto_caixa": True,
         "aba_ordem": None,  # usa ABA_ORDEM_PADRAO
+        "dinamica": False,
     },
     "cc": {
         "id": "cc",
@@ -104,12 +110,82 @@ UNIDADES = {
             "materiais",
             "fios",
         ],
+        "dinamica": False,
     },
 }
+
+# Compat: código antigo ainda referencia UNIDADES
+UNIDADES = UNIDADES_FIXAS
+
+_IDS_RESERVADOS = {"ufcd", "cc", "centro", "centro_cirurgico", "bloco", "admin", "api"}
+
+
+def _db_path_unidades():
+    return None if using_neon() else PEDIDOS_SQLITE
+
+
+def slugify_unidade(titulo: str) -> str:
+    raw = (titulo or "").strip().lower()
+    # remove acentos básicos
+    trans = str.maketrans(
+        "áàâãäéèêëíìîïóòôõöúùûüçñ",
+        "aaaaaeeeeiiiiooooouuuucn",
+    )
+    raw = raw.translate(trans)
+    slug = re.sub(r"[^a-z0-9]+", "_", raw).strip("_")
+    slug = re.sub(r"_+", "_", slug)
+    if not slug:
+        slug = "unidade"
+    if slug[0].isdigit():
+        slug = f"u_{slug}"
+    return slug[:40]
+
+
+def unidades_todas() -> dict:
+    """UFCD + CC + unidades criadas no Neon/SQLite."""
+    try:
+        from flask import g, has_request_context
+
+        if has_request_context() and "_unidades" in g.__dict__:
+            return g._unidades
+    except Exception:
+        pass
+
+    merged = {k: dict(v) for k, v in UNIDADES_FIXAS.items()}
+    try:
+        for row in listar_unidades_db(_db_path_unidades()):
+            uid = row["id"]
+            if uid in UNIDADES_FIXAS:
+                continue
+            merged[uid] = {
+                "id": uid,
+                "titulo": row["titulo"],
+                "catalogo": None,
+                "estoque_file": f"estoque_{uid}.json",
+                "legacy_estoque": [],
+                "modelo": row["modelo"],
+                "hint_estoque": row["hint_estoque"],
+                "mostra_ponto_caixa": row["mostra_ponto_caixa"],
+                "aba_ordem": None,
+                "dinamica": True,
+            }
+    except Exception as exc:
+        print("aviso listar_unidades_db:", exc)
+    global UNIDADES
+    UNIDADES = merged
+    try:
+        from flask import g, has_request_context
+
+        if has_request_context():
+            g._unidades = merged
+    except Exception:
+        pass
+    return merged
 
 
 def resolve_unidade(raw: str | None = None, *, persist: bool | None = None) -> str:
     from_request = raw is None
+    unidades = unidades_todas()
     if from_request:
         raw = (
             request.args.get("unidade")
@@ -120,7 +196,7 @@ def resolve_unidade(raw: str | None = None, *, persist: bool | None = None) -> s
     u = str(raw).strip().lower()
     if u in ("centro", "centro_cirurgico", "bloco", "cc"):
         u = "cc"
-    if u not in UNIDADES:
+    if u not in unidades:
         u = "ufcd"
     if persist is None:
         persist = from_request
@@ -130,11 +206,12 @@ def resolve_unidade(raw: str | None = None, *, persist: bool | None = None) -> s
 
 
 def unidade_cfg(unidade: str | None = None) -> dict:
+    unidades = unidades_todas()
     if unidade is None:
         uid = resolve_unidade()
     else:
         uid = resolve_unidade(unidade, persist=False)
-    return UNIDADES[uid]
+    return unidades[uid]
 
 
 app = Flask(__name__)
@@ -159,16 +236,17 @@ except Exception as exc:  # pragma: no cover
 
 @app.context_processor
 def inject_globals():
+    unidades = unidades_todas()
     uid = session.get("unidade") or "ufcd"
-    if uid not in UNIDADES:
+    if uid not in unidades:
         uid = "ufcd"
     return {
         "user": current_user(),
         "is_admin": is_admin(),
         "usando_neon": using_neon(),
-        "unidades": UNIDADES,
+        "unidades": unidades,
         "unidade_id": uid,
-        "unidade": UNIDADES[uid],
+        "unidade": unidades[uid],
     }
 
 # Abas na mesma ordem da planilha (exceto Estoque)
@@ -203,8 +281,22 @@ _catalogo_cache: dict[str, tuple[float, dict]] = {}
 
 def load_catalogo(unidade: str | None = None) -> dict:
     cfg = unidade_cfg(unidade)
-    path = cfg["catalogo"]
-    if not path.exists():
+    # Unidades criadas na sidebar: catálogo no Neon/SQLite
+    if cfg.get("dinamica"):
+        key = f"db:{cfg['id']}"
+        hit = _catalogo_cache.get(key)
+        # sem mtime de arquivo — invalida só no save
+        if hit:
+            return hit[1]
+        data = load_catalogo_unidade_db(cfg["id"], _db_path_unidades())
+        if not data:
+            data = {"abas": [], "itens": {}, "modelo": cfg["modelo"]}
+        data.setdefault("modelo", cfg["modelo"])
+        _catalogo_cache[key] = (0.0, data)
+        return data
+
+    path = cfg.get("catalogo")
+    if path is None or not path.exists():
         # fallback UFCD legado
         if cfg["id"] == "ufcd" and CATALOGO_PATH.exists():
             path = CATALOGO_PATH
@@ -226,6 +318,10 @@ def load_catalogo(unidade: str | None = None) -> dict:
 
 def save_catalogo(catalogo: dict, unidade: str | None = None) -> None:
     cfg = unidade_cfg(unidade)
+    if cfg.get("dinamica"):
+        save_catalogo_unidade_db(cfg["id"], catalogo, _db_path_unidades())
+        _catalogo_cache.pop(f"db:{cfg['id']}", None)
+        return
     path = cfg["catalogo"]
     path.write_text(
         json.dumps(catalogo, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -254,7 +350,7 @@ def _uid_storage(unidade: str | None = None) -> str:
 
         if has_request_context():
             u = session.get("unidade")
-            if u in UNIDADES:
+            if u in unidades_todas():
                 return u
     except Exception:
         pass
@@ -1010,6 +1106,91 @@ def usuarios_senha(user_id: int):
     ok, msg = users.change_password(user_id, request.form.get("password", ""))
     flash(msg, "ok" if ok else "erro")
     return redirect(url_for("usuarios"))
+
+
+@app.route("/unidades/criar", methods=["POST"])
+@login_required
+def unidades_criar():
+    titulo = (request.form.get("titulo") or "").strip()
+    modelo = (request.form.get("modelo") or "ponto").strip().lower()
+    hint = (request.form.get("hint_estoque") or "").strip()
+    raw_id = (request.form.get("id") or "").strip().lower()
+    if not titulo:
+        flash("Informe o nome da unidade.", "erro")
+        return redirect(url_for("index"))
+
+    uid = slugify_unidade(raw_id or titulo)
+    if uid in _IDS_RESERVADOS or uid in UNIDADES_FIXAS:
+        flash(f"O id '{uid}' é reservado. Escolha outro nome ou id.", "erro")
+        return redirect(url_for("index"))
+
+    # Garante unicidade
+    existentes = unidades_todas()
+    base = uid
+    n = 2
+    while uid in existentes:
+        uid = f"{base}_{n}"
+        n += 1
+        if n > 50:
+            flash("Não foi possível gerar um id único.", "erro")
+            return redirect(url_for("index"))
+
+    if modelo not in ("ponto", "minimo"):
+        modelo = "ponto"
+    if not hint:
+        hint = (
+            "EstoqueFarmaciaBloco"
+            if modelo == "minimo"
+            else "EstoqueFarmacia (saldo farmácia)"
+        )
+
+    try:
+        criar_unidade_db(
+            uid,
+            titulo,
+            modelo=modelo,
+            hint_estoque=hint,
+            mostra_ponto_caixa=(modelo == "ponto"),
+            sqlite_path=_db_path_unidades(),
+        )
+        # invalida cache da request
+        try:
+            from flask import g
+
+            g.__dict__.pop("_unidades", None)
+        except Exception:
+            pass
+        unidades_todas()
+        flash(f"Unidade '{titulo}' criada. Importe o catálogo e o estoque.", "ok")
+        return redirect(url_for("index", unidade=uid))
+    except Exception as e:
+        flash(f"Erro ao criar unidade: {e}", "erro")
+        return redirect(url_for("index"))
+
+
+@app.route("/unidades/<uid>/excluir", methods=["POST"])
+@admin_required
+def unidades_excluir(uid: str):
+    uid = (uid or "").strip().lower()
+    if uid in UNIDADES_FIXAS:
+        flash("Não é possível excluir UFCD ou Centro Cirúrgico.", "erro")
+        return redirect(url_for("index", unidade=uid or "ufcd"))
+    try:
+        ok = excluir_unidade_db(uid, _db_path_unidades())
+        _catalogo_cache.pop(f"db:{uid}", None)
+        try:
+            from flask import g
+
+            g.__dict__.pop("_unidades", None)
+        except Exception:
+            pass
+        if ok:
+            flash("Unidade removida.", "ok")
+        else:
+            flash("Unidade não encontrada.", "erro")
+    except Exception as e:
+        flash(f"Erro ao excluir: {e}", "erro")
+    return redirect(url_for("index", unidade="ufcd"))
 
 
 @app.route("/")

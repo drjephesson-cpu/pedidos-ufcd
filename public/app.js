@@ -425,3 +425,27 @@ async function gravarPedidoDiaEmBackground() {
 }
 
 gravarPedidoDiaEmBackground();
+
+/* Modal: adicionar unidade */
+(function () {
+  const modal = document.getElementById("modalAddUnidade");
+  const openBtn = document.getElementById("btnAddUnidade");
+  if (!modal || !openBtn) return;
+
+  function openModal() {
+    modal.hidden = false;
+    const first = modal.querySelector('input[name="titulo"]');
+    if (first) first.focus();
+  }
+  function closeModal() {
+    modal.hidden = true;
+  }
+
+  openBtn.addEventListener("click", openModal);
+  modal.querySelectorAll("[data-close-unidade]").forEach((el) => {
+    el.addEventListener("click", closeModal);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+})();

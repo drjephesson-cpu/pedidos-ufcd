@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from contextlib import contextmanager
 from datetime import date
@@ -142,6 +143,17 @@ def init_db(sqlite_path: Path | None = None) -> None:
             PRIMARY KEY (unidade, codigo)
         )
         """,
+        f"""
+        CREATE TABLE IF NOT EXISTS unidades_config (
+            id TEXT PRIMARY KEY,
+            titulo TEXT NOT NULL,
+            modelo TEXT NOT NULL DEFAULT 'ponto',
+            hint_estoque TEXT NOT NULL DEFAULT '',
+            mostra_ponto_caixa INTEGER NOT NULL DEFAULT 1,
+            catalogo_json TEXT NOT NULL DEFAULT '{{}}',
+            criado_em TIMESTAMP NOT NULL DEFAULT {ts_default}
+        )
+        """,
     ]
     index_stmts = [
         "CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos (data_pedido DESC)",
@@ -229,12 +241,14 @@ def _infer_unidade(unidade: str | None, observacao: str | None) -> str:
         return "cc"
     if u in ("ufcd",):
         return "ufcd"
+    if u:
+        return u
     obs = observacao or ""
     if "Centro Cirúrgico" in obs or "[cc]" in obs.lower():
         return "cc"
     if "UFCD" in obs:
         return "ufcd"
-    return u or "ufcd"
+    return "ufcd"
 
 
 def criar_pedido(
@@ -748,3 +762,157 @@ def save_estoque_db(
                     "meta_json": meta_json,
                 },
             )
+
+
+# —— Unidades dinâmicas (além de UFCD / CC) ——
+
+_EMPTY_CATALOGO = {"abas": [], "itens": {}, "modelo": "ponto"}
+
+
+def listar_unidades_db(sqlite_path: Path | None = None) -> list[dict[str, Any]]:
+    with connect(sqlite_path) as conn:
+        rows = (
+            conn.execute(
+                text(
+                    """
+                    SELECT id, titulo, modelo, hint_estoque, mostra_ponto_caixa, catalogo_json
+                    FROM unidades_config
+                    ORDER BY titulo
+                    """
+                )
+            )
+            .mappings()
+            .fetchall()
+        )
+    out = []
+    for r in rows:
+        try:
+            catalogo = json.loads(r["catalogo_json"] or "{}")
+        except Exception:
+            catalogo = dict(_EMPTY_CATALOGO)
+        if not isinstance(catalogo, dict):
+            catalogo = dict(_EMPTY_CATALOGO)
+        out.append(
+            {
+                "id": r["id"],
+                "titulo": r["titulo"],
+                "modelo": (r["modelo"] or "ponto").lower(),
+                "hint_estoque": r["hint_estoque"] or "EstoqueFarmacia",
+                "mostra_ponto_caixa": bool(r["mostra_ponto_caixa"]),
+                "catalogo": catalogo,
+                "dinamica": True,
+            }
+        )
+    return out
+
+
+def criar_unidade_db(
+    unidade_id: str,
+    titulo: str,
+    *,
+    modelo: str = "ponto",
+    hint_estoque: str = "",
+    mostra_ponto_caixa: bool = True,
+    catalogo: dict | None = None,
+    sqlite_path: Path | None = None,
+) -> None:
+    uid = (unidade_id or "").strip().lower()
+    if not uid:
+        raise ValueError("ID da unidade inválido.")
+    titulo = (titulo or "").strip()
+    if not titulo:
+        raise ValueError("Informe o nome da unidade.")
+    modelo = (modelo or "ponto").strip().lower()
+    if modelo not in ("ponto", "minimo"):
+        modelo = "ponto"
+    cat = catalogo or {**_EMPTY_CATALOGO, "modelo": modelo}
+    cat.setdefault("modelo", modelo)
+    payload = json.dumps(cat, ensure_ascii=False)
+    with connect(sqlite_path) as conn:
+        exists = conn.execute(
+            text("SELECT 1 FROM unidades_config WHERE id = :id"),
+            {"id": uid},
+        ).first()
+        if exists:
+            raise ValueError(f"Já existe unidade com id '{uid}'.")
+        conn.execute(
+            text(
+                """
+                INSERT INTO unidades_config
+                    (id, titulo, modelo, hint_estoque, mostra_ponto_caixa, catalogo_json)
+                VALUES
+                    (:id, :titulo, :modelo, :hint_estoque, :mostra_ponto_caixa, :catalogo_json)
+                """
+            ),
+            {
+                "id": uid,
+                "titulo": titulo,
+                "modelo": modelo,
+                "hint_estoque": hint_estoque or "EstoqueFarmacia",
+                "mostra_ponto_caixa": 1 if mostra_ponto_caixa else 0,
+                "catalogo_json": payload,
+            },
+        )
+
+
+def load_catalogo_unidade_db(
+    unidade_id: str, sqlite_path: Path | None = None
+) -> dict | None:
+    with connect(sqlite_path) as conn:
+        row = (
+            conn.execute(
+                text(
+                    "SELECT catalogo_json, modelo FROM unidades_config WHERE id = :id"
+                ),
+                {"id": unidade_id},
+            )
+            .mappings()
+            .first()
+        )
+    if not row:
+        return None
+    try:
+        data = json.loads(row["catalogo_json"] or "{}")
+    except Exception:
+        data = dict(_EMPTY_CATALOGO)
+    if not isinstance(data, dict):
+        data = dict(_EMPTY_CATALOGO)
+    data.setdefault("modelo", (row["modelo"] or "ponto").lower())
+    data.setdefault("abas", [])
+    data.setdefault("itens", {})
+    return data
+
+
+def save_catalogo_unidade_db(
+    unidade_id: str,
+    catalogo: dict,
+    sqlite_path: Path | None = None,
+) -> None:
+    payload = json.dumps(catalogo, ensure_ascii=False)
+    modelo = (catalogo.get("modelo") or "ponto").lower()
+    with connect(sqlite_path) as conn:
+        res = conn.execute(
+            text(
+                """
+                UPDATE unidades_config
+                SET catalogo_json = :catalogo_json, modelo = :modelo
+                WHERE id = :id
+                """
+            ),
+            {
+                "id": unidade_id,
+                "catalogo_json": payload,
+                "modelo": modelo,
+            },
+        )
+        if res.rowcount == 0:
+            raise ValueError(f"Unidade '{unidade_id}' não encontrada.")
+
+
+def excluir_unidade_db(unidade_id: str, sqlite_path: Path | None = None) -> bool:
+    with connect(sqlite_path) as conn:
+        res = conn.execute(
+            text("DELETE FROM unidades_config WHERE id = :id"),
+            {"id": unidade_id},
+        )
+        return bool(res.rowcount)

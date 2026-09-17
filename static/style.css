@@ -98,6 +98,42 @@ a { color: inherit; }
 }
 
 .unit-tree { display: grid; gap: 0.25rem; min-height: 0; }
+.btn-add-unit {
+  width: calc(100% - 0.2rem);
+  margin: 0.55rem 0.1rem 0;
+  border: 1px dashed rgba(237,245,240,0.28);
+  background: transparent;
+  color: rgba(237,245,240,0.78);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.btn-add-unit:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border-color: rgba(237,245,240,0.45);
+}
+.modal-body label {
+  display: grid;
+  gap: 0.28rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.modal-body input,
+.modal-body select {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+}
 .unit-toggle {
   width: 100%;
   display: flex;
