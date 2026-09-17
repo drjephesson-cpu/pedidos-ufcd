@@ -449,3 +449,208 @@ gravarPedidoDiaEmBackground();
     if (e.key === "Escape" && !modal.hidden) closeModal();
   });
 })();
+
+/* Importar catálogo com preview de abas */
+(function () {
+  const modal = document.getElementById("modalCatalogo");
+  const openBtns = document.querySelectorAll("#btnImportCatalogo");
+  if (!modal || !openBtns.length) return;
+
+  const previewEl = document.getElementById("catalogoPreview");
+  const btnAnalisar = document.getElementById("btnAnalisarCatalogo");
+  const btnConfirmar = document.getElementById("btnConfirmarCatalogo");
+  const fileInput = document.getElementById("catalogoArquivo");
+  const senhaInput = document.getElementById("catalogoSenha");
+  const mesclarInput = document.getElementById("catalogoMesclar");
+  let lastFile = null;
+
+  function openModal() {
+    modal.hidden = false;
+  }
+  function closeModal() {
+    modal.hidden = true;
+  }
+
+  openBtns.forEach((btn) => btn.addEventListener("click", openModal));
+  modal.querySelectorAll("[data-close-catalogo]").forEach((el) => {
+    el.addEventListener("click", closeModal);
+  });
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderPreview(data) {
+    if (!previewEl) return;
+    if (!data.abas || !data.abas.length) {
+      previewEl.hidden = false;
+      previewEl.innerHTML =
+        '<p class="catalogo-preview-summary">Nenhuma aba válida encontrada (precisa de Cód. AGHU nas colunas A–E).</p>';
+      if (btnConfirmar) btnConfirmar.disabled = true;
+      return;
+    }
+    const rows = data.abas
+      .map((aba) => {
+        const amostra = (aba.amostra || [])
+          .map(
+            (it) =>
+              `<tr><td>${escapeHtml(it.codigo)}</td><td>${escapeHtml(
+                it.descricao
+              )}</td><td>${escapeHtml(it.estoque_minimo)}</td><td>${escapeHtml(
+                it.ponto_pedido
+              )}</td><td>${escapeHtml(it.caixa_com)}</td></tr>`
+          )
+          .join("");
+        const cols = (aba.colunas || [])
+          .map((c) => `<th>${escapeHtml(c.letra)} · ${escapeHtml(c.titulo)}</th>`)
+          .join("");
+        return `<div class="catalogo-aba">
+          <label class="catalogo-aba-head">
+            <input type="checkbox" name="aba_sel" value="${escapeHtml(aba.titulo)}" checked />
+            <span>${escapeHtml(aba.titulo)}</span>
+            <em>${aba.count} itens · linha cabeçalho ${aba.header_row}</em>
+          </label>
+          <table><thead><tr>${cols}</tr></thead><tbody>${amostra}</tbody></table>
+        </div>`;
+      })
+      .join("");
+    const ignoradas = (data.ignoradas || [])
+      .map((i) => `<li>${escapeHtml(i.titulo)} — ${escapeHtml(i.motivo)}</li>`)
+      .join("");
+    previewEl.hidden = false;
+    previewEl.innerHTML = `
+      <p class="catalogo-preview-summary">
+        ${data.abas.length} abas · ${data.total_itens} itens detectados em <strong>${escapeHtml(
+          data.arquivo || ""
+        )}</strong>
+      </p>
+      ${rows}
+      ${
+        ignoradas
+          ? `<div class="catalogo-ignoradas"><strong>Ignoradas:</strong><ul>${ignoradas}</ul></div>`
+          : ""
+      }
+    `;
+    if (btnConfirmar) btnConfirmar.disabled = false;
+  }
+
+  btnAnalisar?.addEventListener("click", async () => {
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      alert("Selecione o Excel de pedidos.");
+      return;
+    }
+    lastFile = file;
+    const fd = new FormData();
+    fd.append("arquivo", file);
+    if (senhaInput?.value) fd.append("senha", senhaInput.value);
+    try {
+      const res = await neonFetch(
+        "/api/catalogo/preview",
+        { method: "POST", body: fd },
+        "Analisando Excel de pedidos…"
+      );
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.erro || "Falha ao analisar.");
+        return;
+      }
+      renderPreview(data);
+    } catch (err) {
+      alert("Erro ao analisar a planilha.");
+    }
+  });
+
+  btnConfirmar?.addEventListener("click", async () => {
+    const file = lastFile || fileInput?.files?.[0];
+    if (!file) {
+      alert("Selecione e analise o Excel antes.");
+      return;
+    }
+    const selecionadas = [
+      ...modal.querySelectorAll('input[name="aba_sel"]:checked'),
+    ].map((el) => el.value);
+    if (!selecionadas.length) {
+      alert("Marque ao menos uma aba.");
+      return;
+    }
+    const unidade =
+      document.querySelector('input[name="unidade"]')?.value ||
+      new URLSearchParams(location.search).get("unidade") ||
+      "";
+    const fd = new FormData();
+    fd.append("arquivo", file);
+    if (unidade) fd.append("unidade", unidade);
+    if (senhaInput?.value) fd.append("senha", senhaInput.value);
+    if (mesclarInput?.checked) fd.append("modo", "mesclar");
+    selecionadas.forEach((a) => fd.append("abas", a));
+    NeonLoad.show("Importando catálogo no Neon…");
+    // form POST clássico para reaproveitar flash/redirect
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/importar/catalogo";
+    form.enctype = "multipart/form-data";
+    // Não dá para anexar File via form.create — usa fetch + redirect
+    try {
+      const res = await fetch("/importar/catalogo", { method: "POST", body: fd });
+      if (res.redirected) {
+        window.location.href = res.url;
+        return;
+      }
+      // Flask redirect normalmente vem como 302 seguido; fetch segue
+      window.location.href = res.url || window.location.href;
+    } catch (err) {
+      NeonLoad.hide(true);
+      alert("Erro ao importar catálogo.");
+    }
+  });
+})();
+
+/* Medicamento manual no catálogo */
+(function () {
+  const modal = document.getElementById("modalMedicamento");
+  const openBtns = document.querySelectorAll("#btnAddMedicamento");
+  const form = document.getElementById("formMedicamentoManual");
+  if (!modal || !openBtns.length || !form) return;
+
+  function openModal() {
+    modal.hidden = false;
+  }
+  function closeModal() {
+    modal.hidden = true;
+  }
+  openBtns.forEach((btn) => btn.addEventListener("click", openModal));
+  modal.querySelectorAll("[data-close-med]").forEach((el) => {
+    el.addEventListener("click", closeModal);
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const payload = Object.fromEntries(fd.entries());
+    try {
+      const res = await neonFetch(
+        "/api/catalogo/item",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+        "Salvando medicamento no catálogo…"
+      );
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        alert(data.erro || "Não foi possível salvar.");
+        return;
+      }
+      NeonLoad.show("Atualizando tela…");
+      window.location.reload();
+    } catch (err) {
+      alert("Erro ao salvar medicamento.");
+    }
+  });
+})();

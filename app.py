@@ -545,61 +545,161 @@ def parse_estoque_xlsx(file_storage) -> tuple[dict, dict]:
 def _is_header_cell(val) -> bool:
     if not isinstance(val, str):
         return False
-    vu = val.upper().replace("Ó", "O").replace("Ê", "E")
-    return "AGHU" in vu or "CODIGO" in vu
+    vu = (
+        val.upper()
+        .replace("Ó", "O")
+        .replace("Ê", "E")
+        .replace("Í", "I")
+        .replace("Á", "A")
+        .replace("Ã", "A")
+    )
+    # Ex.: "Cód. AGHU", "Cód. AGH", "Código"
+    return (
+        "AGHU" in vu
+        or "AGH" in vu
+        or "CODIGO" in vu
+        or vu.replace(".", " ").startswith("COD ")
+        or vu.startswith("COD.")
+    )
 
 
-def parse_pedido_workbook(wb) -> dict:
-    """Extrai abas de pedido de um workbook openpyxl."""
+def _aba_id_from_name(name: str) -> str:
+    raw = (name or "").strip()
+    trans = str.maketrans(
+        "áàâãäéèêëíìîïóòôõöúùûüçñÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑ",
+        "aaaaaeeeeiiiiooooouuuucnAAAAAEEEEIIIIOOOOOUUUUCN",
+    )
+    slug = re.sub(r"[^a-zA-Z0-9]+", "_", raw.translate(trans)).strip("_")
+    return (slug or "aba")[:60]
+
+
+def _parse_pedido_sheet(name: str, rows: list) -> dict | None:
+    """Lê uma aba (colunas A–E) e devolve meta + itens, ou None se inválida."""
+    if (name or "").upper() == "ESTOQUE":
+        return None
+    header_row = None
+    for r_idx, row in enumerate(rows[:15]):
+        for cell in (row or [])[:12]:
+            if _is_header_cell(cell):
+                header_row = r_idx
+                break
+        if header_row is not None:
+            break
+    if header_row is None:
+        return None
+
+    header = list(rows[header_row] or [])
+    colunas = []
+    for i, h in enumerate(header[:5]):
+        colunas.append(
+            {
+                "idx": i,
+                "letra": chr(ord("A") + i),
+                "titulo": str(h).strip() if h is not None else f"Coluna {i + 1}",
+            }
+        )
+
+    items = []
+    for row in rows[header_row + 1 :]:
+        if not row:
+            continue
+        cod = normaliza_codigo(row[0] if len(row) > 0 else None)
+        if not cod:
+            continue
+        desc = row[1] if len(row) > 1 else ""
+        est_min = row[2] if len(row) > 2 else None
+        ponto = row[3] if len(row) > 3 else None
+        caixa = row[4] if len(row) > 4 else None
+        if est_min is None and ponto is None:
+            continue
+        try:
+            items.append(
+                {
+                    "codigo": int(cod),
+                    "descricao": str(desc).strip() if desc else "",
+                    "estoque_minimo": float(est_min or 0),
+                    "ponto_pedido": float(ponto if ponto is not None else est_min or 0),
+                    "caixa_com": float(caixa) if caixa not in (None, 0, "") else 1.0,
+                }
+            )
+        except Exception:
+            continue
+
+    aba_id = _aba_id_from_name(name)
+    return {
+        "id": aba_id,
+        "titulo": name,
+        "count": len(items),
+        "header_row": header_row + 1,
+        "colunas": colunas,
+        "amostra": items[:5],
+        "itens": items,
+        "ok": len(items) > 0,
+    }
+
+
+def parse_pedido_workbook(wb, abas_filtro: set[str] | None = None) -> dict:
+    """Extrai abas de pedido de um workbook openpyxl (colunas A–E)."""
     catalog: dict = {"abas": [], "itens": {}}
     for name in wb.sheetnames:
-        if name.upper() == "ESTOQUE":
+        if abas_filtro is not None and name not in abas_filtro:
+            # também aceita id slugificado
+            if _aba_id_from_name(name) not in abas_filtro:
+                continue
+        rows = list(wb[name].iter_rows(values_only=True))
+        sheet = _parse_pedido_sheet(name, rows)
+        if not sheet or not sheet["ok"]:
             continue
-        ws = wb[name]
-        rows = list(ws.iter_rows(values_only=True))
-        header_row = None
-        for r_idx, row in enumerate(rows[:12]):
-            for cell in row[:12]:
-                if _is_header_cell(cell):
-                    header_row = r_idx
-                    break
-            if header_row is not None:
-                break
-        if header_row is None:
-            continue
-        items = []
-        for row in rows[header_row + 1 :]:
-            if not row:
-                continue
-            cod = normaliza_codigo(row[0])
-            if not cod:
-                continue
-            desc = row[1] if len(row) > 1 else ""
-            est_min = row[2] if len(row) > 2 else None
-            ponto = row[3] if len(row) > 3 else None
-            caixa = row[4] if len(row) > 4 else None
-            if est_min is None and ponto is None:
-                continue
-            try:
-                items.append(
-                    {
-                        "codigo": int(cod),
-                        "descricao": str(desc).strip() if desc else "",
-                        "estoque_minimo": float(est_min or 0),
-                        "ponto_pedido": float(ponto or 0),
-                        "caixa_com": float(caixa)
-                        if caixa not in (None, 0, "")
-                        else 1.0,
-                    }
-                )
-            except Exception:
-                continue
-        catalog["abas"].append({"id": name, "titulo": name, "count": len(items)})
-        catalog["itens"][name] = items
+        catalog["abas"].append(
+            {"id": sheet["id"], "titulo": sheet["titulo"], "count": sheet["count"]}
+        )
+        catalog["itens"][sheet["id"]] = sheet["itens"]
     return catalog
 
 
-def import_pedido_file(file_bytes: bytes, filename: str, password: str | None) -> dict:
+def preview_pedido_workbook(wb) -> dict:
+    """Lista abas detectadas com amostra (sem gravar)."""
+    abas = []
+    ignoradas = []
+    for name in wb.sheetnames:
+        if (name or "").upper() == "ESTOQUE":
+            ignoradas.append({"titulo": name, "motivo": "aba de estoque"})
+            continue
+        rows = list(wb[name].iter_rows(values_only=True))
+        sheet = _parse_pedido_sheet(name, rows)
+        if not sheet:
+            ignoradas.append(
+                {"titulo": name, "motivo": "cabeçalho Cód. AGHU não encontrado"}
+            )
+            continue
+        if not sheet["ok"]:
+            ignoradas.append({"titulo": name, "motivo": "sem itens nas colunas A–E"})
+            continue
+        abas.append(
+            {
+                "id": sheet["id"],
+                "titulo": sheet["titulo"],
+                "count": sheet["count"],
+                "header_row": sheet["header_row"],
+                "colunas": sheet["colunas"],
+                "amostra": sheet["amostra"],
+            }
+        )
+    return {
+        "abas": abas,
+        "ignoradas": ignoradas,
+        "total_itens": sum(a["count"] for a in abas),
+    }
+
+
+def import_pedido_file(
+    file_bytes: bytes,
+    filename: str,
+    password: str | None,
+    *,
+    abas_filtro: set[str] | None = None,
+    preview_only: bool = False,
+) -> dict:
     """Importa catálogo de .xlsx/.xls, com suporte a senha (msoffcrypto)."""
     name_lower = (filename or "").lower()
     data = file_bytes
@@ -624,32 +724,96 @@ def import_pedido_file(file_bytes: bytes, filename: str, password: str | None) -
     except ValueError:
         raise
     except Exception as e:
-        # se não for encrypted / lib falhar, segue com bytes originais
         if "password" in str(e).lower() or "decrypt" in str(e).lower():
             raise ValueError(f"Não foi possível abrir com a senha informada: {e}") from e
+
+    def _from_wb(wb):
+        if preview_only:
+            return preview_pedido_workbook(wb)
+        return parse_pedido_workbook(wb, abas_filtro=abas_filtro)
 
     # Detecta formato
     if data[:2] == b"PK":
         wb = load_workbook(io.BytesIO(data), data_only=True)
-        return parse_pedido_workbook(wb)
+        try:
+            return _from_wb(wb)
+        finally:
+            try:
+                wb.close()
+            except Exception:
+                pass
 
-    # OLE legado: tenta via Excel COM
+    # OLE legado (.xls): xlrd (Linux/Vercel) ou Excel COM (Windows)
     if data[:4] == b"\xd0\xcf\x11\xe0":
-        return _import_via_excel_com(data, password)
+        try:
+            return _from_wb(_workbook_from_xls_bytes(data))
+        except Exception as xlrd_err:
+            try:
+                return _import_via_excel_com(
+                    data, password, abas_filtro=abas_filtro, preview_only=preview_only
+                )
+            except Exception:
+                raise ValueError(
+                    "Arquivo .xls legado. Salve como .xlsx no Excel e tente de novo "
+                    f"(detalhe: {xlrd_err})"
+                ) from xlrd_err
 
     raise ValueError(
         "Formato não reconhecido. Salve a planilha como .xlsx (Excel) e tente de novo."
     )
 
 
-def _import_via_excel_com(data: bytes, password: str | None) -> dict:
+def _workbook_from_xls_bytes(data: bytes):
+    """Converte bytes .xls em workbook openpyxl via xlrd → xlsx temporário em memória."""
+    try:
+        import xlrd
+    except ImportError as e:
+        raise ValueError("Biblioteca xlrd ausente para ler .xls") from e
+
+    from openpyxl import Workbook as _Wb
+
+    book = xlrd.open_workbook(file_contents=data)
+    wb = _Wb()
+    # remove sheet padrão
+    default = wb.active
+    first = True
+    for sheet in book.sheets():
+        if first:
+            ws = default
+            ws.title = sheet.name[:31] or "Aba"
+            first = False
+        else:
+            ws = wb.create_sheet(title=sheet.name[:31] or "Aba")
+        for r in range(sheet.nrows):
+            values = []
+            for c in range(sheet.ncols):
+                cell = sheet.cell(r, c)
+                val = cell.value
+                # xlrd dates etc. — mantém número/texto
+                if cell.ctype == xlrd.XL_CELL_DATE:
+                    try:
+                        val = xlrd.xldate_as_datetime(val, book.datemode)
+                    except Exception:
+                        pass
+                values.append(val)
+            ws.append(values)
+    return wb
+
+
+def _import_via_excel_com(
+    data: bytes,
+    password: str | None,
+    *,
+    abas_filtro: set[str] | None = None,
+    preview_only: bool = False,
+) -> dict:
     try:
         import pythoncom
         import win32com.client
     except ImportError as e:
         raise ValueError(
-            "Arquivo legado (.xls criptografado). Salve como .xlsx no Excel ou "
-            "instale pywin32 para importação automática."
+            "Arquivo legado (.xls). Salve como .xlsx no Excel ou "
+            "instale pywin32/xlrd para importação automática."
         ) from e
 
     pythoncom.CoInitialize()
@@ -667,17 +831,24 @@ def _import_via_excel_com(data: bytes, password: str | None) -> dict:
         else:
             wb = excel.Workbooks.Open(str(tmp), **kwargs)
 
-        # Salva temporário xlsx e lê com openpyxl
         xlsx_tmp = Path(tempfile.gettempdir()) / "pedido_import_tmp.xlsx"
         wb.SaveAs(str(xlsx_tmp), FileFormat=51)
         wb.Close(False)
         wb = None
-        catalog = parse_pedido_workbook(load_workbook(xlsx_tmp, data_only=True))
+        ox = load_workbook(xlsx_tmp, data_only=True)
         try:
-            xlsx_tmp.unlink(missing_ok=True)
-        except Exception:
-            pass
-        return catalog
+            if preview_only:
+                return preview_pedido_workbook(ox)
+            return parse_pedido_workbook(ox, abas_filtro=abas_filtro)
+        finally:
+            try:
+                ox.close()
+            except Exception:
+                pass
+            try:
+                xlsx_tmp.unlink(missing_ok=True)
+            except Exception:
+                pass
     finally:
         try:
             if wb is not None:
@@ -1264,14 +1435,33 @@ def importar_catalogo():
     uid = resolve_unidade()
     f = request.files.get("arquivo")
     password = (request.form.get("senha") or "").strip() or None
+    abas_sel = request.form.getlist("abas") or request.form.getlist("abas[]")
     if not f or not f.filename:
         flash("Selecione o arquivo de pedidos (catálogo).", "erro")
         return redirect(url_for("index", unidade=uid))
     try:
-        catalog = import_pedido_file(f.read(), f.filename, password)
+        filtro = set(abas_sel) if abas_sel else None
+        catalog = import_pedido_file(
+            f.read(), f.filename, password, abas_filtro=filtro
+        )
         if not catalog["abas"]:
             flash("Nenhuma aba de pedido encontrada no arquivo.", "erro")
             return redirect(url_for("index", unidade=uid))
+        cfg = unidade_cfg(uid)
+        catalog.setdefault("modelo", cfg.get("modelo") or "ponto")
+        # mescla com catálogo existente se pedido
+        if request.form.get("modo") == "mesclar":
+            atual = load_catalogo(uid)
+            itens = dict(atual.get("itens") or {})
+            abas_map = {a["id"]: a for a in (atual.get("abas") or [])}
+            for a in catalog["abas"]:
+                abas_map[a["id"]] = a
+                itens[a["id"]] = catalog["itens"].get(a["id"], [])
+            catalog = {
+                "abas": list(abas_map.values()),
+                "itens": itens,
+                "modelo": catalog.get("modelo") or atual.get("modelo") or cfg["modelo"],
+            }
         save_catalogo(catalog, uid)
         total = sum(a["count"] for a in catalog["abas"])
         flash(
@@ -1281,6 +1471,94 @@ def importar_catalogo():
     except Exception as e:
         flash(str(e), "erro")
     return redirect(url_for("index", unidade=uid))
+
+
+@app.route("/api/catalogo/preview", methods=["POST"])
+@login_required
+def api_catalogo_preview():
+    f = request.files.get("arquivo")
+    password = (request.form.get("senha") or "").strip() or None
+    if not f or not f.filename:
+        return jsonify({"ok": False, "erro": "Selecione o Excel de pedidos."}), 400
+    try:
+        preview = import_pedido_file(
+            f.read(), f.filename, password, preview_only=True
+        )
+        return jsonify({"ok": True, "arquivo": Path(f.filename).name, **preview})
+    except Exception as e:
+        return jsonify({"ok": False, "erro": str(e)}), 400
+
+
+@app.route("/api/catalogo/item", methods=["POST"])
+@login_required
+def api_catalogo_item():
+    """Insere medicamento manualmente no catálogo da unidade."""
+    data = request.get_json(force=True) if request.is_json else request.form
+    uid = resolve_unidade(data.get("unidade"))
+    aba_titulo = (data.get("aba") or data.get("aba_titulo") or "MANUAL").strip() or "MANUAL"
+    aba_id = _aba_id_from_name(data.get("aba_id") or aba_titulo)
+    desc = (data.get("descricao") or "").strip()
+    if not desc:
+        return jsonify({"ok": False, "erro": "Informe a descrição."}), 400
+    try:
+        est_min = float(data.get("estoque_minimo") or 0)
+        ponto = float(data.get("ponto_pedido") if data.get("ponto_pedido") not in (None, "") else est_min)
+        caixa = float(data.get("caixa_com") or 1)
+    except (TypeError, ValueError):
+        return jsonify({"ok": False, "erro": "Valores numéricos inválidos."}), 400
+    if caixa <= 0:
+        caixa = 1.0
+    cod_raw = data.get("codigo")
+    if cod_raw in (None, ""):
+        return jsonify({"ok": False, "erro": "Informe o Cód. AGHU."}), 400
+    cod = normaliza_codigo(cod_raw)
+    if not cod:
+        return jsonify({"ok": False, "erro": "Código AGHU inválido."}), 400
+
+    catalogo = load_catalogo(uid)
+    cfg = unidade_cfg(uid)
+    catalogo.setdefault("modelo", cfg.get("modelo") or "ponto")
+    catalogo.setdefault("abas", [])
+    catalogo.setdefault("itens", {})
+
+    if aba_id not in catalogo["itens"]:
+        catalogo["itens"][aba_id] = []
+        catalogo["abas"].append({"id": aba_id, "titulo": aba_titulo, "count": 0})
+
+    item = {
+        "codigo": int(cod),
+        "descricao": desc,
+        "estoque_minimo": est_min,
+        "ponto_pedido": ponto,
+        "caixa_com": caixa,
+    }
+    # substitui se código já existe na aba
+    lista = catalogo["itens"][aba_id]
+    replaced = False
+    for i, old in enumerate(lista):
+        if str(old.get("codigo")) == cod:
+            lista[i] = item
+            replaced = True
+            break
+    if not replaced:
+        lista.append(item)
+
+    for a in catalogo["abas"]:
+        if a["id"] == aba_id:
+            a["titulo"] = aba_titulo
+            a["count"] = len(lista)
+            break
+
+    save_catalogo(catalogo, uid)
+    return jsonify(
+        {
+            "ok": True,
+            "substituido": replaced,
+            "aba": aba_id,
+            "codigo": int(cod),
+            "total_aba": len(lista),
+        }
+    )
 
 
 @app.route("/importar/estoque", methods=["POST"])

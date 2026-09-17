@@ -118,6 +118,19 @@
     </div>
   </section>
 
+  <section class="top-cards">
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h2>Catálogo</h2>
+        <p>{{ total_catalogo }} itens · {{ abas|length }} categorias</p>
+      </div>
+      <div class="panel-card-body" style="gap:0.5rem">
+        <button type="button" class="btn" id="btnImportCatalogo">Importar Excel de pedidos</button>
+        <button type="button" class="btn btn-quiet" id="btnAddMedicamento">+ Medicamento manual</button>
+      </div>
+    </div>
+  </section>
+
   <section class="panel-card filter-card">
     <div class="panel-card-head">
       <h2>Buscar na lista</h2>
@@ -229,21 +242,11 @@
   {% else %}
   <section class="empty-state">
     <h2>Catálogo pendente — {{ unidade.titulo }}</h2>
-    <p>Importe a planilha de pedidos (abas com Cód. AGHU) para começar.</p>
-    <form
-      class="panel-card"
-      style="max-width:28rem;margin:1rem auto 0;text-align:left"
-      action="{{ url_for('importar_catalogo') }}"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <input type="hidden" name="unidade" value="{{ unidade_id }}" />
-      <div class="panel-card-body" style="flex-direction:column;align-items:stretch;gap:0.6rem">
-        <input type="file" name="arquivo" accept=".xlsx,.xls" required />
-        <input type="password" name="senha" placeholder="Senha do Excel (se houver)" />
-        <button type="submit" class="btn btn-primary">Importar catálogo</button>
-      </div>
-    </form>
+    <p>Importe o Excel de pedidos (abas = categorias; colunas A–E = código, nome, est. mín., ponto, caixa) ou cadastre itens à mão.</p>
+    <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
+      <button type="button" class="btn btn-primary" id="btnImportCatalogo">Importar Excel de pedidos</button>
+      <button type="button" class="btn" id="btnAddMedicamento">+ Medicamento manual</button>
+    </div>
     {% if unidade.dinamica and is_admin %}
     <form
       method="post"
@@ -287,9 +290,99 @@
           Dica do Excel de estoque
           <input type="text" name="hint_estoque" placeholder="Ex.: EstoqueFarmacia…" />
         </label>
+        <p style="margin:0;font-size:0.82rem;color:var(--muted)">
+          Depois de criar, importe o Excel de pedidos (cada aba vira uma categoria) ou cadastre medicamentos manualmente.
+        </p>
         <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.4rem">
           <button type="button" class="btn btn-quiet" data-close-unidade>Cancelar</button>
           <button type="submit" class="btn btn-primary">Criar unidade</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalCatalogo" class="modal" hidden>
+    <div class="modal-backdrop" data-close-catalogo></div>
+    <div class="modal-card modal-card-wide" role="dialog" aria-labelledby="modalCatalogoTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalCatalogoTitle">Importar Excel de pedidos</h2>
+          <p>O site identifica as abas e as colunas A–E. Escolha o que importar.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-catalogo aria-label="Fechar">×</button>
+      </div>
+      <div class="modal-body">
+        <label>
+          Arquivo (.xlsx / .xls)
+          <input type="file" id="catalogoArquivo" accept=".xlsx,.xls" />
+        </label>
+        <label>
+          Senha do Excel (se houver)
+          <input type="password" id="catalogoSenha" placeholder="Opcional" />
+        </label>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button type="button" class="btn btn-primary" id="btnAnalisarCatalogo">Analisar planilha</button>
+          <label class="chk-inline">
+            <input type="checkbox" id="catalogoMesclar" />
+            Mesclar com catálogo atual
+          </label>
+        </div>
+        <div id="catalogoPreview" class="catalogo-preview" hidden></div>
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.4rem">
+          <button type="button" class="btn btn-quiet" data-close-catalogo>Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmarCatalogo" disabled>Importar selecionadas</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalMedicamento" class="modal" hidden>
+    <div class="modal-backdrop" data-close-med></div>
+    <div class="modal-card" role="dialog" aria-labelledby="modalMedTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalMedTitle">Medicamento manual</h2>
+          <p>Entra no catálogo da unidade {{ unidade.titulo }}.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-med aria-label="Fechar">×</button>
+      </div>
+      <form class="modal-body" id="formMedicamentoManual">
+        <input type="hidden" name="unidade" value="{{ unidade_id }}" />
+        <label>
+          Categoria
+          <input list="listaAbasUnidade" name="aba" placeholder="Ex.: COMPRIMIDOS ou MANUAL" value="MANUAL" required />
+          <datalist id="listaAbasUnidade">
+            {% for a in abas or [] %}
+            <option value="{{ a.titulo }}"></option>
+            {% endfor %}
+            <option value="MANUAL"></option>
+          </datalist>
+        </label>
+        <label>
+          Cód. AGHU
+          <input type="text" name="codigo" required placeholder="Ex.: 205125" />
+        </label>
+        <label>
+          Descrição
+          <input type="text" name="descricao" required placeholder="Nome do medicamento" />
+        </label>
+        <div class="form-row-3">
+          <label>
+            Est. mín.
+            <input type="number" name="estoque_minimo" min="0" step="1" value="0" required />
+          </label>
+          <label>
+            Ponto
+            <input type="number" name="ponto_pedido" min="0" step="1" value="0" required />
+          </label>
+          <label>
+            Caixa
+            <input type="number" name="caixa_com" min="1" step="1" value="1" required />
+          </label>
+        </div>
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.4rem">
+          <button type="button" class="btn btn-quiet" data-close-med>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar no catálogo</button>
         </div>
       </form>
     </div>

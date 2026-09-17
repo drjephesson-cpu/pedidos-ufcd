@@ -526,6 +526,73 @@ td.col-qtde-pedir {
   box-shadow: 0 24px 60px rgba(0,0,0,0.18);
   animation: rise 0.2s ease both;
 }
+.modal-card-wide {
+  width: min(720px, 100%);
+  max-height: min(88vh, 760px);
+}
+.chk-inline {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--muted);
+  grid-template-columns: none !important;
+}
+.chk-inline input { width: auto; }
+.form-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+.catalogo-preview {
+  margin-top: 0.35rem;
+  display: grid;
+  gap: 0.65rem;
+  max-height: 42vh;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+.catalogo-preview-summary {
+  font-size: 0.86rem;
+  color: var(--muted);
+  font-weight: 650;
+}
+.catalogo-aba {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  background: #fbfcfb;
+}
+.catalogo-aba-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 750;
+  margin-bottom: 0.4rem;
+}
+.catalogo-aba-head em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.catalogo-aba table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.catalogo-aba th,
+.catalogo-aba td {
+  border-top: 1px solid var(--line);
+  padding: 0.28rem 0.3rem;
+  text-align: left;
+}
+.catalogo-aba th { color: var(--muted); font-weight: 700; }
+.catalogo-ignoradas {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
 .modal-head {
   display: flex;
   justify-content: space-between;
