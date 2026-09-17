@@ -1289,7 +1289,8 @@ def usuarios_senha(user_id: int):
 @login_required
 def unidades_criar():
     titulo = (request.form.get("titulo") or "").strip()
-    modelo = (request.form.get("modelo") or "ponto").strip().lower()
+    # Modelo vem do Excel/catálogo importado; padrão = ponto (como UFCD)
+    modelo = "ponto"
     hint = (request.form.get("hint_estoque") or "").strip()
     raw_id = (request.form.get("id") or "").strip().lower()
     if not titulo:
@@ -1312,14 +1313,8 @@ def unidades_criar():
             flash("Não foi possível gerar um id único.", "erro")
             return redirect(url_for("index"))
 
-    if modelo not in ("ponto", "minimo"):
-        modelo = "ponto"
     if not hint:
-        hint = (
-            "EstoqueFarmaciaBloco"
-            if modelo == "minimo"
-            else "EstoqueFarmacia (saldo farmácia)"
-        )
+        hint = "EstoqueFarmacia (saldo farmácia)"
 
     try:
         criar_unidade_db(
