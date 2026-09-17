@@ -19,6 +19,9 @@
         <select name="role">
           <option value="usuario">Usuário</option>
           <option value="admin">Administrador</option>
+          {% if is_master %}
+          <option value="master">Master</option>
+          {% endif %}
         </select>
         <button type="submit" class="btn btn-primary">Adicionar</button>
       </div>
@@ -47,6 +50,9 @@
               <select name="role" onchange="this.form.submit()">
                 <option value="usuario" {% if u.role == 'usuario' %}selected{% endif %}>Usuário</option>
                 <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Administrador</option>
+                {% if is_master %}
+                <option value="master" {% if u.role == 'master' %}selected{% endif %}>Master</option>
+                {% endif %}
               </select>
             </form>
           </td>

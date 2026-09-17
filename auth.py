@@ -22,7 +22,7 @@ ADMIN_SEED = {
         "4498fb103ed137aeda0e1f39a4d4c8a0635144d192ab0b809ef99dc5f74af7f7"
         "75a4bd52a41015adbd8ca887da8eb7ce20ba0f8673d011d4284a748916f9602a"
     ),
-    "role": "admin",
+    "role": "master",
     "nome": "Jephesson",
 }
 
@@ -41,8 +41,14 @@ RESTORE_USERS = [
     },
 ]
 
-ROLES = ("admin", "usuario")
-
+# admin = gestão do dia a dia; master = desenvolvedor / dono (exclui unidades etc.)
+ROLES = ("master", "admin", "usuario")
+MASTER_USERNAMES = {"jephesson"}
+ROLE_LABELS = {
+    "master": "Master",
+    "admin": "Administrador",
+    "usuario": "Usuário",
+}
 
 class UserStore:
     def __init__(self, db_path: Path | None = None):
@@ -83,6 +89,18 @@ class UserStore:
                         "role": ADMIN_SEED["role"],
                         "nome": ADMIN_SEED["nome"],
                     },
+                )
+            else:
+                # Garante papel master no desenvolvedor seed
+                conn.execute(
+                    text(
+                        """
+                        UPDATE users SET role = 'master'
+                        WHERE LOWER(username) = LOWER(:username)
+                          AND role <> 'master'
+                        """
+                    ),
+                    {"username": ADMIN_SEED["username"]},
                 )
 
             temp_pw = (os.environ.get("DEFAULT_USER_PASSWORD") or "Alterar@2026").strip()
@@ -198,8 +216,12 @@ class UserStore:
         user = self.get_user(user_id)
         if not user:
             return False, "Usuário não encontrado."
-        if user["username"].lower() == ADMIN_SEED["username"].lower() and role != "admin":
-            return False, "Não é permitido remover o admin principal."
+        uname = (user["username"] or "").lower()
+        if uname == ADMIN_SEED["username"].lower() and role != "master":
+            return False, "Não é permitido remover o master/desenvolvedor principal."
+        actor = current_user() or {}
+        if role == "master" and not is_master(actor):
+            return False, "Somente master pode atribuir o papel Master."
         with connect(self._sqlite_path()) as conn:
             conn.execute(
                 text("UPDATE users SET role = :role WHERE id = :id"),
@@ -212,7 +234,7 @@ class UserStore:
         if not user:
             return False, "Usuário não encontrado."
         if user["username"].lower() == ADMIN_SEED["username"].lower() and not ativo:
-            return False, "Não é permitido desativar o admin principal."
+            return False, "Não é permitido desativar o master/desenvolvedor principal."
         with connect(self._sqlite_path()) as conn:
             conn.execute(
                 text("UPDATE users SET ativo = :ativo WHERE id = :id"),
@@ -225,7 +247,7 @@ class UserStore:
         if not user:
             return False, "Usuário não encontrado."
         if user["username"].lower() == ADMIN_SEED["username"].lower():
-            return False, "Não é permitido excluir o admin principal."
+            return False, "Não é permitido excluir o master/desenvolvedor principal."
         with connect(self._sqlite_path()) as conn:
             conn.execute(text("DELETE FROM users WHERE id = :id"), {"id": user_id})
         return True, "Usuário excluído."
@@ -259,8 +281,22 @@ def admin_required(view):
         user = session.get("user")
         if not user:
             return redirect(url_for("login", next=request_path()))
-        if user.get("role") != "admin":
+        if user.get("role") not in ("admin", "master"):
             flash("Acesso restrito a administradores.", "erro")
+            return redirect(url_for("index"))
+        return view(*args, **kwargs)
+
+    return wrapped
+
+
+def master_required(view):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        user = session.get("user")
+        if not user:
+            return redirect(url_for("login", next=request_path()))
+        if not is_master(user):
+            flash("Acesso restrito a master/desenvolvedor.", "erro")
             return redirect(url_for("index"))
         return view(*args, **kwargs)
 
@@ -278,5 +314,16 @@ def current_user() -> dict | None:
 
 
 def is_admin() -> bool:
+    """Admin ou master (master herda privilégios de admin)."""
     user = current_user()
-    return bool(user and user.get("role") == "admin")
+    return bool(user and user.get("role") in ("admin", "master"))
+
+
+def is_master(user: dict | None = None) -> bool:
+    """Desenvolvedor (jephesson) ou papel master."""
+    u = user if user is not None else current_user()
+    if not u:
+        return False
+    if u.get("role") == "master":
+        return True
+    return (u.get("username") or "").lower() in MASTER_USERNAMES

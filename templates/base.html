@@ -61,7 +61,7 @@
         {% if user %}
         <div class="sidebar-user">
           <strong>{{ user.nome }}</strong>
-          <span>{{ 'Admin' if is_admin else 'Usuário' }}{% if usando_neon %} · Neon{% endif %}</span>
+          <span>{{ role_labels.get(user.role, user.role) if user else 'Usuário' }}{% if usando_neon %} · Neon{% endif %}</span>
         </div>
         {% endif %}
         <a class="nav-link logout" href="{{ url_for('logout') }}">Sair</a>

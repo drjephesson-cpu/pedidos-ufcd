@@ -42,11 +42,15 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from werkzeug.utils import secure_filename
 
 from auth import (
+    ROLE_LABELS,
+    ROLES,
     UserStore,
     admin_required,
     current_user,
     is_admin,
+    is_master,
     login_required,
+    master_required,
 )
 from db import (
     criar_pedido,
@@ -243,10 +247,12 @@ def inject_globals():
     return {
         "user": current_user(),
         "is_admin": is_admin(),
+        "is_master": is_master(),
         "usando_neon": using_neon(),
         "unidades": unidades,
         "unidade_id": uid,
         "unidade": unidades[uid],
+        "role_labels": ROLE_LABELS,
     }
 
 # Abas na mesma ordem da planilha (exceto Estoque)
@@ -1340,7 +1346,7 @@ def unidades_criar():
 
 
 @app.route("/unidades/<uid>/excluir", methods=["POST"])
-@admin_required
+@master_required
 def unidades_excluir(uid: str):
     uid = (uid or "").strip().lower()
     if uid in UNIDADES_FIXAS:

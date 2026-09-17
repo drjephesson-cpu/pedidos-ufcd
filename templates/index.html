@@ -48,10 +48,30 @@
           {% if contagens.get(a.id, 0) %}<em>{{ contagens[a.id] }}</em>{% endif %}
         </a>
         {% endfor %}
+        {% if is_master and ucfg.dinamica %}
+        <form
+          method="post"
+          action="{{ url_for('unidades_excluir', uid=uid) }}"
+          class="side-cat-form"
+          onsubmit="return confirm('Excluir a unidade {{ ucfg.titulo }}? Esta ação não remove o histórico já salvo.');"
+        >
+          <button type="submit" class="side-cat danger">Excluir unidade</button>
+        </form>
+        {% endif %}
         {% else %}
         <a class="side-cat" href="{{ url_for('index', unidade=uid) }}">
           <span>Abrir unidade</span>
         </a>
+        {% if is_master and ucfg.dinamica %}
+        <form
+          method="post"
+          action="{{ url_for('unidades_excluir', uid=uid) }}"
+          class="side-cat-form"
+          onsubmit="return confirm('Excluir a unidade {{ ucfg.titulo }}? Esta ação não remove o histórico já salvo.');"
+        >
+          <button type="submit" class="side-cat danger">Excluir unidade</button>
+        </form>
+        {% endif %}
         {% endif %}
       </div>
       {% endfor %}
@@ -247,7 +267,7 @@
       <button type="button" class="btn btn-primary" id="btnImportCatalogo">Importar Excel de pedidos</button>
       <button type="button" class="btn" id="btnAddMedicamento">+ Medicamento manual</button>
     </div>
-    {% if unidade.dinamica and is_admin %}
+    {% if unidade.dinamica and is_master %}
     <form
       method="post"
       action="{{ url_for('unidades_excluir', uid=unidade_id) }}"
