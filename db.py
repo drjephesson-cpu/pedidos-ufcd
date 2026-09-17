@@ -12,7 +12,7 @@ from typing import Any
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import QueuePool
 
 _engine: Engine | None = None
 
@@ -54,9 +54,17 @@ def get_engine(sqlite_path: Path | None = None) -> Engine:
             connect_args["check_same_thread"] = False
             engine_kwargs["pool_pre_ping"] = True
         else:
-            # Serverless (Vercel): sem pool persistente; timeout evita hang longo
+            # Reusa 1 conexão na instância quente do Vercel (NullPool abria TCP a cada request)
             connect_args["connect_timeout"] = 10
-            engine_kwargs["poolclass"] = NullPool
+            engine_kwargs.update(
+                {
+                    "poolclass": QueuePool,
+                    "pool_size": 1,
+                    "max_overflow": 0,
+                    "pool_pre_ping": True,
+                    "pool_recycle": 280,
+                }
+            )
         _engine = create_engine(url, **engine_kwargs)
     return _engine
 

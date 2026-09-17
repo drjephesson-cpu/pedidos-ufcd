@@ -16,6 +16,7 @@ import math
 import os
 import re
 import tempfile
+import time
 from datetime import date, datetime
 from pathlib import Path
 
@@ -145,6 +146,32 @@ def slugify_unidade(titulo: str) -> str:
     return slug[:40]
 
 
+# Cache em memória da instância Vercel (entre requests “quentes”)
+_mem_cache: dict[str, tuple[float, object]] = {}
+
+
+def _cache_get(key: str, ttl: float):
+    hit = _mem_cache.get(key)
+    if not hit:
+        return None
+    ts, val = hit
+    if time.monotonic() - ts > ttl:
+        _mem_cache.pop(key, None)
+        return None
+    return val
+
+
+def _cache_set(key: str, val):
+    _mem_cache[key] = (time.monotonic(), val)
+    return val
+
+
+def _cache_del_prefix(prefix: str) -> None:
+    for k in list(_mem_cache.keys()):
+        if k.startswith(prefix):
+            _mem_cache.pop(k, None)
+
+
 def unidades_todas() -> dict:
     """UFCD + CC + unidades criadas no Neon/SQLite."""
     try:
@@ -155,26 +182,32 @@ def unidades_todas() -> dict:
     except Exception:
         pass
 
-    merged = {k: dict(v) for k, v in UNIDADES_FIXAS.items()}
-    try:
-        for row in listar_unidades_db(_db_path_unidades()):
-            uid = row["id"]
-            if uid in UNIDADES_FIXAS:
-                continue
-            merged[uid] = {
-                "id": uid,
-                "titulo": row["titulo"],
-                "catalogo": None,
-                "estoque_file": f"estoque_{uid}.json",
-                "legacy_estoque": [],
-                "modelo": row["modelo"],
-                "hint_estoque": row["hint_estoque"],
-                "mostra_ponto_caixa": row["mostra_ponto_caixa"],
-                "aba_ordem": None,
-                "dinamica": True,
-            }
-    except Exception as exc:
-        print("aviso listar_unidades_db:", exc)
+    cached = _cache_get("unidades_todas", ttl=60.0)
+    if cached is not None:
+        merged = cached
+    else:
+        merged = {k: dict(v) for k, v in UNIDADES_FIXAS.items()}
+        try:
+            for row in listar_unidades_db(_db_path_unidades()):
+                uid = row["id"]
+                if uid in UNIDADES_FIXAS:
+                    continue
+                merged[uid] = {
+                    "id": uid,
+                    "titulo": row["titulo"],
+                    "catalogo": None,
+                    "estoque_file": f"estoque_{uid}.json",
+                    "legacy_estoque": [],
+                    "modelo": row["modelo"],
+                    "hint_estoque": row["hint_estoque"],
+                    "mostra_ponto_caixa": row["mostra_ponto_caixa"],
+                    "aba_ordem": None,
+                    "dinamica": True,
+                }
+        except Exception as exc:
+            print("aviso listar_unidades_db:", exc)
+        _cache_set("unidades_todas", merged)
+
     global UNIDADES
     UNIDADES = merged
     try:
@@ -379,7 +412,12 @@ def load_estoque(unidade: str | None = None) -> dict:
         cache = None
 
     if using_neon():
-        data = load_estoque_db(uid, None) or {}
+        mem = _cache_get(f"estoque:{uid}", ttl=45.0)
+        if mem is not None:
+            data = mem
+        else:
+            data = load_estoque_db(uid, None) or {}
+            _cache_set(f"estoque:{uid}", data)
     else:
         path = estoque_path_for(uid)
         data = {} if not path.exists() else json.loads(path.read_text(encoding="utf-8"))
@@ -394,13 +432,14 @@ def save_estoque(mapa: dict, meta: dict | None = None, unidade: str | None = Non
     if using_neon():
         save_estoque_db(uid, mapa, payload_meta, None)
     else:
-        cfg = UNIDADES[uid]
+        cfg = UNIDADES[uid] if uid in UNIDADES else unidade_cfg(uid)
         path = WRITABLE / cfg["estoque_file"]
         path.parent.mkdir(parents=True, exist_ok=True)
         payload = {"saldos": mapa, "meta": payload_meta}
         path.write_text(
             json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
         )
+    _cache_del_prefix(f"estoque:{uid}")
     try:
         from flask import g, has_request_context
 
@@ -1043,7 +1082,7 @@ def listar_itens_filtrados(
     catalogo = load_catalogo(uid)
     saldos = estoque_saldos(uid)
     manuais = manuais_da_unidade(uid)
-    parametros = load_catalogo_parametros(uid, _db_path())
+    parametros = parametros_da_unidade(uid)
     abas = catalogo.get("abas") or []
     abas_sorted = ordenar_abas(abas, uid)
     modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
@@ -1086,6 +1125,16 @@ def itens_para_pdf(itens: list[dict]) -> list[dict]:
 
 def _db_path():
     return None if using_neon() else PEDIDOS_SQLITE
+
+
+def parametros_da_unidade(uid: str) -> dict:
+    """Parâmetros editados (Neon) com cache curto na instância."""
+    key = f"params:{uid}"
+    hit = _cache_get(key, ttl=60.0)
+    if hit is not None:
+        return hit
+    data = load_catalogo_parametros(uid, _db_path())
+    return _cache_set(key, data)
 
 
 def autosave_pedido_dia(
@@ -1136,7 +1185,7 @@ def coletar_itens_pedido(incluir_extras: bool = True, unidade: str | None = None
     catalogo = load_catalogo(uid)
     saldos = estoque_saldos(uid)
     manuais = manuais_da_unidade(uid)
-    parametros = load_catalogo_parametros(uid, _db_path())
+    parametros = parametros_da_unidade(uid)
     modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
     out: list[dict] = []
     vistos: set[str] = set()
@@ -1325,6 +1374,7 @@ def unidades_criar():
             mostra_ponto_caixa=(modelo == "ponto"),
             sqlite_path=_db_path_unidades(),
         )
+        _cache_del_prefix("unidades")
         # invalida cache da request
         try:
             from flask import g
@@ -1350,6 +1400,9 @@ def unidades_excluir(uid: str):
     try:
         ok = excluir_unidade_db(uid, _db_path_unidades())
         _catalogo_cache.pop(f"db:{uid}", None)
+        _cache_del_prefix("unidades")
+        _cache_del_prefix(f"estoque:{uid}")
+        _cache_del_prefix(f"params:{uid}")
         try:
             from flask import g
 
@@ -1382,7 +1435,7 @@ def index():
 
     manuais = manuais_da_unidade(uid)
     modelo = catalogo.get("modelo") or cfg["modelo"]
-    parametros = load_catalogo_parametros(uid, _db_path())
+    parametros = parametros_da_unidade(uid)
 
     # Uma passagem só: contagens + lista filtrada (antes recalculava 2–3× + outra unidade)
     todos = montar_todos(
@@ -1620,7 +1673,7 @@ def api_manual():
     catalogo = load_catalogo(uid)
     saldos = estoque_saldos(uid)
     manuais = manuais_da_unidade(uid)
-    parametros = load_catalogo_parametros(uid, _db_path())
+    parametros = parametros_da_unidade(uid)
     modelo = catalogo.get("modelo") or unidade_cfg(uid)["modelo"]
     item_raw = None
     aba_titulo = ""
@@ -1691,6 +1744,7 @@ def api_parametros():
         )
     except Exception as e:
         return jsonify({"ok": False, "erro": str(e)}), 500
+    _cache_del_prefix(f"params:{uid}")
     return jsonify({"ok": True})
 
 
