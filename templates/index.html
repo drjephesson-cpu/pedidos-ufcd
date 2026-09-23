@@ -6,21 +6,19 @@
 {% block page_sub %}Unidade {{ unidade.titulo }} · match por Cód. AGHU{% endblock %}
 
 {% block top_actions %}
-  <div class="top-pedido-meta">
-    {% if ultimo_pedido %}
-    <span class="ultimo-pedido-pill" title="Último pedido gravado no histórico">
-      Último pedido {{ ultimo_pedido.data }}
-      {% if ultimo_pedido.id %} · #{{ ultimo_pedido.id }}{% endif %}
-    </span>
+  <div class="acao-rapida">
+    {% if ultimo_pedido and ultimo_pedido.id %}
+    <a
+      class="btn"
+      href="{{ url_for('historico_detalhe', pedido_id=ultimo_pedido.id) }}"
+      title="{{ ultimo_pedido.data }} · {{ ultimo_pedido.usuario }}"
+    >Ver último pedido</a>
     {% else %}
-    <span class="ultimo-pedido-pill muted">Nenhum pedido salvo ainda</span>
+    <button type="button" class="btn" disabled title="Nenhum pedido salvo ainda">Ver último pedido</button>
     {% endif %}
+    <a class="btn btn-primary" href="#secaoNovoPedido" id="btnCriarNovoPedido">Criar novo pedido</a>
+    <a class="btn" href="#secaoMedicamentos" id="btnVerMedicamentos">Ver lista de medicamentos</a>
   </div>
-  <label class="date-field compact">
-    Data do save
-    <input type="text" id="dataPedido" value="{{ hoje }}" form="formSalvar" />
-  </label>
-  <button type="submit" class="btn btn-primary" form="formSalvar">Salvar</button>
 {% endblock %}
 
 {% block sidebar_extra %}
@@ -110,24 +108,26 @@
 
     <form class="panel-card" id="formSalvar" action="{{ url_for('pedido_salvar') }}" method="post">
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
-      <div class="panel-card-head">
-        <h2>Pedido do dia</h2>
+      <div class="panel-card-head" id="secaoNovoPedido">
+        <h2>Criar novo pedido</h2>
         <p id="pedidoDiaStatus">
           {% if ultimo_pedido %}
             Último no histórico: {{ ultimo_pedido.data }}
             {% if ultimo_pedido.id %} · #{{ ultimo_pedido.id }}{% endif %}
             · {{ ultimo_pedido.usuario }}
-          {% elif autosave_info %}
-            Salvo automaticamente #{{ autosave_info[0] }} · {{ autosave_info[1] }} itens
           {% else %}
-            Ainda não há pedido salvo — a data ao lado é só para o próximo save
+            Nenhum pedido salvo ainda nesta unidade
           {% endif %}
         </p>
       </div>
-      <div class="panel-card-body">
+      <div class="panel-card-body wrap-actions">
+        <label class="date-field compact">
+          Data do pedido
+          <input type="text" id="dataPedido" name="data_pedido_display" value="{{ hoje }}" />
+        </label>
         <input type="hidden" name="data_pedido" id="dataPedidoHidden" value="{{ hoje }}" />
-        <input type="text" name="observacao" placeholder="Observação (opcional)" class="grow-input" />
-        <button type="submit" class="btn">Salvar / atualizar agora</button>
+        <input type="text" name="observacao" id="obsPedido" placeholder="Observação (opcional)" class="grow-input" />
+        <button type="submit" class="btn btn-primary">Salvar pedido</button>
       </div>
     </form>
   </section>
@@ -152,20 +152,20 @@
     </div>
   </section>
 
-  <section class="top-cards">
+  <section class="top-cards" id="secaoMedicamentos">
     <div class="panel-card">
       <div class="panel-card-head">
-        <h2>Catálogo</h2>
-        <p>{{ total_catalogo }} itens · {{ abas|length }} categorias</p>
+        <h2>Lista de medicamentos</h2>
+        <p>{{ total_catalogo }} itens · {{ abas|length }} categorias — use para conferir ou adicionar um novo</p>
       </div>
       <div class="panel-card-body" style="gap:0.5rem">
-        <button type="button" class="btn" id="btnImportCatalogo">Importar Excel de pedidos</button>
-        <button type="button" class="btn btn-quiet" id="btnAddMedicamento">+ Medicamento manual</button>
+        <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
+        <button type="button" class="btn btn-quiet" id="btnImportCatalogo">Importar Excel de pedidos</button>
       </div>
     </div>
   </section>
 
-  <section class="panel-card filter-card">
+  <section class="panel-card filter-card" id="listaMedicamentos">
     <div class="panel-card-head">
       <h2>Buscar na lista</h2>
       <p>{{ 'Todas as categorias' if ver_todos else ('Categoria: ' ~ aba_atual) }}</p>
@@ -274,12 +274,12 @@
     </table>
   </div>
   {% else %}
-  <section class="empty-state">
-    <h2>Catálogo pendente — {{ unidade.titulo }}</h2>
-    <p>Importe o Excel de pedidos (abas = categorias; colunas A–E = código, nome, est. mín., ponto, caixa) ou cadastre itens à mão.</p>
+  <section class="empty-state" id="secaoMedicamentos">
+    <h2>Lista de medicamentos — {{ unidade.titulo }}</h2>
+    <p>Importe o Excel de pedidos ou cadastre um medicamento para começar.</p>
     <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
-      <button type="button" class="btn btn-primary" id="btnImportCatalogo">Importar Excel de pedidos</button>
-      <button type="button" class="btn" id="btnAddMedicamento">+ Medicamento manual</button>
+      <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
+      <button type="button" class="btn" id="btnImportCatalogo">Importar Excel de pedidos</button>
     </div>
     {% if unidade.dinamica and is_master %}
     <form

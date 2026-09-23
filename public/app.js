@@ -277,6 +277,44 @@ if (dataInput) {
   syncDataPedido();
 }
 
+function highlightSection(el) {
+  if (!el) return;
+  el.classList.add("is-focus");
+  setTimeout(() => el.classList.remove("is-focus"), 1600);
+}
+
+document.getElementById("btnCriarNovoPedido")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  const params = new URLSearchParams(window.location.search);
+  params.set("filtro", "pedir");
+  if (!params.get("aba")) params.set("aba", "todos");
+  // marca para focar o formulário após o reload
+  try {
+    sessionStorage.setItem("foco_novo_pedido", "1");
+  } catch (err) {}
+  window.location.href = `${window.location.pathname}?${params.toString()}#secaoNovoPedido`;
+});
+
+document.getElementById("btnVerMedicamentos")?.addEventListener("click", (e) => {
+  // âncora nativa + destaque
+  const sec = document.getElementById("secaoMedicamentos");
+  highlightSection(sec || document.getElementById("listaMedicamentos"));
+});
+
+// Após "Criar novo pedido"
+(function () {
+  try {
+    if (sessionStorage.getItem("foco_novo_pedido") !== "1") return;
+    sessionStorage.removeItem("foco_novo_pedido");
+  } catch (err) {
+    return;
+  }
+  const form = document.getElementById("formSalvar");
+  const obs = document.getElementById("obsPedido");
+  highlightSection(form);
+  if (obs) setTimeout(() => obs.focus(), 250);
+})();
+
 const toggle = document.getElementById("sidebarToggle");
 if (toggle) {
   toggle.addEventListener("click", () => {

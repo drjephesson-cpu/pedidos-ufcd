@@ -253,8 +253,23 @@ a { color: inherit; }
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  align-items: end;
+  align-items: center;
   justify-content: flex-end;
+}
+.acao-rapida {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+.acao-rapida .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.panel-card-body.wrap-actions {
+  flex-wrap: wrap;
+  align-items: end;
 }
 .top-pedido-meta {
   display: flex;
@@ -275,6 +290,15 @@ a { color: inherit; }
 .ultimo-pedido-pill.muted {
   background: #eef1ef;
   color: var(--muted);
+}
+#secaoNovoPedido,
+#secaoMedicamentos,
+#listaMedicamentos {
+  scroll-margin-top: 1rem;
+}
+.panel-card.is-focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 .sidebar-toggle { display: none; }
 .main-content {
