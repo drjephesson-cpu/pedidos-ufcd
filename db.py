@@ -358,6 +358,31 @@ def buscar_pedido_id_dia(
     return int(row[0]) if row else None
 
 
+def ultimo_pedido_unidade(
+    unidade: str, sqlite_path: Path | None = None
+) -> dict[str, Any] | None:
+    """Retorna o pedido mais recente da unidade (data_pedido, id, usuario…)."""
+    unidade_id = _infer_unidade(unidade, None)
+    with connect(sqlite_path) as conn:
+        row = (
+            conn.execute(
+                text(
+                    """
+                    SELECT id, data_pedido, usuario, observacao, unidade, criado_em
+                    FROM pedidos
+                    WHERE unidade = :unidade
+                    ORDER BY data_pedido DESC, id DESC
+                    LIMIT 1
+                    """
+                ),
+                {"unidade": unidade_id},
+            )
+            .mappings()
+            .first()
+        )
+    return dict(row) if row else None
+
+
 def salvar_pedido_dia(
     data_pedido: date,
     usuario: str | None,

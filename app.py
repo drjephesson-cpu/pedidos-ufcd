@@ -70,6 +70,7 @@ from db import (
     save_catalogo_unidade_db,
     save_estoque_db,
     salvar_pedido_dia,
+    ultimo_pedido_unidade,
     using_neon,
 )
 from pdf_util import gerar_pdf_pedido
@@ -1137,6 +1138,21 @@ def parametros_da_unidade(uid: str) -> dict:
     return _cache_set(key, data)
 
 
+def ultimo_pedido_info(uid: str) -> dict | None:
+    """Último pedido salvo da unidade (com cache curto)."""
+    key = f"ultimo_pedido:{uid}"
+    hit = _cache_get(key, ttl=30.0)
+    if hit is not None:
+        return hit if hit else None
+    try:
+        ped = ultimo_pedido_unidade(uid, _db_path())
+    except Exception as exc:
+        print("aviso ultimo_pedido:", exc)
+        ped = None
+    _cache_set(key, ped or {})
+    return ped
+
+
 def autosave_pedido_dia(
     unidade: str,
     data_ped: date | None = None,
@@ -1167,6 +1183,7 @@ def autosave_pedido_dia(
         sqlite_path=_db_path(),
         unidade=unidade,
     )
+    _cache_del_prefix(f"ultimo_pedido:{unidade}")
     if not quiet:
         flash(
             f"Pedido do dia salvo automaticamente (#{pid}) — {len(itens)} itens.",
@@ -1459,6 +1476,24 @@ def index():
         for oid in UNIDADES
     }
 
+    ultimo = ultimo_pedido_info(uid)
+    ultimo_txt = None
+    if ultimo:
+        dp = ultimo.get("data_pedido")
+        if hasattr(dp, "strftime"):
+            data_str = dp.strftime("%d/%m/%Y")
+        else:
+            data_str = str(dp or "")[:10]
+            if len(data_str) == 10 and "-" in data_str:
+                y, m, d = data_str.split("-")
+                data_str = f"{d}/{m}/{y}"
+        user_str = (ultimo.get("usuario") or "").strip() or "—"
+        ultimo_txt = {
+            "id": ultimo.get("id"),
+            "data": data_str,
+            "usuario": user_str,
+        }
+
     return render_template(
         "index.html",
         abas=abas_sorted,
@@ -1480,6 +1515,7 @@ def index():
         unidade=cfg,
         mostra_ponto_caixa=True,
         autosave_info=None,
+        ultimo_pedido=ultimo_txt,
     )
 
 
@@ -1821,6 +1857,7 @@ def pedido_salvar():
             sqlite_path=_db_path(),
             unidade=uid,
         )
+        _cache_del_prefix(f"ultimo_pedido:{uid}")
         session["extras_manuais"] = []
         session.modified = True
         acao = "criado" if criado else "atualizado"

@@ -6,8 +6,18 @@
 {% block page_sub %}Unidade {{ unidade.titulo }} · match por Cód. AGHU{% endblock %}
 
 {% block top_actions %}
+  <div class="top-pedido-meta">
+    {% if ultimo_pedido %}
+    <span class="ultimo-pedido-pill" title="Último pedido gravado no histórico">
+      Último pedido {{ ultimo_pedido.data }}
+      {% if ultimo_pedido.id %} · #{{ ultimo_pedido.id }}{% endif %}
+    </span>
+    {% else %}
+    <span class="ultimo-pedido-pill muted">Nenhum pedido salvo ainda</span>
+    {% endif %}
+  </div>
   <label class="date-field compact">
-    Data
+    Data do save
     <input type="text" id="dataPedido" value="{{ hoje }}" form="formSalvar" />
   </label>
   <button type="submit" class="btn btn-primary" form="formSalvar">Salvar</button>
@@ -103,10 +113,14 @@
       <div class="panel-card-head">
         <h2>Pedido do dia</h2>
         <p id="pedidoDiaStatus">
-          {% if autosave_info %}
+          {% if ultimo_pedido %}
+            Último no histórico: {{ ultimo_pedido.data }}
+            {% if ultimo_pedido.id %} · #{{ ultimo_pedido.id }}{% endif %}
+            · {{ ultimo_pedido.usuario }}
+          {% elif autosave_info %}
             Salvo automaticamente #{{ autosave_info[0] }} · {{ autosave_info[1] }} itens
           {% else %}
-            Após o Excel, o pedido do dia grava sozinho no histórico (em segundo plano)
+            Ainda não há pedido salvo — a data ao lado é só para o próximo save
           {% endif %}
         </p>
       </div>
