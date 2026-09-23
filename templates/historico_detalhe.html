@@ -10,7 +10,8 @@
 {% endblock %}
 
 {% block top_actions %}
-  <a class="btn" href="{{ url_for('historico') }}">Voltar</a>
+  <a class="btn" href="{{ url_for('index', unidade=pedido.unidade or 'ufcd') }}">Voltar aos pedidos</a>
+  <a class="btn" href="{{ url_for('historico', unidade=pedido.unidade or '') }}">Histórico</a>
   <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=pedido.id) }}">PDF</a>
 {% endblock %}
 

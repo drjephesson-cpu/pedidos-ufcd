@@ -1488,8 +1488,13 @@ def index():
                 y, m, d = data_str.split("-")
                 data_str = f"{d}/{m}/{y}"
         user_str = (ultimo.get("usuario") or "").strip() or "—"
+        pid = ultimo.get("id")
+        try:
+            pid = int(pid) if pid is not None else None
+        except (TypeError, ValueError):
+            pid = None
         ultimo_txt = {
-            "id": ultimo.get("id"),
+            "id": pid,
             "data": data_str,
             "usuario": user_str,
         }
@@ -1914,6 +1919,28 @@ def pedido_pdf_atual():
     )
 
 
+@app.route("/pedido/ultimo")
+@login_required
+def pedido_ultimo():
+    """Abre o último pedido salvo da unidade (não a lista geral do histórico)."""
+    uid = resolve_unidade()
+    try:
+        ped = ultimo_pedido_info(uid)
+    except Exception as exc:
+        print("aviso pedido_ultimo:", exc)
+        ped = None
+    pid = None
+    if ped:
+        try:
+            pid = int(ped.get("id"))
+        except (TypeError, ValueError):
+            pid = None
+    if not pid:
+        flash("Nenhum pedido salvo ainda nesta unidade.", "erro")
+        return redirect(url_for("index", unidade=uid))
+    return redirect(url_for("historico_detalhe", pedido_id=pid))
+
+
 @app.route("/historico")
 @login_required
 def historico():
@@ -1985,10 +2012,15 @@ def historico():
 @app.route("/historico/<int:pedido_id>")
 @login_required
 def historico_detalhe(pedido_id: int):
-    ped = obter_pedido(pedido_id, _db_path())
+    try:
+        ped = obter_pedido(pedido_id, _db_path())
+    except Exception as exc:
+        print("erro historico_detalhe:", exc)
+        flash(f"Erro ao abrir pedido #{pedido_id}: {exc}", "erro")
+        return redirect(url_for("index"))
     if not ped:
-        flash("Pedido não encontrado.", "erro")
-        return redirect(url_for("historico"))
+        flash(f"Pedido #{pedido_id} não encontrado.", "erro")
+        return redirect(url_for("index"))
     uid = ped.get("unidade") or "ufcd"
     # agrupa itens por categoria (subitem)
     por_aba = []

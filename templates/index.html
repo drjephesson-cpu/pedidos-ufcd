@@ -10,8 +10,9 @@
     {% if ultimo_pedido and ultimo_pedido.id %}
     <a
       class="btn"
-      href="{{ url_for('historico_detalhe', pedido_id=ultimo_pedido.id) }}"
-      title="{{ ultimo_pedido.data }} · {{ ultimo_pedido.usuario }}"
+      id="btnVerUltimoPedido"
+      href="{{ url_for('pedido_ultimo', unidade=unidade_id) }}"
+      title="Abre o pedido #{{ ultimo_pedido.id }} · {{ ultimo_pedido.data }} · {{ ultimo_pedido.usuario }}"
     >Ver último pedido</a>
     {% else %}
     <button type="button" class="btn" disabled title="Nenhum pedido salvo ainda">Ver último pedido</button>

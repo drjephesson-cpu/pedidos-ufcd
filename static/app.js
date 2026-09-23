@@ -145,11 +145,13 @@ document.addEventListener("click", (e) => {
   const path = a.pathname || "";
   // Export PDF/Excel também passa pelo servidor
   NeonLoad.show(
-    path.includes("historico")
-      ? "Carregando histórico…"
-      : path.includes("pdf") || path.includes("export")
-        ? "Gerando arquivo…"
-        : "Carregando Neon…"
+    path.includes("pedido/ultimo") || /\/historico\/\d+/.test(path)
+      ? "Abrindo pedido…"
+      : path.includes("historico")
+        ? "Carregando histórico…"
+        : path.includes("pdf") || path.includes("export")
+          ? "Gerando arquivo…"
+          : "Carregando Neon…"
   );
 });
 
