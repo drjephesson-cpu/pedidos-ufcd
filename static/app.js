@@ -283,23 +283,56 @@ function highlightSection(el) {
   setTimeout(() => el.classList.remove("is-focus"), 1600);
 }
 
+function mostrarPainelInferior(abrir) {
+  const painel = document.getElementById("painelInferior");
+  if (!painel) return;
+  painel.hidden = !abrir;
+  try {
+    if (abrir) sessionStorage.setItem("mostrar_lista_med", "1");
+    else sessionStorage.removeItem("mostrar_lista_med");
+  } catch (err) {}
+  if (abrir) {
+    painel.scrollIntoView({ behavior: "smooth", block: "start" });
+    highlightSection(painel);
+  }
+}
+
 document.getElementById("btnCriarNovoPedido")?.addEventListener("click", (e) => {
   e.preventDefault();
-  const params = new URLSearchParams(window.location.search);
-  params.set("filtro", "pedir");
-  if (!params.get("aba")) params.set("aba", "todos");
-  // marca para focar o formulário após o reload
+  // não abre a lista — só o formulário de novo pedido
   try {
     sessionStorage.setItem("foco_novo_pedido", "1");
+    sessionStorage.removeItem("mostrar_lista_med");
   } catch (err) {}
+  const params = new URLSearchParams(window.location.search);
+  params.delete("lista");
+  params.delete("q");
+  if (!params.get("aba")) params.set("aba", "todos");
   window.location.href = `${window.location.pathname}?${params.toString()}#secaoNovoPedido`;
 });
 
 document.getElementById("btnVerMedicamentos")?.addEventListener("click", (e) => {
-  // âncora nativa + destaque
-  const sec = document.getElementById("secaoMedicamentos");
-  highlightSection(sec || document.getElementById("listaMedicamentos"));
+  e.preventDefault();
+  mostrarPainelInferior(true);
 });
+
+document.getElementById("btnFecharLista")?.addEventListener("click", () => {
+  mostrarPainelInferior(false);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Mantém lista aberta após filtrar / trocar aba (?lista=1 ou session)
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  let abrir = params.get("lista") === "1";
+  try {
+    if (sessionStorage.getItem("mostrar_lista_med") === "1") abrir = true;
+  } catch (err) {}
+  if (abrir) {
+    const painel = document.getElementById("painelInferior");
+    if (painel) painel.hidden = false;
+  }
+})();
 
 // Após "Criar novo pedido"
 (function () {

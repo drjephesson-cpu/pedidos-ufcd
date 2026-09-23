@@ -293,8 +293,26 @@ a { color: inherit; }
 }
 #secaoNovoPedido,
 #secaoMedicamentos,
-#listaMedicamentos {
+#listaMedicamentos,
+#painelInferior {
   scroll-margin-top: 1rem;
+}
+.painel-inferior {
+  display: grid;
+  gap: 0.75rem;
+}
+.painel-inferior[hidden] {
+  display: none !important;
+}
+.painel-inferior-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.15rem 0.1rem;
+}
+.painel-inferior-bar strong {
+  font-size: 0.95rem;
 }
 .panel-card.is-focus {
   outline: 2px solid var(--accent);

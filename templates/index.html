@@ -133,165 +133,179 @@
   </section>
 
   {% if tem_catalogo %}
-  <section class="top-cards metrics-cards">
-    <div class="panel-card metric-card">
-      <span>Itens</span>
-      <strong>{{ resumo.total }}</strong>
+  <div id="painelInferior" class="painel-inferior" hidden>
+    <div class="painel-inferior-bar">
+      <strong>Lista de medicamentos</strong>
+      <button type="button" class="btn btn-quiet" id="btnFecharLista">Fechar lista</button>
     </div>
-    <div class="panel-card metric-card accent">
-      <span>A pedir</span>
-      <strong>{{ resumo.pedir }}</strong>
-    </div>
-    <div class="panel-card metric-card">
-      <span>Sem saldo</span>
-      <strong>{{ resumo.sem_saldo }}</strong>
-    </div>
-    <div class="panel-card metric-card">
-      <span>Quantidade</span>
-      <strong>{{ resumo.qtd_pedir | int }}</strong>
-    </div>
-  </section>
 
-  <section class="top-cards" id="secaoMedicamentos">
-    <div class="panel-card">
+    <section class="top-cards metrics-cards">
+      <div class="panel-card metric-card">
+        <span>Itens</span>
+        <strong>{{ resumo.total }}</strong>
+      </div>
+      <div class="panel-card metric-card accent">
+        <span>A pedir</span>
+        <strong>{{ resumo.pedir }}</strong>
+      </div>
+      <div class="panel-card metric-card">
+        <span>Sem saldo</span>
+        <strong>{{ resumo.sem_saldo }}</strong>
+      </div>
+      <div class="panel-card metric-card">
+        <span>Quantidade</span>
+        <strong>{{ resumo.qtd_pedir | int }}</strong>
+      </div>
+    </section>
+
+    <section class="top-cards" id="secaoMedicamentos">
+      <div class="panel-card">
+        <div class="panel-card-head">
+          <h2>Lista de medicamentos</h2>
+          <p>{{ total_catalogo }} itens · {{ abas|length }} categorias — use para conferir ou adicionar um novo</p>
+        </div>
+        <div class="panel-card-body" style="gap:0.5rem">
+          <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
+          <button type="button" class="btn btn-quiet" id="btnImportCatalogo">Importar Excel de pedidos</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel-card filter-card" id="listaMedicamentos">
       <div class="panel-card-head">
-        <h2>Lista de medicamentos</h2>
-        <p>{{ total_catalogo }} itens · {{ abas|length }} categorias — use para conferir ou adicionar um novo</p>
+        <h2>Buscar na lista</h2>
+        <p>{{ 'Todas as categorias' if ver_todos else ('Categoria: ' ~ aba_atual) }}</p>
       </div>
-      <div class="panel-card-body" style="gap:0.5rem">
-        <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
-        <button type="button" class="btn btn-quiet" id="btnImportCatalogo">Importar Excel de pedidos</button>
-      </div>
-    </div>
-  </section>
+      <form class="panel-card-body filters" method="get">
+        <input type="hidden" name="unidade" value="{{ unidade_id }}" />
+        <input type="hidden" name="aba" value="{{ aba_atual }}" />
+        <input type="hidden" name="lista" value="1" />
+        <input type="search" name="q" value="{{ q }}" placeholder="Código ou medicamento…" />
+        <select name="filtro" id="filtroSelect" onchange="this.form.submit()">
+          <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
+          <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
+          <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
+        </select>
+        <a
+          class="btn export-link"
+          id="pdfExportBtn"
+          href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
+        >PDF</a>
+        <a
+          class="btn export-link"
+          id="excelExportBtn"
+          href="{{ url_for('exportar', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
+        >Excel</a>
+      </form>
+    </section>
 
-  <section class="panel-card filter-card" id="listaMedicamentos">
-    <div class="panel-card-head">
-      <h2>Buscar na lista</h2>
-      <p>{{ 'Todas as categorias' if ver_todos else ('Categoria: ' ~ aba_atual) }}</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            {% if ver_todos %}<th>Categoria</th>{% endif %}
+            <th>Cód. AGHU</th>
+            <th>{% if unidade.modelo == 'minimo' %}Item{% else %}Medicamento{% endif %}</th>
+            <th>Est. Mín.</th>
+            <th>Ponto</th>
+            <th>Caixa</th>
+            <th class="col-estoque">Estoque</th>
+            <th>Pedir?</th>
+            <th class="col-qtde">Qtde</th>
+            <th>Manual</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set cols = 10 + (1 if ver_todos else 0) %}
+          {% for it in itens %}
+          <tr
+            class="item-row {% if it.sem_estoque %}row-sem{% endif %}"
+            data-codigo="{{ it.codigo }}"
+            data-unidade="{{ unidade_id }}"
+          >
+            {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
+            <td class="mono">{{ it.codigo }}</td>
+            <td class="desc">{{ it.descricao }}</td>
+            <td class="num param-cell" data-field="estoque_minimo">
+              <span class="param-view">{{ it.estoque_minimo | int }}</span>
+              <input class="param-input" type="number" min="0" step="1" value="{{ it.estoque_minimo | int }}" hidden />
+            </td>
+            <td class="num param-cell" data-field="ponto_pedido">
+              <span class="param-view">{{ it.ponto_pedido | int }}</span>
+              <input class="param-input" type="number" min="0" step="1" value="{{ it.ponto_pedido | int }}" hidden />
+            </td>
+            <td class="num param-cell" data-field="caixa_com">
+              <span class="param-view">{{ it.caixa_com | int }}</span>
+              <input class="param-input" type="number" min="1" step="1" value="{{ it.caixa_com | int }}" hidden />
+            </td>
+            <td class="num col-estoque">
+              {% if it.estoque_aghu is none %}<span class="muted">—</span>{% else %}{{ it.estoque_aghu | int }}{% endif %}
+            </td>
+            <td>
+              {% if it.estoque_aghu is none %}
+                <span class="pill neutro">?</span>
+              {% elif it.pedir %}
+                <span class="pill sim">Sim</span>
+              {% else %}
+                <span class="pill nao">Não</span>
+              {% endif %}
+            </td>
+            <td class="num quanto {% if it.pedir and it.quanto_pedir is not none %}col-qtde-pedir{% endif %}">
+              {% if it.quanto_pedir is not none %}{{ it.quanto_pedir | int }}{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td>
+              <input
+                class="manual-input"
+                type="number"
+                min="0"
+                step="1"
+                data-codigo="{{ it.codigo }}"
+                data-unidade="{{ unidade_id }}"
+                value="{{ it.manual if it.manual is not none else '' }}"
+                placeholder="—"
+              />
+            </td>
+            <td class="actions param-actions">
+              <button type="button" class="btn btn-quiet btn-edit-param">Editar</button>
+              <button type="button" class="btn btn-primary btn-save-param" hidden>Salvar</button>
+              <button type="button" class="btn btn-quiet btn-cancel-param" hidden>Cancelar</button>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="{{ cols }}" class="empty">Nenhum item neste filtro.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <form class="panel-card-body filters" method="get">
-      <input type="hidden" name="unidade" value="{{ unidade_id }}" />
-      <input type="hidden" name="aba" value="{{ aba_atual }}" />
-      <input type="search" name="q" value="{{ q }}" placeholder="Código ou medicamento…" />
-      <select name="filtro" id="filtroSelect" onchange="this.form.submit()">
-        <option value="todos" {% if filtro == 'todos' %}selected{% endif %}>Todos</option>
-        <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
-        <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
-      </select>
-      <a
-        class="btn export-link"
-        id="pdfExportBtn"
-        href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
-      >PDF</a>
-      <a
-        class="btn export-link"
-        id="excelExportBtn"
-        href="{{ url_for('exportar', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
-      >Excel</a>
-    </form>
-  </section>
-
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          {% if ver_todos %}<th>Categoria</th>{% endif %}
-          <th>Cód. AGHU</th>
-          <th>{% if unidade.modelo == 'minimo' %}Item{% else %}Medicamento{% endif %}</th>
-          <th>Est. Mín.</th>
-          <th>Ponto</th>
-          <th>Caixa</th>
-          <th class="col-estoque">Estoque</th>
-          <th>Pedir?</th>
-          <th class="col-qtde">Qtde</th>
-          <th>Manual</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% set cols = 10 + (1 if ver_todos else 0) %}
-        {% for it in itens %}
-        <tr
-          class="item-row {% if it.sem_estoque %}row-sem{% endif %}"
-          data-codigo="{{ it.codigo }}"
-          data-unidade="{{ unidade_id }}"
-        >
-          {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
-          <td class="mono">{{ it.codigo }}</td>
-          <td class="desc">{{ it.descricao }}</td>
-          <td class="num param-cell" data-field="estoque_minimo">
-            <span class="param-view">{{ it.estoque_minimo | int }}</span>
-            <input class="param-input" type="number" min="0" step="1" value="{{ it.estoque_minimo | int }}" hidden />
-          </td>
-          <td class="num param-cell" data-field="ponto_pedido">
-            <span class="param-view">{{ it.ponto_pedido | int }}</span>
-            <input class="param-input" type="number" min="0" step="1" value="{{ it.ponto_pedido | int }}" hidden />
-          </td>
-          <td class="num param-cell" data-field="caixa_com">
-            <span class="param-view">{{ it.caixa_com | int }}</span>
-            <input class="param-input" type="number" min="1" step="1" value="{{ it.caixa_com | int }}" hidden />
-          </td>
-          <td class="num col-estoque">
-            {% if it.estoque_aghu is none %}<span class="muted">—</span>{% else %}{{ it.estoque_aghu | int }}{% endif %}
-          </td>
-          <td>
-            {% if it.estoque_aghu is none %}
-              <span class="pill neutro">?</span>
-            {% elif it.pedir %}
-              <span class="pill sim">Sim</span>
-            {% else %}
-              <span class="pill nao">Não</span>
-            {% endif %}
-          </td>
-          <td class="num quanto {% if it.pedir and it.quanto_pedir is not none %}col-qtde-pedir{% endif %}">
-            {% if it.quanto_pedir is not none %}{{ it.quanto_pedir | int }}{% else %}<span class="muted">—</span>{% endif %}
-          </td>
-          <td>
-            <input
-              class="manual-input"
-              type="number"
-              min="0"
-              step="1"
-              data-codigo="{{ it.codigo }}"
-              data-unidade="{{ unidade_id }}"
-              value="{{ it.manual if it.manual is not none else '' }}"
-              placeholder="—"
-            />
-          </td>
-          <td class="actions param-actions">
-            <button type="button" class="btn btn-quiet btn-edit-param">Editar</button>
-            <button type="button" class="btn btn-primary btn-save-param" hidden>Salvar</button>
-            <button type="button" class="btn btn-quiet btn-cancel-param" hidden>Cancelar</button>
-          </td>
-        </tr>
-        {% else %}
-        <tr>
-          <td colspan="{{ cols }}" class="empty">Nenhum item neste filtro.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
   {% else %}
-  <section class="empty-state" id="secaoMedicamentos">
-    <h2>Lista de medicamentos — {{ unidade.titulo }}</h2>
-    <p>Importe o Excel de pedidos ou cadastre um medicamento para começar.</p>
-    <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
-      <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
-      <button type="button" class="btn" id="btnImportCatalogo">Importar Excel de pedidos</button>
+  <div id="painelInferior" class="painel-inferior" hidden>
+    <div class="painel-inferior-bar">
+      <strong>Lista de medicamentos</strong>
+      <button type="button" class="btn btn-quiet" id="btnFecharLista">Fechar lista</button>
     </div>
-    {% if unidade.dinamica and is_master %}
-    <form
-      method="post"
-      action="{{ url_for('unidades_excluir', uid=unidade_id) }}"
-      style="margin-top:1rem"
-      onsubmit="return confirm('Excluir a unidade {{ unidade.titulo }}?');"
-    >
-      <button type="submit" class="btn btn-quiet">Excluir esta unidade</button>
-    </form>
-    {% endif %}
-  </section>
+    <section class="empty-state" id="secaoMedicamentos">
+      <h2>Lista de medicamentos — {{ unidade.titulo }}</h2>
+      <p>Importe o Excel de pedidos ou cadastre um medicamento para começar.</p>
+      <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
+        <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
+        <button type="button" class="btn" id="btnImportCatalogo">Importar Excel de pedidos</button>
+      </div>
+      {% if unidade.dinamica and is_master %}
+      <form
+        method="post"
+        action="{{ url_for('unidades_excluir', uid=unidade_id) }}"
+        style="margin-top:1rem"
+        onsubmit="return confirm('Excluir a unidade {{ unidade.titulo }}?');"
+      >
+        <button type="submit" class="btn btn-quiet">Excluir esta unidade</button>
+      </form>
+      {% endif %}
+    </section>
+  </div>
   {% endif %}
 
   <div id="modalAddUnidade" class="modal" hidden>
