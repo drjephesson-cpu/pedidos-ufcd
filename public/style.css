@@ -50,6 +50,15 @@ a { color: inherit; }
   gap: 0.7rem;
   align-items: center;
   padding: 0.35rem 0.5rem 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+.brand-logo {
+  width: min(100%, 148px);
+  height: auto;
+  display: block;
+  /* logo preto → claro na sidebar escura */
+  filter: invert(1) brightness(1.05);
 }
 .brand-mark {
   width: 2.35rem;
@@ -783,9 +792,15 @@ td.col-qtde-pedir {
   display: grid;
   gap: 0.8rem;
 }
-.login-brand { text-align: center; display: grid; gap: 0.25rem; justify-items: center; }
-.login-brand h1 { margin: 0; font-size: 1.4rem; }
+.login-brand { text-align: center; display: grid; gap: 0.35rem; justify-items: center; }
+.login-brand h1 { margin: 0; font-size: 1.25rem; }
 .login-brand p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+.login-logo {
+  width: min(240px, 100%);
+  height: auto;
+  display: block;
+  margin-bottom: 0.35rem;
+}
 .login-form { display: grid; gap: 0.65rem; }
 .login-form label { display: grid; gap: 0.25rem; font-size: 0.8rem; font-weight: 700; color: var(--muted); }
 
@@ -951,3 +966,139 @@ html.neon-loading .neon-loader[hidden] {
 @keyframes neon-spin {
   to { transform: rotate(360deg); }
 }
+
+/* —— Página inicial HE-UFPel —— */
+.home-page .main-content {
+  display: grid;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--radius) + 4px);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  min-height: min(62vh, 520px);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+}
+.home-hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 420px at 12% -10%, rgba(13, 107, 76, 0.14), transparent 55%),
+    radial-gradient(700px 380px at 100% 110%, rgba(16, 26, 22, 0.06), transparent 50%),
+    linear-gradient(165deg, #f7faf8 0%, #eef4f0 48%, #e7efea 100%);
+  animation: home-bg-shift 14s ease-in-out infinite alternate;
+}
+.home-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  padding: 2.4rem 1.5rem 2.6rem;
+  display: grid;
+  gap: 0.85rem;
+  justify-items: center;
+  text-align: center;
+  animation: rise 0.55s ease-out both;
+}
+.home-logo {
+  width: min(380px, 88vw);
+  height: auto;
+  display: block;
+  margin-bottom: 0.35rem;
+  animation: home-logo-in 0.7s ease-out both;
+}
+.home-welcome {
+  margin: 0;
+  font-size: clamp(1.55rem, 3.2vw, 2.05rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1.15;
+}
+.home-lead {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+.home-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+  margin-top: 0.55rem;
+  animation: rise 0.65s ease-out 0.12s both;
+}
+.home-cta .btn {
+  min-width: 9.5rem;
+  justify-content: center;
+}
+.home-units {
+  animation: rise 0.6s ease-out 0.18s both;
+}
+.home-units-head {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 0.85rem;
+}
+.home-units-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+.home-units-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.home-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+.home-unit-link {
+  display: grid;
+  gap: 0.28rem;
+  padding: 1rem 1.05rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.home-unit-link:hover {
+  border-color: #b7d4c6;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.home-unit-link strong {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.home-unit-link span {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+@keyframes home-logo-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes home-bg-shift {
+  from { filter: saturate(1); }
+  to { filter: saturate(1.08); }
+}
+@media (max-width: 640px) {
+  .home-hero { min-height: auto; }
+  .home-hero-inner { padding: 1.75rem 1.1rem 2rem; }
+  .home-cta .btn { width: 100%; }
+}
+

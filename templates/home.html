@@ -1,0 +1,47 @@
+{% set nav_active = 'inicio' %}
+{% extends "base.html" %}
+
+{% block title %}Início — HE-UFPel{% endblock %}
+{% block body_class %}home-page{% endblock %}
+{% block page_title %}Início{% endblock %}
+{% block page_sub %}Hospital Escola UFPel{% endblock %}
+
+{% block content %}
+<section class="home-hero" aria-label="Boas-vindas">
+  <div class="home-hero-bg" aria-hidden="true"></div>
+  <div class="home-hero-inner">
+    <img
+      class="home-logo"
+      src="/he-ufpel.png"
+      alt="Hospital Escola UFPel"
+      width="420"
+      height="120"
+    />
+    <h2 class="home-welcome">
+      Bem-vindo{% if user and user.nome %}, {{ user.nome.split()[0] }}{% endif %}
+    </h2>
+    <p class="home-lead">
+      Pedidos de estoque da farmácia hospitalar — escolha uma unidade para começar.
+    </p>
+    <div class="home-cta">
+      <a class="btn btn-primary" href="{{ url_for('index') }}">Abrir pedidos</a>
+      <a class="btn" href="{{ url_for('historico') }}">Ver histórico</a>
+    </div>
+  </div>
+</section>
+
+<section class="home-units" aria-label="Unidades">
+  <header class="home-units-head">
+    <h3>Unidades</h3>
+    <p>Acesse o pedido da sua área</p>
+  </header>
+  <div class="home-unit-grid">
+    {% for uid, ucfg in unidades.items() %}
+    <a class="home-unit-link" href="{{ url_for('index', unidade=uid) }}">
+      <strong>{{ ucfg.titulo }}</strong>
+      <span>{{ ucfg.hint_estoque or 'Pedido de estoque' }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

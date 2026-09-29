@@ -35,6 +35,7 @@ from flask import (
     render_template,
     request,
     send_file,
+    send_from_directory,
     session,
     url_for,
 )
@@ -1273,7 +1274,7 @@ def parse_data_pedido(raw: str | None) -> date:
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("user"):
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
     if request.method == "POST":
         username = request.form.get("username", "")
         password = request.form.get("password", "")
@@ -1282,13 +1283,23 @@ def login():
             session["user"] = user
             session.pop("manuais", None)
             session.pop("extras_manuais", None)
-            nxt = request.args.get("next") or url_for("index")
+            nxt = request.args.get("next") or url_for("home")
             if not nxt.startswith("/"):
-                nxt = url_for("index")
+                nxt = url_for("home")
             flash(f"Olá, {user['nome']}!", "ok")
             return redirect(nxt)
         flash("Usuário ou senha inválidos.", "erro")
     return render_template("login.html")
+
+
+@app.route("/he-ufpel.png")
+def he_ufpel_logo():
+    """Serve o logo na raiz (Vercel public + Flask local)."""
+    for folder in (BASE / "public", BASE / "static"):
+        path = folder / "he-ufpel.png"
+        if path.exists():
+            return send_from_directory(folder, "he-ufpel.png")
+    return ("", 404)
 
 
 @app.route("/logout", methods=["POST", "GET"])
@@ -1436,6 +1447,21 @@ def unidades_excluir(uid: str):
 
 
 @app.route("/")
+@login_required
+def home():
+    """Página inicial de boas-vindas (HE-UFPel) para o profissional logado."""
+    user = current_user() or {}
+    unidades = unidades_todas()
+    return render_template(
+        "home.html",
+        user=user,
+        is_admin=is_admin(),
+        unidades=unidades,
+        usando_neon=using_neon(),
+    )
+
+
+@app.route("/pedidos")
 @login_required
 def index():
     uid = resolve_unidade()

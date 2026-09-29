@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Pedidos UFCD{% endblock %}</title>
+  <title>{% block title %}Pedidos — HE-UFPel{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -39,15 +39,12 @@
   </div>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand">
-        <span class="brand-mark">P</span>
-        <div>
-          <strong>Pedidos</strong>
-          <small>Farmácia hospitalar</small>
-        </div>
-      </div>
+      <a class="sidebar-brand" href="{{ url_for('home') }}">
+        <img class="brand-logo" src="/he-ufpel.png" alt="HE-UFPel" width="132" height="38" />
+      </a>
 
       <nav class="sidebar-nav">
+        <a class="nav-link {% if nav_active == 'inicio' %}active{% endif %}" href="{{ url_for('home') }}">Início</a>
         <a class="nav-link {% if nav_active == 'pedidos' %}active{% endif %}" href="{{ url_for('index') }}">Pedidos</a>
         <a class="nav-link {% if nav_active == 'historico' %}active{% endif %}" href="{{ url_for('historico') }}">Histórico</a>
         {% if is_admin %}
