@@ -18,7 +18,8 @@
     <button type="button" class="btn" disabled title="Nenhum pedido salvo ainda">Ver último pedido</button>
     {% endif %}
     <a class="btn btn-primary" href="#secaoNovoPedido" id="btnCriarNovoPedido">Criar novo pedido</a>
-    <a class="btn" href="#secaoMedicamentos" id="btnVerMedicamentos">Ver lista de medicamentos</a>
+    <button type="button" class="btn" id="btnAddMedicamentoMenu">+ Adicionar medicamento</button>
+    <a class="btn" href="#secaoMedicamentos" id="btnVerMedicamentos">Ver lista</a>
   </div>
 {% endblock %}
 
@@ -79,15 +80,25 @@
 {% endblock %}
 
 {% block content %}
-  <section class="top-cards">
-    <form class="panel-card" action="{{ url_for('importar_estoque') }}" method="post" enctype="multipart/form-data">
+  <section class="top-cards top-cards-pedidos">
+    <form
+      class="panel-card estoque-destaque"
+      action="{{ url_for('importar_estoque') }}"
+      method="post"
+      enctype="multipart/form-data"
+      id="formEstoqueAghu"
+    >
       <input type="hidden" name="unidade" value="{{ unidade_id }}" />
       <div class="panel-card-head">
-        <h2>Estoque {{ 'Bloco' if unidade.modelo == 'minimo' else 'AGHU' }}</h2>
-        <p>{{ unidade.hint_estoque }} · salvo no Neon</p>
+        <h2>Inserir estoque {{ 'do Bloco' if unidade.modelo == 'minimo' else 'AGHU' }}</h2>
+        <p>{{ unidade.hint_estoque }} · atualize com frequência · salvo no Neon</p>
       </div>
-      <div class="panel-card-body">
-        <input type="file" name="arquivo" accept=".xlsx,.xls" required onchange="this.form.classList.add('is-uploading'); this.form.submit()" />
+      <div class="panel-card-body estoque-destaque-body">
+        <label class="estoque-upload">
+          <span class="estoque-upload-title">Escolher arquivo Excel</span>
+          <span class="estoque-upload-hint">.xlsx ou .xls — clique ou arraste aqui</span>
+          <input type="file" name="arquivo" accept=".xlsx,.xls" required onchange="this.form.classList.add('is-uploading'); this.form.submit()" />
+        </label>
         {% if tem_estoque %}
           <span class="meta-pill">{{ estoque_meta.get('itens', 0) }} códigos</span>
         {% else %}
@@ -124,10 +135,13 @@
 
   {% if tem_catalogo %}
   <div id="painelInferior" class="painel-inferior" hidden>
-    <div class="painel-inferior-bar">
-      <strong>Lista de medicamentos</strong>
+    <section class="painel-inferior-bar" id="secaoMedicamentos">
+      <div>
+        <strong>Lista de medicamentos</strong>
+        <p class="muted" style="margin:0.15rem 0 0;font-size:0.82rem">{{ total_catalogo }} itens · {{ abas|length }} categorias</p>
+      </div>
       <button type="button" class="btn btn-quiet" id="btnFecharLista">Fechar lista</button>
-    </div>
+    </section>
 
     <section class="top-cards metrics-cards">
       <div class="panel-card metric-card">
@@ -145,19 +159,6 @@
       <div class="panel-card metric-card">
         <span>Quantidade</span>
         <strong>{{ resumo.qtd_pedir | int }}</strong>
-      </div>
-    </section>
-
-    <section class="top-cards" id="secaoMedicamentos">
-      <div class="panel-card">
-        <div class="panel-card-head">
-          <h2>Lista de medicamentos</h2>
-          <p>{{ total_catalogo }} itens · {{ abas|length }} categorias — use para conferir ou adicionar um novo</p>
-        </div>
-        <div class="panel-card-body" style="gap:0.5rem">
-          <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
-          <button type="button" class="btn btn-quiet" id="btnImportCatalogo">Importar Excel de pedidos</button>
-        </div>
       </div>
     </section>
 
@@ -283,10 +284,9 @@
     </div>
     <section class="empty-state" id="secaoMedicamentos">
       <h2>Lista de medicamentos — {{ unidade.titulo }}</h2>
-      <p>Importe o Excel de pedidos ou cadastre um medicamento para começar.</p>
+      <p>Cadastre o catálogo para começar (manual ou Excel).</p>
       <div style="display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
-        <button type="button" class="btn btn-primary" id="btnAddMedicamento">+ Adicionar medicamento</button>
-        <button type="button" class="btn" id="btnImportCatalogo">Importar Excel de pedidos</button>
+        <button type="button" class="btn btn-primary" id="btnAddMedicamentoMenuEmpty">+ Adicionar medicamento</button>
       </div>
       {% if unidade.dinamica and is_master %}
       <form
@@ -301,6 +301,29 @@
     </section>
   </div>
   {% endif %}
+
+  <div id="modalAddMedicamentoEscolha" class="modal" hidden>
+    <div class="modal-backdrop" data-close-med-escolha></div>
+    <div class="modal-card" role="dialog" aria-labelledby="modalAddMedEscolhaTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalAddMedEscolhaTitle">Adicionar medicamento</h2>
+          <p>Escolha como incluir no catálogo de {{ unidade.titulo }}.</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-med-escolha aria-label="Fechar">×</button>
+      </div>
+      <div class="modal-body med-escolha-grid">
+        <button type="button" class="med-escolha-card" id="btnEscolhaManual">
+          <strong>Manual</strong>
+          <span>Cadastrar um item por vez</span>
+        </button>
+        <button type="button" class="med-escolha-card" id="btnEscolhaExcel">
+          <strong>Importar Excel</strong>
+          <span>Planilha de pedidos (abas A–E)</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div id="modalCatalogo" class="modal" hidden>
     <div class="modal-backdrop" data-close-catalogo></div>

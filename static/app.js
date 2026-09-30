@@ -526,7 +526,7 @@ gravarPedidoDiaEmBackground();
 /* Importar catálogo com preview de abas */
 (function () {
   const modal = document.getElementById("modalCatalogo");
-  const openBtns = document.querySelectorAll("#btnImportCatalogo");
+  const openBtns = document.querySelectorAll("#btnImportCatalogo, #btnEscolhaExcel");
   if (!modal || !openBtns.length) return;
 
   const previewEl = document.getElementById("catalogoPreview");
@@ -683,12 +683,47 @@ gravarPedidoDiaEmBackground();
   });
 })();
 
+/* Escolha: medicamento manual × importar Excel */
+(function () {
+  const escolha = document.getElementById("modalAddMedicamentoEscolha");
+  const openBtns = document.querySelectorAll("#btnAddMedicamentoMenu, #btnAddMedicamentoMenuEmpty");
+  const btnManual = document.getElementById("btnEscolhaManual");
+  const btnExcel = document.getElementById("btnEscolhaExcel");
+  const modalMed = document.getElementById("modalMedicamento");
+  const modalCat = document.getElementById("modalCatalogo");
+  if (!escolha || !openBtns.length) return;
+
+  function openEscolha() {
+    escolha.hidden = false;
+  }
+  function closeEscolha() {
+    escolha.hidden = true;
+  }
+
+  openBtns.forEach((btn) => btn.addEventListener("click", openEscolha));
+  escolha.querySelectorAll("[data-close-med-escolha]").forEach((el) => {
+    el.addEventListener("click", closeEscolha);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !escolha.hidden) closeEscolha();
+  });
+
+  btnManual?.addEventListener("click", () => {
+    closeEscolha();
+    if (modalMed) modalMed.hidden = false;
+  });
+  btnExcel?.addEventListener("click", () => {
+    closeEscolha();
+    if (modalCat) modalCat.hidden = false;
+  });
+})();
+
 /* Medicamento manual no catálogo */
 (function () {
   const modal = document.getElementById("modalMedicamento");
   const openBtns = document.querySelectorAll("#btnAddMedicamento");
   const form = document.getElementById("formMedicamentoManual");
-  if (!modal || !openBtns.length || !form) return;
+  if (!modal || !form) return;
 
   function openModal() {
     modal.hidden = false;
