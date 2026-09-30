@@ -116,7 +116,6 @@ def gerar_pdf_pedido(
         "Ponto",
         "Caixa",
         "Estoque",
-        "Pedir?",
         "Qtde",
     ]
     data = [header]
@@ -135,7 +134,6 @@ def gerar_pdf_pedido(
                 Paragraph(_fmt_num(it.get("ponto_pedido")), cell_center),
                 Paragraph(_fmt_num(it.get("caixa_com")), cell_center),
                 Paragraph(_fmt_num(it.get("estoque_aghu")), cell_center),
-                Paragraph("Sim" if pedir else "Não", cell_center),
                 Paragraph(_fmt_qtd(it.get("quantidade")), cell_center),
             ]
         )
@@ -149,13 +147,12 @@ def gerar_pdf_pedido(
             colWidths=[
                 3.0 * cm,  # categoria
                 1.8 * cm,  # cód
-                9.2 * cm,  # medicamento
+                11.0 * cm,  # medicamento
                 2.0 * cm,  # est mín
                 1.8 * cm,  # ponto
                 1.6 * cm,  # caixa
                 2.0 * cm,  # estoque
-                1.6 * cm,  # pedir
-                1.8 * cm,  # qtde
+                2.0 * cm,  # qtde
             ],
             repeatRows=1,
         )
@@ -179,7 +176,7 @@ def gerar_pdf_pedido(
             ("RIGHTPADDING", (0, 0), (-1, -1), 3),
         ]
         highlight = colors.HexColor("#FDEBD0")
-        qtde_col = 8  # última coluna: Qtde
+        qtde_col = 7  # última coluna: Qtde
         for row in highlight_rows:
             style_cmds.append(("BACKGROUND", (qtde_col, row), (qtde_col, row), highlight))
             style_cmds.append(("FONTNAME", (qtde_col, row), (qtde_col, row), "Helvetica-Bold"))
