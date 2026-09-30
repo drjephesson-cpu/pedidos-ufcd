@@ -35,7 +35,6 @@
           <th>Usuário</th>
           <th>Nome</th>
           <th>Papel</th>
-          <th>Nova senha</th>
           <th>Status</th>
           <th>Criado em</th>
           <th>Ações</th>
@@ -43,62 +42,63 @@
       </thead>
       <tbody>
         {% for u in lista %}
-        <tr class="{% if not u.ativo %}row-sem{% endif %}">
-          <td colspan="7" class="user-edit-cell">
-            <form method="post" action="{{ url_for('usuarios_editar', user_id=u.id) }}" class="user-edit-form">
-              <input
-                class="user-edit-input mono"
-                type="text"
-                name="username"
-                value="{{ u.username }}"
-                required
-                autocomplete="off"
-                title="Login"
-              />
-              <input
-                class="user-edit-input"
-                type="text"
-                name="nome"
-                value="{{ u.nome }}"
-                placeholder="Nome"
-                title="Nome"
-              />
-              <select name="role" class="user-edit-role" title="Papel">
-                <option value="usuario" {% if u.role == 'usuario' %}selected{% endif %}>Usuário</option>
-                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Administrador</option>
-                {% if is_master or u.role == 'master' %}
-                <option value="master" {% if u.role == 'master' %}selected{% endif %}>Master</option>
-                {% endif %}
-              </select>
-              <input
-                class="user-edit-input"
-                type="password"
-                name="password"
-                placeholder="Nova senha (opcional)"
-                autocomplete="new-password"
-                title="Deixe em branco para manter a senha"
-              />
-              {% if u.ativo %}
-                <span class="pill sim">Ativo</span>
-              {% else %}
-                <span class="pill neutro">Inativo</span>
-              {% endif %}
-              <span class="muted user-edit-meta">{{ u.criado_em }}</span>
-              <button type="submit" class="btn btn-primary">Salvar</button>
+        <tr class="user-row {% if not u.ativo %}row-sem{% endif %}" data-user-id="{{ u.id }}">
+          <td class="mono">{{ u.username }}</td>
+          <td>{{ u.nome or '—' }}</td>
+          <td>{{ role_labels.get(u.role, u.role) }}</td>
+          <td>
+            {% if u.ativo %}
+              <span class="pill sim">Ativo</span>
+            {% else %}
+              <span class="pill neutro">Inativo</span>
+            {% endif %}
+          </td>
+          <td class="muted">{{ u.criado_em }}</td>
+          <td class="actions">
+            <button type="button" class="btn btn-quiet btn-edit-user">Editar</button>
+            <form method="post" action="{{ url_for('usuarios_excluir', user_id=u.id) }}" class="inline-form" onsubmit="return confirm('Excluir {{ u.username }}?');">
+              <button type="submit" class="btn btn-danger">Excluir</button>
             </form>
-            <div class="user-edit-side">
-              <form method="post" action="{{ url_for('usuarios_ativo', user_id=u.id) }}" class="inline-form">
-                <input type="hidden" name="ativo" value="{{ 0 if u.ativo else 1 }}" />
-                <button type="submit" class="btn">{{ 'Desativar' if u.ativo else 'Ativar' }}</button>
-              </form>
-              <form method="post" action="{{ url_for('usuarios_excluir', user_id=u.id) }}" class="inline-form" onsubmit="return confirm('Excluir {{ u.username }}?');">
-                <button type="submit" class="btn btn-danger">Excluir</button>
-              </form>
-            </div>
+          </td>
+        </tr>
+        <tr class="user-edit-row {% if not u.ativo %}row-sem{% endif %}" data-user-id="{{ u.id }}" hidden>
+          <td colspan="6">
+            <form method="post" action="{{ url_for('usuarios_editar', user_id=u.id) }}" class="user-edit-form">
+              <label>
+                <span>Login</span>
+                <input class="user-edit-input mono" type="text" name="username" value="{{ u.username }}" required autocomplete="off" />
+              </label>
+              <label>
+                <span>Nome</span>
+                <input class="user-edit-input" type="text" name="nome" value="{{ u.nome }}" placeholder="Nome" />
+              </label>
+              <label>
+                <span>Papel</span>
+                <select name="role" class="user-edit-role">
+                  <option value="usuario" {% if u.role == 'usuario' %}selected{% endif %}>Usuário</option>
+                  <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Administrador</option>
+                  {% if is_master or u.role == 'master' %}
+                  <option value="master" {% if u.role == 'master' %}selected{% endif %}>Master</option>
+                  {% endif %}
+                </select>
+              </label>
+              <label>
+                <span>Nova senha</span>
+                <input class="user-edit-input" type="password" name="password" placeholder="Opcional" autocomplete="new-password" />
+              </label>
+              <div class="user-edit-actions">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="button" class="btn btn-quiet btn-cancel-user">Cancelar</button>
+              </div>
+            </form>
+            <form method="post" action="{{ url_for('usuarios_ativo', user_id=u.id) }}" class="inline-form user-toggle-ativo">
+              <input type="hidden" name="ativo" value="{{ 0 if u.ativo else 1 }}" />
+              <button type="submit" class="btn">{{ 'Desativar' if u.ativo else 'Ativar' }}</button>
+            </form>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="7" class="empty">Nenhum usuário.</td></tr>
+        <tr><td colspan="6" class="empty">Nenhum usuário.</td></tr>
         {% endfor %}
       </tbody>
     </table>

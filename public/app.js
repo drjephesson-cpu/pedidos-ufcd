@@ -775,3 +775,40 @@ gravarPedidoDiaEmBackground();
   sel.addEventListener("change", sync);
   sync();
 })();
+
+/* Usuários: Editar abre o formulário; Cancelar fecha */
+(function () {
+  function editRowFor(viewRow) {
+    const id = viewRow?.dataset?.userId;
+    if (!id) return null;
+    return document.querySelector(`.user-edit-row[data-user-id="${id}"]`);
+  }
+
+  document.querySelectorAll(".btn-edit-user").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const view = btn.closest(".user-row");
+      const edit = editRowFor(view);
+      if (!view || !edit) return;
+      document.querySelectorAll(".user-row.is-editing").forEach((r) => {
+        r.classList.remove("is-editing");
+        const other = editRowFor(r);
+        if (other) other.hidden = true;
+      });
+      view.classList.add("is-editing");
+      edit.hidden = false;
+      edit.querySelector("input[name='username']")?.focus();
+    });
+  });
+
+  document.querySelectorAll(".btn-cancel-user").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const edit = btn.closest(".user-edit-row");
+      const id = edit?.dataset?.userId;
+      if (!edit || !id) return;
+      edit.hidden = true;
+      document
+        .querySelector(`.user-row[data-user-id="${id}"]`)
+        ?.classList.remove("is-editing");
+    });
+  });
+})();
