@@ -33,6 +33,48 @@
       <span>Abrir pedido</span>
     </a>
     {% endfor %}
+    {% if is_master %}
+    <button type="button" class="home-unit-card home-unit-add" id="btnAddUnidade">
+      <strong>+ Adicionar unidade</strong>
+      <span>Nova área de pedidos</span>
+    </button>
+    {% endif %}
   </nav>
 </section>
+
+{% if is_master %}
+<div id="modalAddUnidade" class="modal" hidden>
+  <div class="modal-backdrop" data-close-unidade></div>
+  <div class="modal-card" role="dialog" aria-labelledby="modalAddUnidadeTitle">
+    <div class="modal-head">
+      <div>
+        <h2 id="modalAddUnidadeTitle">Nova unidade</h2>
+        <p>Fica salva no Neon, como UFCD e Centro Cirúrgico.</p>
+      </div>
+      <button type="button" class="icon-btn" data-close-unidade aria-label="Fechar">×</button>
+    </div>
+    <form class="modal-body" method="post" action="{{ url_for('unidades_criar') }}">
+      <label>
+        Nome da unidade
+        <input type="text" name="titulo" required placeholder="Ex.: Pronto Socorro" autofocus />
+      </label>
+      <label>
+        Id (opcional)
+        <input type="text" name="id" placeholder="Gerado do nome (ex.: pronto_socorro)" />
+      </label>
+      <label>
+        Nome do estoque
+        <input type="text" name="hint_estoque" placeholder="Ex.: Estoque Farmácia Central" />
+      </label>
+      <p style="margin:0;font-size:0.82rem;color:var(--muted)">
+        Depois de criar, importe o Excel de pedidos (cada aba vira uma categoria) ou cadastre medicamentos manualmente.
+      </p>
+      <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.4rem">
+        <button type="button" class="btn btn-quiet" data-close-unidade>Cancelar</button>
+        <button type="submit" class="btn btn-primary">Criar unidade</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

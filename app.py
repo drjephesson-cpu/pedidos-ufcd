@@ -1372,12 +1372,12 @@ def unidades_criar():
     raw_id = (request.form.get("id") or "").strip().lower()
     if not titulo:
         flash("Informe o nome da unidade.", "erro")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
     uid = slugify_unidade(raw_id or titulo)
     if uid in _IDS_RESERVADOS or uid in UNIDADES_FIXAS:
         flash(f"O id '{uid}' é reservado. Escolha outro nome ou id.", "erro")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
     # Garante unicidade
     existentes = unidades_todas()
@@ -1388,7 +1388,7 @@ def unidades_criar():
         n += 1
         if n > 50:
             flash("Não foi possível gerar um id único.", "erro")
-            return redirect(url_for("index"))
+            return redirect(url_for("home"))
 
     if not hint:
         hint = "Estoque Farmácia"
@@ -1415,7 +1415,7 @@ def unidades_criar():
         return redirect(url_for("index", unidade=uid))
     except Exception as e:
         flash(f"Erro ao criar unidade: {e}", "erro")
-        return redirect(url_for("index"))
+        return redirect(url_for("home"))
 
 
 @app.route("/unidades/<uid>/excluir", methods=["POST"])

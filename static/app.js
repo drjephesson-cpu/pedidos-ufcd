@@ -360,13 +360,12 @@ if (toggle) {
 document.querySelectorAll(".unit-toggle").forEach((btn) => {
   btn.addEventListener("click", () => {
     const unit = btn.dataset.unit;
-    if (!unit) return;
-    const params = new URLSearchParams(window.location.search);
-    params.set("unidade", unit);
-    params.set("aba", "todos");
-    params.delete("q");
-    NeonLoad.show("Carregando unidade…");
-    window.location.href = `${window.location.pathname}?${params.toString()}`;
+    const panel =
+      document.getElementById("unitCats") ||
+      document.querySelector(`[data-unit-panel="${unit}"]`);
+    const open = btn.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (panel) panel.classList.toggle("is-open", open);
   });
 });
 
