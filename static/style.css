@@ -121,6 +121,9 @@ a { color: inherit; }
   font-weight: 700;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
+  display: block;
+  box-sizing: border-box;
 }
 .btn-add-unit:hover {
   background: rgba(255,255,255,0.06);
