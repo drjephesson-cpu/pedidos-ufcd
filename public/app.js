@@ -142,16 +142,24 @@ document.addEventListener("click", (e) => {
   }
   if (a.hasAttribute("download") || a.target === "_blank") return;
   if (!isInternalNav(a.getAttribute("href"))) return;
-  const path = a.pathname || "";
-  // Export PDF/Excel também passa pelo servidor
+  let path = "";
+  try {
+    path = new URL(a.getAttribute("href"), window.location.origin).pathname;
+  } catch (err) {
+    path = a.pathname || "";
+  }
+  // PDF/Excel: o browser baixa o arquivo sem navegar — o loader não pode ficar eterno
+  if (path.includes("/pdf") || path.includes("/export") || /\.pdf$/i.test(path)) {
+    NeonLoad.show("Gerando arquivo…");
+    window.setTimeout(() => NeonLoad.hide(true), 1600);
+    return;
+  }
   NeonLoad.show(
     path.includes("pedido/ultimo") || /\/historico\/\d+/.test(path)
       ? "Abrindo pedido…"
       : path.includes("historico")
         ? "Carregando histórico…"
-        : path.includes("pdf") || path.includes("export")
-          ? "Gerando arquivo…"
-          : "Carregando Neon…"
+        : "Carregando Neon…"
   );
 });
 
