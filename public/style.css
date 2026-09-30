@@ -10,7 +10,7 @@
   --danger: #9b2c2c;
   --pedir: #fff6ec;
   --estoque: #eaf5fb;
-  --side: #101a16;
+  --side: #0a0a0a;
   --side-w: 250px;
   --radius: 14px;
   --font: "Manrope", system-ui, sans-serif;
@@ -57,8 +57,9 @@ a { color: inherit; }
   width: min(100%, 148px);
   height: auto;
   display: block;
-  /* logo preto → claro na sidebar escura */
-  filter: invert(1) brightness(1.05);
+  /* logo preto-sobre-branco → branco limpo na faixa preta (sem caixa) */
+  filter: invert(1);
+  mix-blend-mode: lighten;
 }
 .brand-mark {
   width: 2.35rem;
@@ -967,27 +968,18 @@ html.neon-loading .neon-loader[hidden] {
   to { transform: rotate(360deg); }
 }
 
-/* —— Página inicial HE-UFPel (plano contínuo, sem caixas) —— */
+/* —— Página inicial HE-UFPel —— */
 .home-page {
-  --home-surface: #f4f7f5;
   --home-ink: #132019;
   --home-muted: #5d6f65;
-  --side: #163028;
+}
+.home-page,
+.home-page .main-area,
+.home-page .main-content {
+  background: #fff;
 }
 .home-page .main-area {
-  background: var(--home-surface);
   position: relative;
-  isolation: isolate;
-}
-.home-page .main-area::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 70% 55% at 18% 8%, rgba(13, 107, 76, 0.11), transparent 60%),
-    radial-gradient(ellipse 55% 45% at 88% 92%, rgba(16, 40, 32, 0.05), transparent 55%);
 }
 .home-page .main-bar {
   background: transparent;
@@ -1018,7 +1010,7 @@ html.neon-loading .neon-loader[hidden] {
   gap: 0;
 }
 .home-stage {
-  width: min(640px, 100%);
+  width: min(720px, 100%);
   display: grid;
   justify-items: center;
   text-align: center;
@@ -1079,29 +1071,41 @@ html.neon-loading .neon-loader[hidden] {
   text-decoration-color: var(--accent);
 }
 .home-units {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.35rem 1.75rem;
-  margin-top: 2.1rem;
-  padding-top: 1.55rem;
-  width: min(520px, 100%);
-  border-top: 1px solid rgba(19, 32, 25, 0.08);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 2rem;
+  width: min(640px, 100%);
   animation: rise 0.65s ease-out 0.28s both;
 }
-.home-unit-link {
-  display: inline-block;
-  padding: 0.35rem 0.15rem;
+.home-unit-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid #e6ebe8;
+  background: #fff;
   text-decoration: none;
-  font-size: 0.98rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: var(--home-ink);
-  text-align: center;
-  transition: color 0.15s ease, transform 0.15s ease;
+  text-align: left;
+  color: inherit;
+  box-shadow: 0 8px 24px rgba(16, 26, 22, 0.04);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
-.home-unit-link:hover {
-  transform: translateY(-1px);
+.home-unit-card:hover {
+  border-color: #b9d4c6;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16, 26, 22, 0.08);
+}
+.home-unit-card strong {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--home-ink);
+  line-height: 1.25;
+}
+.home-unit-card span {
+  font-size: 0.82rem;
+  font-weight: 650;
   color: var(--accent);
 }
 @keyframes home-logo-in {
@@ -1111,7 +1115,7 @@ html.neon-loading .neon-loader[hidden] {
 @media (max-width: 960px) {
   .home-page .main-bar {
     position: sticky;
-    background: color-mix(in srgb, var(--home-surface) 88%, transparent);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
   }
   .home-page .sidebar-toggle { display: inline-flex; }
@@ -1128,9 +1132,7 @@ html.neon-loading .neon-loader[hidden] {
   }
   .home-cta .btn { width: 100%; }
   .home-units {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
+    grid-template-columns: 1fr;
   }
 }
 
