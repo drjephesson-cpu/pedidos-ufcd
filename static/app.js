@@ -719,3 +719,21 @@ gravarPedidoDiaEmBackground();
     }
   });
 })();
+
+/* Layout do PDF: tudo junto × 1 categoria por página */
+(function () {
+  const sel = document.getElementById("pdfLayout");
+  const btn = document.getElementById("pdfExportBtn");
+  if (!sel || !btn) return;
+
+  function sync() {
+    try {
+      const u = new URL(btn.getAttribute("href"), window.location.origin);
+      u.searchParams.set("layout", sel.value);
+      btn.setAttribute("href", u.pathname + u.search);
+    } catch (err) {}
+  }
+
+  sel.addEventListener("change", sync);
+  sync();
+})();
