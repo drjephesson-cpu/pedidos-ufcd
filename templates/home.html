@@ -29,8 +29,7 @@
   <nav class="home-units" aria-label="Unidades">
     {% for uid, ucfg in unidades.items() %}
     <a class="home-unit-link" href="{{ url_for('index', unidade=uid) }}">
-      <strong>{{ ucfg.titulo }}</strong>
-      <span>{{ ucfg.hint_estoque or 'Pedido de estoque' }}</span>
+      {{ ucfg.hint_estoque or ucfg.titulo }}
     </a>
     {% endfor %}
   </nav>

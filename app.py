@@ -97,7 +97,7 @@ UNIDADES_FIXAS = {
         "estoque_file": "estoque_ufcd.json",
         "legacy_estoque": ["estoque_atual.json"],
         "modelo": "ponto",
-        "hint_estoque": "EstoqueFarmacia (saldo farmácia central)",
+        "hint_estoque": "Estoque Farmácia Central",
         "mostra_ponto_caixa": True,
         "aba_ordem": None,  # usa ABA_ORDEM_PADRAO
         "dinamica": False,
@@ -109,7 +109,7 @@ UNIDADES_FIXAS = {
         "estoque_file": "estoque_cc.json",
         "legacy_estoque": [],
         "modelo": "minimo",
-        "hint_estoque": "EstoqueFarmaciaBloco (saldo farmácia do bloco)",
+        "hint_estoque": "Estoque Farmácia do Bloco Cirúrgico",
         "mostra_ponto_caixa": False,
         "aba_ordem": [
             "med_caf",
@@ -1391,7 +1391,7 @@ def unidades_criar():
             return redirect(url_for("index"))
 
     if not hint:
-        hint = "EstoqueFarmacia (saldo farmácia)"
+        hint = "Estoque Farmácia"
 
     try:
         criar_unidade_db(
