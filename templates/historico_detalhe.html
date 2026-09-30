@@ -12,7 +12,32 @@
 {% block top_actions %}
   <a class="btn" href="{{ url_for('index', unidade=pedido.unidade or 'ufcd') }}">Voltar aos pedidos</a>
   <a class="btn" href="{{ url_for('historico', unidade=pedido.unidade or '') }}">Histórico</a>
-  <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=pedido.id) }}">PDF</a>
+  <select id="pdfLayout" class="pdf-layout-select" title="Layout do PDF">
+    <option value="paginas" selected>1 cat./página</option>
+    <option value="junto">Tudo junto</option>
+  </select>
+  <a
+    class="btn btn-primary"
+    id="pdfExportBtn"
+    href="{{ url_for('historico_pdf', pedido_id=pedido.id, layout='paginas') }}"
+  >PDF</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const sel = document.getElementById("pdfLayout");
+  const btn = document.getElementById("pdfExportBtn");
+  if (!sel || !btn) return;
+  function sync() {
+    const u = new URL(btn.href, window.location.origin);
+    u.searchParams.set("layout", sel.value);
+    btn.href = u.pathname + u.search;
+  }
+  sel.addEventListener("change", sync);
+  sync();
+})();
+</script>
 {% endblock %}
 
 {% block content %}

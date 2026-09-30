@@ -1931,11 +1931,20 @@ def pedido_pdf_atual():
         titulo += f" · busca: {q}"
 
     user = current_user() or {}
+    layout = (request.args.get("layout") or "").strip().lower()
+    # padrão: 1 categoria/página quando visão "todos"; senão tudo junto
+    if layout in ("paginas", "pagina", "separado", "1"):
+        separar = True
+    elif layout in ("junto", "tudo", "0"):
+        separar = False
+    else:
+        separar = bool(meta.get("ver_todos"))
     pdf = gerar_pdf_pedido(
         titulo=titulo,
         data_pedido=data_ped.strftime("%d/%m/%Y"),
         usuario=user.get("nome") or user.get("username"),
         itens=itens,
+        separar_paginas=separar,
     )
     return send_file(
         io.BytesIO(pdf),
@@ -2083,12 +2092,15 @@ def historico_pdf(pedido_id: int):
     else:
         data_str = str(data_ped)
         data_iso = str(data_ped)
+    layout = (request.args.get("layout") or "paginas").strip().lower()
+    separar = layout not in ("junto", "tudo", "0")
     pdf = gerar_pdf_pedido(
         titulo=f"Pedido #{pedido_id} — {UNIDADES.get(ped.get('unidade') or 'ufcd', {}).get('titulo') or ped.get('unidade') or 'UFCD'}",
         data_pedido=data_str,
         usuario=ped.get("usuario"),
         itens=ped.get("itens") or [],
         observacao=ped.get("observacao"),
+        separar_paginas=separar,
     )
     return send_file(
         io.BytesIO(pdf),

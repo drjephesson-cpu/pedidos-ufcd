@@ -176,10 +176,14 @@
           <option value="pedir" {% if filtro == 'pedir' %}selected{% endif %}>Só Pedir = Sim</option>
           <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
         </select>
+        <select name="pdf_layout" id="pdfLayout" title="Layout do PDF">
+          <option value="paginas" {% if ver_todos %}selected{% endif %}>PDF · 1 cat./página</option>
+          <option value="junto" {% if not ver_todos %}selected{% endif %}>PDF · tudo junto</option>
+        </select>
         <a
           class="btn export-link"
           id="pdfExportBtn"
-          href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q) }}"
+          href="{{ url_for('pedido_pdf_atual', unidade=unidade_id, aba=aba_atual, filtro=filtro, q=q, layout='paginas' if ver_todos else 'junto') }}"
         >PDF</a>
         <a
           class="btn export-link"

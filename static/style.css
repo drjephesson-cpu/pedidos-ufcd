@@ -268,12 +268,16 @@ a { color: inherit; }
   color: var(--muted);
   font-size: 0.82rem;
 }
-.main-bar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  align-items: center;
-  justify-content: flex-end;
+.main-bar-actions .pdf-layout-select {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.48rem 0.7rem;
+  font: inherit;
+  font-weight: 650;
+  font-size: 0.85rem;
 }
 .acao-rapida {
   display: flex;
