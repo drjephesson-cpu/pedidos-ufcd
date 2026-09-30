@@ -1143,6 +1143,18 @@ html.neon-loading .neon-loader[hidden] {
   min-height: 100dvh;
   overflow: hidden;
 }
+.home-page .app-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.55rem;
+  z-index: 6;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--home-muted);
+  opacity: 0.9;
+}
 .home-page .main-bar {
   background: transparent;
   border-bottom: none;
