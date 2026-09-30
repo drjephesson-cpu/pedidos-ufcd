@@ -1286,7 +1286,6 @@ def login():
             nxt = request.args.get("next") or url_for("home")
             if not nxt.startswith("/"):
                 nxt = url_for("home")
-            flash(f"Olá, {user['nome']}!", "ok")
             return redirect(nxt)
         flash("Usuário ou senha inválidos.", "erro")
     return render_template("login.html")
