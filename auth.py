@@ -264,6 +264,104 @@ class UserStore:
                 return False, "Usuário não encontrado."
         return True, "Senha alterada."
 
+    def update_user(
+        self,
+        user_id: int,
+        *,
+        username: str | None = None,
+        nome: str | None = None,
+        password: str | None = None,
+        role: str | None = None,
+    ) -> tuple[bool, str]:
+        """Atualiza dados do usuário. Senha só muda se informada."""
+        user = self.get_user(user_id)
+        if not user:
+            return False, "Usuário não encontrado."
+
+        actor = current_user() or {}
+        novo_username = (username if username is not None else user["username"] or "").strip()
+        novo_nome = (nome if nome is not None else user.get("nome") or "").strip()
+        if not novo_username:
+            return False, "Informe o login."
+        if not novo_nome:
+            novo_nome = novo_username
+
+        novo_role = role if role is not None else user.get("role") or "usuario"
+        if novo_role not in ROLES:
+            return False, "Papel inválido."
+
+        seed = ADMIN_SEED["username"].lower()
+        uname_atual = (user["username"] or "").lower()
+        if uname_atual == seed and novo_username.lower() != seed:
+            return False, "Não é permitido alterar o login do master principal."
+        if uname_atual == seed and novo_role != "master":
+            return False, "Não é permitido remover o master/desenvolvedor principal."
+        if novo_role == "master" and not is_master(actor):
+            return False, "Somente master pode atribuir o papel Master."
+
+        # Só admin/master podem alterar senha de outros (e a própria nesta tela)
+        nova_senha = (password or "").strip()
+        if nova_senha:
+            if not is_admin():
+                return False, "Somente administrador ou master pode alterar senhas."
+            if len(nova_senha) < 4:
+                return False, "Senha deve ter pelo menos 4 caracteres."
+
+        try:
+            with connect(self._sqlite_path()) as conn:
+                if novo_username.lower() != uname_atual and self._user_exists(
+                    conn, novo_username
+                ):
+                    return False, "Este login já está em uso."
+                params = {
+                    "id": user_id,
+                    "username": novo_username,
+                    "nome": novo_nome,
+                    "role": novo_role,
+                }
+                if nova_senha:
+                    params["password_hash"] = generate_password_hash(nova_senha)
+                    conn.execute(
+                        text(
+                            """
+                            UPDATE users
+                            SET username = :username, nome = :nome, role = :role,
+                                password_hash = :password_hash
+                            WHERE id = :id
+                            """
+                        ),
+                        params,
+                    )
+                else:
+                    conn.execute(
+                        text(
+                            """
+                            UPDATE users
+                            SET username = :username, nome = :nome, role = :role
+                            WHERE id = :id
+                            """
+                        ),
+                        params,
+                    )
+        except IntegrityError:
+            return False, "Este login já está em uso."
+        except Exception as e:
+            return False, f"Erro ao atualizar: {e}"
+
+        # Atualiza sessão se editou a si mesmo
+        if actor.get("id") == user_id:
+            session["user"] = {
+                **actor,
+                "username": novo_username,
+                "nome": novo_nome,
+                "role": novo_role,
+            }
+
+        msg = "Dados atualizados."
+        if nova_senha:
+            msg = "Dados e senha atualizados."
+        return True, msg
+
 
 def login_required(view):
     @wraps(view)

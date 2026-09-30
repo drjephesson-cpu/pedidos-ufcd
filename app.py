@@ -1328,6 +1328,20 @@ def usuarios():
     )
 
 
+@app.route("/usuarios/<int:user_id>/editar", methods=["POST"])
+@admin_required
+def usuarios_editar(user_id: int):
+    ok, msg = users.update_user(
+        user_id,
+        username=request.form.get("username", ""),
+        nome=request.form.get("nome", ""),
+        password=request.form.get("password") or None,
+        role=request.form.get("role"),
+    )
+    flash(msg, "ok" if ok else "erro")
+    return redirect(url_for("usuarios"))
+
+
 @app.route("/usuarios/<int:user_id>/papel", methods=["POST"])
 @admin_required
 def usuarios_papel(user_id: int):
