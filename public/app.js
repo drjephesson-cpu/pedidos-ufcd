@@ -360,20 +360,13 @@ if (toggle) {
 document.querySelectorAll(".unit-toggle").forEach((btn) => {
   btn.addEventListener("click", () => {
     const unit = btn.dataset.unit;
+    if (!unit) return;
     const params = new URLSearchParams(window.location.search);
-    const current = params.get("unidade") || "ufcd";
-    if (unit && unit !== current) {
-      params.set("unidade", unit);
-      params.set("aba", "todos");
-      params.delete("q");
-      NeonLoad.show("Carregando unidade…");
-      window.location.href = `${window.location.pathname}?${params.toString()}`;
-      return;
-    }
-    const panel = document.querySelector(`[data-unit-panel="${unit}"]`);
-    const open = btn.classList.toggle("is-open");
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-    if (panel) panel.classList.toggle("is-open", open);
+    params.set("unidade", unit);
+    params.set("aba", "todos");
+    params.delete("q");
+    NeonLoad.show("Carregando unidade…");
+    window.location.href = `${window.location.pathname}?${params.toString()}`;
   });
 });
 

@@ -27,62 +27,25 @@
     <p class="sidebar-label">Unidades</p>
     <div class="unit-tree">
       {% for uid, ucfg in unidades.items() %}
-      <button
-        type="button"
-        class="unit-toggle {% if unidade_id == uid %}is-open{% endif %}"
-        data-unit="{{ uid }}"
-        aria-expanded="{{ 'true' if unidade_id == uid else 'false' }}"
+      <a
+        class="unit-link {% if unidade_id == uid %}active{% endif %}"
+        href="{{ url_for('index', unidade=uid) }}"
       >
-        <span class="unit-chevron">▸</span>
         <span class="unit-name">{{ ucfg.titulo }}</span>
         {% if contagens_unidade.get(uid, 0) %}
           <em>{{ contagens_unidade[uid] }}</em>
         {% endif %}
-      </button>
-      <div class="unit-children {% if unidade_id == uid %}is-open{% endif %}" data-unit-panel="{{ uid }}">
-        {% if unidade_id == uid and tem_catalogo and abas %}
-        <a
-          class="side-cat {% if aba_atual == 'todos' %}active{% endif %}"
-          href="{{ url_for('index', unidade=unidade_id, aba='todos', filtro=filtro, q=q) }}"
-        >
-          <span>Todos</span>
-          {% if contagens.get('todos', 0) %}<em>{{ contagens['todos'] }}</em>{% endif %}
-        </a>
-        {% for a in abas %}
-        <a
-          class="side-cat {% if a.id == aba_atual %}active{% endif %}"
-          href="{{ url_for('index', unidade=unidade_id, aba=a.id, filtro=filtro, q=q) }}"
-        >
-          <span>{{ a.titulo }}</span>
-          {% if contagens.get(a.id, 0) %}<em>{{ contagens[a.id] }}</em>{% endif %}
-        </a>
-        {% endfor %}
-        {% if is_master and ucfg.dinamica %}
-        <form
-          method="post"
-          action="{{ url_for('unidades_excluir', uid=uid) }}"
-          class="side-cat-form"
-          onsubmit="return confirm('Excluir a unidade {{ ucfg.titulo }}? Esta ação não remove o histórico já salvo.');"
-        >
-          <button type="submit" class="side-cat danger">Excluir unidade</button>
-        </form>
-        {% endif %}
-        {% else %}
-        <a class="side-cat" href="{{ url_for('index', unidade=uid) }}">
-          <span>Abrir unidade</span>
-        </a>
-        {% if is_master and ucfg.dinamica %}
-        <form
-          method="post"
-          action="{{ url_for('unidades_excluir', uid=uid) }}"
-          class="side-cat-form"
-          onsubmit="return confirm('Excluir a unidade {{ ucfg.titulo }}? Esta ação não remove o histórico já salvo.');"
-        >
-          <button type="submit" class="side-cat danger">Excluir unidade</button>
-        </form>
-        {% endif %}
-        {% endif %}
-      </div>
+      </a>
+      {% if is_master and ucfg.dinamica and unidade_id == uid %}
+      <form
+        method="post"
+        action="{{ url_for('unidades_excluir', uid=uid) }}"
+        class="side-cat-form"
+        onsubmit="return confirm('Excluir a unidade {{ ucfg.titulo }}? Esta ação não remove o histórico já salvo.');"
+      >
+        <button type="submit" class="side-cat danger">Excluir unidade</button>
+      </form>
+      {% endif %}
       {% endfor %}
     </div>
     <button type="button" class="btn-add-unit" id="btnAddUnidade">+ Adicionar unidade</button>
