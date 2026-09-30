@@ -1363,7 +1363,7 @@ def usuarios_senha(user_id: int):
 
 
 @app.route("/unidades/criar", methods=["POST"])
-@login_required
+@admin_required
 def unidades_criar():
     titulo = (request.form.get("titulo") or "").strip()
     # Modelo vem do Excel/catálogo importado; padrão = ponto (como UFCD)

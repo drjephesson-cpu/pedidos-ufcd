@@ -33,22 +33,22 @@
       <span>Abrir pedido</span>
     </a>
     {% endfor %}
-    {% if is_master %}
+    {% if is_admin %}
     <button type="button" class="home-unit-card home-unit-add" id="btnAddUnidade">
-      <strong>+ Adicionar unidade</strong>
+      <strong>+ Adicionar estoque</strong>
       <span>Nova área de pedidos</span>
     </button>
     {% endif %}
   </nav>
 </section>
 
-{% if is_master %}
+{% if is_admin %}
 <div id="modalAddUnidade" class="modal" hidden>
   <div class="modal-backdrop" data-close-unidade></div>
   <div class="modal-card" role="dialog" aria-labelledby="modalAddUnidadeTitle">
     <div class="modal-head">
       <div>
-        <h2 id="modalAddUnidadeTitle">Nova unidade</h2>
+        <h2 id="modalAddUnidadeTitle">Novo estoque / unidade</h2>
         <p>Fica salva no Neon, como UFCD e Centro Cirúrgico.</p>
       </div>
       <button type="button" class="icon-btn" data-close-unidade aria-label="Fechar">×</button>
@@ -71,7 +71,7 @@
       </p>
       <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.4rem">
         <button type="button" class="btn btn-quiet" data-close-unidade>Cancelar</button>
-        <button type="submit" class="btn btn-primary">Criar unidade</button>
+        <button type="submit" class="btn btn-primary">Criar</button>
       </div>
     </form>
   </div>
