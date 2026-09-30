@@ -293,15 +293,15 @@ function highlightSection(el) {
   setTimeout(() => el.classList.remove("is-focus"), 1600);
 }
 
-function mostrarPainelInferior(abrir) {
+function mostrarPainelInferior(abrir, opts) {
   const painel = document.getElementById("painelInferior");
   if (!painel) return;
   painel.hidden = !abrir;
   try {
     if (abrir) sessionStorage.setItem("mostrar_lista_med", "1");
-    else sessionStorage.removeItem("mostrar_lista_med");
+    else sessionStorage.setItem("mostrar_lista_med", "0");
   } catch (err) {}
-  if (abrir) {
+  if (abrir && opts?.scroll !== false) {
     painel.scrollIntoView({ behavior: "smooth", block: "start" });
     highlightSection(painel);
   }
@@ -309,13 +309,10 @@ function mostrarPainelInferior(abrir) {
 
 document.getElementById("btnCriarNovoPedido")?.addEventListener("click", (e) => {
   e.preventDefault();
-  // não abre a lista — só o formulário de novo pedido
   try {
     sessionStorage.setItem("foco_novo_pedido", "1");
-    sessionStorage.removeItem("mostrar_lista_med");
   } catch (err) {}
   const params = new URLSearchParams(window.location.search);
-  params.delete("lista");
   params.delete("q");
   if (!params.get("aba")) params.set("aba", "todos");
   window.location.href = `${window.location.pathname}?${params.toString()}#secaoNovoPedido`;
@@ -331,17 +328,15 @@ document.getElementById("btnFecharLista")?.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-// Mantém lista aberta após filtrar / trocar aba (?lista=1 ou session)
+// Lista visível por padrão; só esconde se o usuário fechou nesta sessão
 (function () {
   const params = new URLSearchParams(window.location.search);
-  let abrir = params.get("lista") === "1";
+  let abrir = true;
   try {
-    if (sessionStorage.getItem("mostrar_lista_med") === "1") abrir = true;
+    if (sessionStorage.getItem("mostrar_lista_med") === "0") abrir = false;
   } catch (err) {}
-  if (abrir) {
-    const painel = document.getElementById("painelInferior");
-    if (painel) painel.hidden = false;
-  }
+  if (params.get("lista") === "1") abrir = true;
+  mostrarPainelInferior(abrir, { scroll: false });
 })();
 
 // Após "Criar novo pedido"
