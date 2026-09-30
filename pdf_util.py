@@ -73,13 +73,13 @@ def gerar_pdf_pedido(
         parent=styles["Heading1"],
         fontSize=15,
         spaceAfter=4,
-        textColor=colors.HexColor("#143d2f"),
+        textColor=colors.black,
     )
     sub_style = ParagraphStyle(
         "SubUFCD",
         parent=styles["Normal"],
         fontSize=9,
-        textColor=colors.HexColor("#3d5a4c"),
+        textColor=colors.black,
         spaceAfter=3,
     )
     cell_style = ParagraphStyle(
@@ -87,6 +87,7 @@ def gerar_pdf_pedido(
         parent=styles["Normal"],
         fontSize=7.5,
         leading=9,
+        textColor=colors.black,
     )
     cell_center = ParagraphStyle(
         "CellCenterUFCD",
@@ -157,30 +158,33 @@ def gerar_pdf_pedido(
             repeatRows=1,
         )
         style_cmds = [
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#143d2f")),
+            ("BACKGROUND", (0, 0), (-1, 0), colors.black),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
             ("FONTSIZE", (0, 0), (-1, 0), 8),
             ("FONTSIZE", (0, 1), (-1, -1), 7.5),
+            ("TEXTCOLOR", (0, 1), (-1, -1), colors.black),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("GRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#b7c9bf")),
+            ("GRID", (0, 0), (-1, -1), 0.4, colors.black),
             (
                 "ROWBACKGROUNDS",
                 (0, 1),
                 (-1, -1),
-                [colors.white, colors.HexColor("#f3f8f5")],
+                [colors.white, colors.Color(0.92, 0.92, 0.92)],
             ),
             ("TOPPADDING", (0, 0), (-1, -1), 3),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
             ("LEFTPADDING", (0, 0), (-1, -1), 3),
             ("RIGHTPADDING", (0, 0), (-1, -1), 3),
         ]
-        highlight = colors.HexColor("#FDEBD0")
-        qtde_col = 7  # última coluna: Qtde
+        # Qtde a pedir: cinza claro + negrito (sem cor)
+        qtde_col = 7
         for row in highlight_rows:
-            style_cmds.append(("BACKGROUND", (qtde_col, row), (qtde_col, row), highlight))
+            style_cmds.append(
+                ("BACKGROUND", (qtde_col, row), (qtde_col, row), colors.Color(0.85, 0.85, 0.85))
+            )
             style_cmds.append(("FONTNAME", (qtde_col, row), (qtde_col, row), "Helvetica-Bold"))
-            style_cmds.append(("TEXTCOLOR", (qtde_col, row), (qtde_col, row), colors.HexColor("#8a3b00")))
+            style_cmds.append(("TEXTCOLOR", (qtde_col, row), (qtde_col, row), colors.black))
 
         table.setStyle(TableStyle(style_cmds))
         story.append(table)
