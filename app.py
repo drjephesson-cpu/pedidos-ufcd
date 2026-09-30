@@ -67,6 +67,7 @@ from db import (
     load_catalogo_unidade_db,
     load_estoque_db,
     obter_pedido,
+    delete_catalogo_parametro,
     save_catalogo_parametro,
     save_catalogo_unidade_db,
     save_estoque_db,
@@ -1833,9 +1834,20 @@ def api_manual():
 def api_parametros():
     data = request.get_json(force=True)
     uid = resolve_unidade(data.get("unidade"))
-    cod = str(data.get("codigo") or "").strip()
-    if not cod:
+    cod_atual = str(data.get("codigo") or "").strip()
+    if not cod_atual:
         return jsonify({"ok": False, "erro": "Código inválido."}), 400
+
+    cod_novo_raw = data.get("codigo_novo")
+    if cod_novo_raw in (None, ""):
+        cod_novo_raw = cod_atual
+    cod_novo = normaliza_codigo(cod_novo_raw)
+    if not cod_novo:
+        return jsonify({"ok": False, "erro": "Código AGHU inválido."}), 400
+
+    descricao = (data.get("descricao") or "").strip()
+    aba_titulo = (data.get("aba") or data.get("aba_titulo") or "").strip()
+
     try:
         est_min = float(data.get("estoque_minimo"))
         ponto = float(data.get("ponto_pedido"))
@@ -1846,10 +1858,109 @@ def api_parametros():
         return jsonify(
             {"ok": False, "erro": "Est. mínimo e ponto ≥ 0; caixa deve ser > 0."}
         ), 400
+
+    catalogo = load_catalogo(uid)
+    catalogo.setdefault("abas", [])
+    catalogo.setdefault("itens", {})
+
+    found_aba_id = None
+    found_idx = None
+    found_item = None
+    for aba in catalogo["abas"]:
+        lista = catalogo["itens"].get(aba["id"], []) or []
+        for i, it in enumerate(lista):
+            if str(it.get("codigo")) == cod_atual:
+                found_aba_id = aba["id"]
+                found_idx = i
+                found_item = dict(it)
+                break
+        if found_item is not None:
+            break
+
+    if found_item is None:
+        return jsonify({"ok": False, "erro": "Item não encontrado no catálogo."}), 404
+
+    # Título atual da aba de origem
+    aba_titulo_atual = next(
+        (a.get("titulo") or found_aba_id for a in catalogo["abas"] if a["id"] == found_aba_id),
+        found_aba_id,
+    )
+    if not aba_titulo:
+        aba_titulo = aba_titulo_atual
+    if not descricao:
+        descricao = (found_item.get("descricao") or "").strip()
+    if not descricao:
+        return jsonify({"ok": False, "erro": "Informe o nome do medicamento."}), 400
+
+    dest_aba_id = _aba_id_from_name(aba_titulo)
+    codigo_mudou = str(cod_novo) != str(cod_atual)
+    aba_mudou = dest_aba_id != found_aba_id
+
+    # Conflito se o novo código já existe em outro item
+    if codigo_mudou:
+        for aba in catalogo["abas"]:
+            for it in catalogo["itens"].get(aba["id"], []) or []:
+                if str(it.get("codigo")) == str(cod_novo):
+                    return jsonify(
+                        {
+                            "ok": False,
+                            "erro": f"Já existe item com o Cód. AGHU {cod_novo}.",
+                        }
+                    ), 400
+
+    novo_item = {
+        **found_item,
+        "codigo": int(cod_novo) if str(cod_novo).isdigit() else cod_novo,
+        "descricao": descricao,
+        "estoque_minimo": est_min,
+        "ponto_pedido": ponto,
+        "caixa_com": caixa,
+    }
+
+    # Remove da aba antiga
+    origem = catalogo["itens"].get(found_aba_id, []) or []
+    if found_idx is not None and 0 <= found_idx < len(origem):
+        origem.pop(found_idx)
+    catalogo["itens"][found_aba_id] = origem
+
+    # Garante aba destino
+    if dest_aba_id not in catalogo["itens"]:
+        catalogo["itens"][dest_aba_id] = []
+        catalogo["abas"].append(
+            {"id": dest_aba_id, "titulo": aba_titulo, "count": 0}
+        )
+
+    catalogo["itens"][dest_aba_id].append(novo_item)
+
+    # Atualiza títulos/contagens e remove abas vazias
+    vivos = []
+    for a in catalogo["abas"]:
+        aid = a["id"]
+        lista = catalogo["itens"].get(aid, []) or []
+        a["count"] = len(lista)
+        if aid == dest_aba_id:
+            a["titulo"] = aba_titulo
+        if lista:
+            vivos.append(a)
+        else:
+            catalogo["itens"].pop(aid, None)
+    if not any(a["id"] == dest_aba_id for a in vivos):
+        vivos.append(
+            {
+                "id": dest_aba_id,
+                "titulo": aba_titulo,
+                "count": len(catalogo["itens"].get(dest_aba_id, []) or []),
+            }
+        )
+    catalogo["abas"] = vivos
+
     try:
+        save_catalogo(catalogo, uid)
+        if codigo_mudou:
+            delete_catalogo_parametro(uid, cod_atual, sqlite_path=_db_path())
         save_catalogo_parametro(
             uid,
-            cod,
+            str(cod_novo),
             estoque_minimo=est_min,
             ponto_pedido=ponto,
             caixa_com=caixa,
@@ -1857,8 +1968,31 @@ def api_parametros():
         )
     except Exception as e:
         return jsonify({"ok": False, "erro": str(e)}), 500
+
+    # Migra valor manual na sessão se o código mudou
+    if codigo_mudou:
+        try:
+            manuais = manuais_da_unidade(uid)
+            if cod_atual in manuais:
+                set_manual_unidade(uid, str(cod_novo), manuais[cod_atual])
+                set_manual_unidade(uid, cod_atual, None)
+        except Exception:
+            pass
+
     _cache_del_prefix(f"params:{uid}")
-    return jsonify({"ok": True})
+    _catalogo_cache.clear()
+    return jsonify(
+        {
+            "ok": True,
+            "codigo": int(cod_novo) if str(cod_novo).isdigit() else cod_novo,
+            "descricao": descricao,
+            "aba": aba_titulo,
+            "aba_id": dest_aba_id,
+            "codigo_mudou": codigo_mudou,
+            "aba_mudou": aba_mudou,
+            "reload": codigo_mudou or aba_mudou,
+        }
+    )
 
 
 @app.route("/manual/extra", methods=["POST"])

@@ -198,7 +198,7 @@
       <table>
         <thead>
           <tr>
-            {% if ver_todos %}<th>Categoria</th>{% endif %}
+            <th>Categoria</th>
             <th>Cód. AGHU</th>
             <th>{% if unidade.modelo == 'minimo' %}Item{% else %}Medicamento{% endif %}</th>
             <th>Est. Mín.</th>
@@ -212,16 +212,33 @@
           </tr>
         </thead>
         <tbody>
-          {% set cols = 10 + (1 if ver_todos else 0) %}
+          {% set cols = 11 %}
           {% for it in itens %}
           <tr
             class="item-row {% if it.sem_estoque %}row-sem{% endif %}"
             data-codigo="{{ it.codigo }}"
             data-unidade="{{ unidade_id }}"
+            data-aba-id="{{ it.aba_id or '' }}"
+            data-aba="{{ it.aba or '' }}"
           >
-            {% if ver_todos %}<td class="cat-cell">{{ it.aba }}</td>{% endif %}
-            <td class="mono">{{ it.codigo }}</td>
-            <td class="desc">{{ it.descricao }}</td>
+            <td class="cat-cell param-cell" data-field="aba">
+              <span class="param-view">{{ it.aba or '—' }}</span>
+              <input
+                class="param-input cat-input"
+                type="text"
+                list="listaAbasUnidade"
+                value="{{ it.aba or '' }}"
+                hidden
+              />
+            </td>
+            <td class="mono param-cell" data-field="codigo_novo">
+              <span class="param-view">{{ it.codigo }}</span>
+              <input class="param-input codigo-input" type="text" value="{{ it.codigo }}" hidden />
+            </td>
+            <td class="desc param-cell" data-field="descricao">
+              <span class="param-view">{{ it.descricao }}</span>
+              <input class="param-input desc-input" type="text" value="{{ it.descricao }}" hidden />
+            </td>
             <td class="num param-cell" data-field="estoque_minimo">
               <span class="param-view">{{ it.estoque_minimo | int }}</span>
               <input class="param-input" type="number" min="0" step="1" value="{{ it.estoque_minimo | int }}" hidden />

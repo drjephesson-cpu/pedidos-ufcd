@@ -681,6 +681,20 @@ td.col-qtde-pedir {
   text-align: right;
   background: #fff;
 }
+.param-input.codigo-input {
+  width: 6.5rem;
+  text-align: left;
+  font-family: ui-monospace, monospace;
+}
+.param-input.desc-input {
+  width: min(18rem, 100%);
+  text-align: left;
+}
+.param-input.cat-input {
+  width: 9.5rem;
+  text-align: left;
+  font-size: 0.8rem;
+}
 .param-actions {
   display: flex;
   flex-wrap: wrap;

@@ -409,11 +409,17 @@ document.querySelectorAll(".item-row").forEach((row) => {
     const payload = {
       unidade: row.dataset.unidade,
       codigo: row.dataset.codigo,
+      aba_id: row.dataset.abaId || "",
     };
     row.querySelectorAll(".param-cell").forEach((cell) => {
       const field = cell.dataset.field;
       const input = cell.querySelector(".param-input");
-      if (field && input) payload[field] = Number(input.value);
+      if (!field || !input) return;
+      if (field === "estoque_minimo" || field === "ponto_pedido" || field === "caixa_com") {
+        payload[field] = Number(input.value);
+      } else {
+        payload[field] = input.value.trim();
+      }
     });
     saveBtn.disabled = true;
     try {
@@ -424,7 +430,7 @@ document.querySelectorAll(".item-row").forEach((row) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         },
-        "Salvando parâmetros no Neon…"
+        "Salvando item no Neon…"
       );
       const data = await res.json();
       if (!res.ok || !data.ok) {
@@ -432,15 +438,34 @@ document.querySelectorAll(".item-row").forEach((row) => {
         saveBtn.disabled = false;
         return;
       }
+      if (data.reload) {
+        window.location.reload();
+        return;
+      }
       row.querySelectorAll(".param-cell").forEach((cell) => {
         const view = cell.querySelector(".param-view");
         const input = cell.querySelector(".param-input");
-        if (view && input) view.textContent = String(Math.trunc(Number(input.value) || 0));
+        if (!view || !input) return;
+        const field = cell.dataset.field;
+        if (field === "estoque_minimo" || field === "ponto_pedido" || field === "caixa_com") {
+          view.textContent = String(Math.trunc(Number(input.value) || 0));
+        } else {
+          view.textContent = input.value.trim();
+        }
       });
+      if (data.codigo != null) {
+        row.dataset.codigo = String(data.codigo);
+        const manual = row.querySelector(".manual-input");
+        if (manual) manual.dataset.codigo = String(data.codigo);
+      }
+      if (data.aba) {
+        row.dataset.aba = data.aba;
+        row.dataset.abaId = data.aba_id || row.dataset.abaId || "";
+      }
       setRowEditing(row, false);
       saveBtn.disabled = false;
     } catch (err) {
-      alert("Erro ao salvar parâmetros.");
+      alert("Erro ao salvar item.");
       saveBtn.disabled = false;
     }
   });

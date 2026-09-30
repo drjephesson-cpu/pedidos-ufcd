@@ -720,6 +720,23 @@ def save_catalogo_parametro(
             )
 
 
+def delete_catalogo_parametro(
+    unidade: str,
+    codigo: str,
+    sqlite_path: Path | None = None,
+) -> None:
+    with connect(sqlite_path) as conn:
+        conn.execute(
+            text(
+                """
+                DELETE FROM catalogo_parametros
+                WHERE unidade = :unidade AND codigo = :codigo
+                """
+            ),
+            {"unidade": unidade, "codigo": str(codigo)},
+        )
+
+
 def load_estoque_db(unidade: str, sqlite_path: Path | None = None) -> dict | None:
     """Retorna {saldos, meta} do banco, ou None se não houver."""
     import json
