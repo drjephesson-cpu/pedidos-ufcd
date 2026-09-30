@@ -1271,6 +1271,46 @@ def parse_data_pedido(raw: str | None) -> date:
     return date.today()
 
 
+def format_data_br(value, with_time: bool = False) -> str:
+    """Formata data/hora no padrão brasileiro DD/MM/AAAA (e HH:MM se with_time)."""
+    if value is None or value == "":
+        return "—"
+    if isinstance(value, datetime):
+        return value.strftime("%d/%m/%Y %H:%M" if with_time else "%d/%m/%Y")
+    if isinstance(value, date):
+        return value.strftime("%d/%m/%Y")
+    s = str(value).strip()
+    if not s:
+        return "—"
+    # ISO datetime: 2026-09-30T19:53:46... ou com espaço / timezone
+    m = re.match(
+        r"^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?)?",
+        s,
+    )
+    if m:
+        y, mo, d, hh, mm = m.groups()
+        if with_time and hh is not None:
+            return f"{d}/{mo}/{y} {hh}:{mm}"
+        return f"{d}/{mo}/{y}"
+    # Já em DD/MM/AAAA…
+    m2 = re.match(r"^(\d{2}/\d{2}/\d{4})(?:\s+(\d{2}:\d{2}))?", s)
+    if m2:
+        if with_time and m2.group(2):
+            return f"{m2.group(1)} {m2.group(2)}"
+        return m2.group(1)
+    return s
+
+
+@app.template_filter("data_br")
+def data_br_filter(value):
+    return format_data_br(value, with_time=False)
+
+
+@app.template_filter("datahora_br")
+def datahora_br_filter(value):
+    return format_data_br(value, with_time=True)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if session.get("user"):
@@ -1518,14 +1558,7 @@ def index():
     ultimo = ultimo_pedido_info(uid)
     ultimo_txt = None
     if ultimo:
-        dp = ultimo.get("data_pedido")
-        if hasattr(dp, "strftime"):
-            data_str = dp.strftime("%d/%m/%Y")
-        else:
-            data_str = str(dp or "")[:10]
-            if len(data_str) == 10 and "-" in data_str:
-                y, m, d = data_str.split("-")
-                data_str = f"{d}/{m}/{y}"
+        data_str = format_data_br(ultimo.get("data_pedido"))
         user_str = (ultimo.get("usuario") or "").strip() or "—"
         pid = ultimo.get("id")
         try:
@@ -2099,12 +2132,11 @@ def historico_pdf(pedido_id: int):
         flash("Pedido não encontrado.", "erro")
         return redirect(url_for("historico"))
     data_ped = ped["data_pedido"]
-    if hasattr(data_ped, "strftime"):
-        data_str = data_ped.strftime("%d/%m/%Y")
+    data_str = format_data_br(data_ped)
+    if hasattr(data_ped, "isoformat"):
         data_iso = data_ped.isoformat()
     else:
-        data_str = str(data_ped)
-        data_iso = str(data_ped)
+        data_iso = str(data_ped)[:10]
     layout = (request.args.get("layout") or "paginas").strip().lower()
     separar = layout not in ("junto", "tudo", "0")
     pdf = gerar_pdf_pedido(

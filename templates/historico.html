@@ -63,7 +63,7 @@
               {% for p in ug.pedidos %}
               <tr>
                 <td class="mono">{{ p.id }}</td>
-                <td><strong>{{ p.data_pedido.strftime('%d/%m/%Y') if p.data_pedido.strftime is defined else p.data_pedido }}</strong></td>
+                <td><strong>{{ p.data_pedido | data_br }}</strong></td>
                 <td class="hist-abas">
                   {% for a in p.abas_lista %}
                     <span class="meta-pill">{{ a }}</span>
@@ -73,7 +73,7 @@
                 </td>
                 <td class="num">{{ p.qtd_itens }}</td>
                 <td class="num col-qtde-pedir">{{ p.qtd_total | int }}</td>
-                <td class="muted">{{ p.criado_em }}</td>
+                <td class="muted">{{ p.criado_em | datahora_br }}</td>
                 <td class="actions">
                   <a class="btn" href="{{ url_for('historico_detalhe', pedido_id=p.id) }}">Abrir</a>
                   <a class="btn btn-primary" href="{{ url_for('historico_pdf', pedido_id=p.id) }}">PDF</a>

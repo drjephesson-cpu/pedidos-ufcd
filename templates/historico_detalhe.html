@@ -5,7 +5,7 @@
 {% block page_title %}Pedido #{{ pedido.id }}{% endblock %}
 {% block page_sub %}
   {{ unidade_titulo }}
-  · {{ pedido.data_pedido.strftime('%d/%m/%Y') if pedido.data_pedido.strftime is defined else pedido.data_pedido }}
+  · {{ pedido.data_pedido | data_br }}
   · {{ pedido.usuario or '—' }}
 {% endblock %}
 

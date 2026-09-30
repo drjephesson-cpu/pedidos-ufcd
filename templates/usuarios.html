@@ -53,7 +53,7 @@
               <span class="pill neutro">Inativo</span>
             {% endif %}
           </td>
-          <td class="muted">{{ u.criado_em }}</td>
+          <td class="muted">{{ u.criado_em | datahora_br }}</td>
           <td class="actions">
             <button type="button" class="btn btn-quiet btn-edit-user">Editar</button>
             <form method="post" action="{{ url_for('usuarios_excluir', user_id=u.id) }}" class="inline-form" onsubmit="return confirm('Excluir {{ u.username }}?');">
